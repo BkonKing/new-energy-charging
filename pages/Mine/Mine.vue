@@ -67,34 +67,16 @@
 		<!-- 头部底图色 -->
 		<view class="myimg"></view>
 		<!-- 底部自定义tabBar -->
-		<view class="tmenu">
-			<view class="tm40">
-				<view @click="index">
-					<image src="../../static/image/bar_01.png" mode="widthFix"></image>
-					<text>首页</text>
-				</view>
-				<view @click="sitelist">
-					<image src="../../static/image/bar_02.png" mode="widthFix"></image>
-					<text>站点</text>
-				</view>
-			</view>
-			<view class="tmscan" @click="scango"><image src="../../static/image/scan.png" mode="widthFix"></image></view>
-			<view class="tm40">
-				<view @click="wait">
-					<image src="../../static/image/bar_03.png" mode="widthFix"></image>
-					<text>商城</text>
-				</view>
-				<view>
-					<image src="../../static/image/bar_04a.png" mode="widthFix"></image>
-					<text>我的</text>
-				</view>
-			</view>
-		</view>
+		<custom-tab-bar></custom-tab-bar>
 	</view>
 </template>
 
 <script>
+import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 export default {
+	components: {
+		CustomTabBar
+	},
 	data() {
 		return {
 			isshow: false
@@ -102,18 +84,6 @@ export default {
 	},
 	onLoad() {},
 	methods: {
-		// 前往首页
-		index() {
-			uni.navigateTo({
-				url: '../Index/Index'
-			});
-		},
-		// 前往站点
-		sitelist() {
-			uni.navigateTo({
-				url: '../Site/Sitelist'
-			});
-		},
 		// 前往登录
 		login() {
 			uni.navigateTo({
@@ -127,10 +97,10 @@ export default {
 			});
 		},
 		// 前往我的爱车
-		mycar(){
+		mycar() {
 			uni.navigateTo({
-				url:'../Car/Carlist'
-			})
+				url: '../Car/Carlist'
+			});
 		},
 		// 前往我的订单
 		order() {
@@ -168,35 +138,23 @@ export default {
 				url: '../Wallet/Cashin'
 			});
 		},
-		// 扫码前往
-		scango() {
+		// 前往故障报修
+		fixsent() {
 			uni.navigateTo({
-				url: '../Charge/Paychos'
+				url: './Fixsent'
 			});
 		},
-		// 前往故障报修
-		fixsent(){
-			uni.navigateTo({
-				url:'./Fixsent'
-			})
-		},
 		// 联系客服
-		contact(){
+		contact() {
 			uni.navigateTo({
-				url:'./Contact'
-			})
+				url: './Contact'
+			});
 		},
 		// 前往发票报销
-		billitem(){
+		billitem() {
 			uni.navigateTo({
-				url:'../Bill/Billitem'
-			})
-		},
-		// 前往开发中页面
-		wait(){
-		  uni.navigateTo({
-		  	url:'../Other/Wait'
-		  })
+				url: '../Bill/Billitem'
+			});
 		}
 	}
 };
@@ -330,61 +288,15 @@ export default {
 	}
 }
 // 登出
-.loginout{
+.loginout {
 	text-align: center;
 	line-height: 3;
 	font-size: 28rpx;
 	color: #33b048;
-}
-// 底部tabbar
-.tmenu {
-	width: 100%;
-	background: #fff;
-	padding: 0rpx 0;
-	line-height: 30rpx;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	z-index: 100;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.1);
-	.tm40 {
-		width: 38%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		view {
-			width: 50%;
-			display: flex;
-			align-items: center;
-			flex-direction: column;
-			padding: 20rpx 0;
-			font-size: 22rpx;
-			color: #555;
-			image {
-				width: 46rpx;
-				height: 46rpx;
-			}
-		}
-	}
-	.tmscan {
-		width: 24%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		image {
-			width: 170rpx;
-			height: 170rpx;
-			margin-top: -60rpx;
-		}
-	}
 }
 .cleard {
 	clear: both;
 	display: block;
 	height: 200rpx;
 }
-
 </style>

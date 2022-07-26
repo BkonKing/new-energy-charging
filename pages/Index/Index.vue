@@ -66,29 +66,7 @@
 		<!-- 输入电桩编码 -->
 		<view class="enterbm" @click="inputcode">输入电桩编码</view>
 		<!-- 底部自定义tabBar -->
-		<view class="tmenu">
-			<view class="tm40">
-				<view>
-					<image src="../../static/image/bar_01a.png" mode="widthFix"></image>
-					<text>首页</text>
-				</view>
-				<view @click="sitelist">
-					<image src="../../static/image/bar_02.png" mode="widthFix"></image>
-					<text>站点</text>
-				</view>
-			</view>
-			<view class="tmscan" @click="scango"><image src="../../static/image/scan.png" mode="widthFix"></image></view>
-			<view class="tm40">
-				<view @click="wait">
-					<image src="../../static/image/bar_03.png" mode="widthFix"></image>
-					<text>商城</text>
-				</view>
-				<view @click="mine">
-					<image src="../../static/image/bar_04.png" mode="widthFix"></image>
-					<text>我的</text>
-				</view>
-			</view>
-		</view>
+		<custom-tab-bar></custom-tab-bar>
 		<!-- 地图 -->
 		<map
 			id="myMap"
@@ -108,9 +86,11 @@
 </template>
 
 <script>
+import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue'
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 export default {
 	components: {
+		CustomTabBar,
 		cCircle
 	},
 	data() {
@@ -197,28 +177,10 @@ export default {
 				url: '../Charge/Inputcode'
 			});
 		},
-		// 前往站点
-		sitelist() {
-			uni.navigateTo({
-				url: '../Site/Sitelist'
-			});
-		},
 		// 前往电站详情
 		sitedetail() {
 			uni.navigateTo({
 				url: '../../pages/Site/Sitedetail'
-			});
-		},
-		// 前往我的
-		mine() {
-			uni.navigateTo({
-				url: '../Mine/Mine'
-			});
-		},
-		// 扫码前往
-		scango() {
-			uni.navigateTo({
-				url: '../Charge/Paychos'
 			});
 		},
 		// 前往充电中
@@ -227,13 +189,6 @@ export default {
 				url: '../Charge/Charge'
 			});
 		},
-		// 前往开发中页面
-		wait() {
-			uni.navigateTo({
-				url: '../Other/Wait'
-			});
-		},
-
 		//   初次位置授权
 		getAuthorize() {
 			return new Promise((resolve, reject) => {
@@ -250,14 +205,16 @@ export default {
 		},
 		// 确认授权后，获取用户位置
 		getLocationInfo() {
-			const that = this;
-			uni.getLocation({
-				type: 'wgs84',
-				success: function(res) {
-					console.log('当前位置的经度：' + res.longitude);
-					console.log('当前位置的纬度：' + res.latitude);
-				}
-			});
+			return new Promise((resolve, reject) => {
+				uni.getLocation({
+					type: 'wgs84',
+					success: (res) => {
+						console.log('当前位置的经度：' + res.longitude);
+						console.log('当前位置的纬度：' + res.latitude);
+						resolve(res)
+					}
+				});
+			})
 		},
 		// 拒绝授权后，弹框提示是否手动打开位置授权
 		openConfirm() {
@@ -295,6 +252,14 @@ export default {
 		tap() {
 			console.log('站点浮框消失');
 			this.siteshow = false;
+		},
+		onControltap() {
+			this.getLocationInfo().then((res) => {
+				console.log(res)
+				const { longitude, latitude } = res
+				this.myMap.latitude = latitude
+				this.myMap.longitude = longitude
+			})
 		},
 		// 前往地图APP
 		gomap(e) {
@@ -566,50 +531,5 @@ export default {
 	bottom: 150rpx;
 	z-index: 101;
 	box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
-}
-// 底部tabbar
-.tmenu {
-	width: 100%;
-	background: #fff;
-	padding: 0rpx 0;
-	line-height: 30rpx;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	z-index: 100;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.1);
-	.tm40 {
-		width: 38%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		view {
-			width: 50%;
-			display: flex;
-			align-items: center;
-			flex-direction: column;
-			padding: 20rpx 0;
-			font-size: 22rpx;
-			color: #555;
-			image {
-				width: 46rpx;
-				height: 46rpx;
-			}
-		}
-	}
-	.tmscan {
-		width: 24%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		image {
-			width: 170rpx;
-			height: 170rpx;
-			margin-top: -60rpx;
-		}
-	}
 }
 </style>
