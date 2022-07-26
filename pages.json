@@ -1,0 +1,250 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/Index/Index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Site/Sitelist",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Charge/Charge",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/Site/Sitedetail",
+			"style": {
+				"navigationBarTitleText": "电站详情"
+			}
+		},
+		{
+			"path": "pages/Site/Terminal",
+			"style": {
+				"navigationBarTitleText": "终端列表"
+			}
+		},
+		{
+			"path": "pages/Charge/Inputcode",
+			"style": {
+				"navigationBarTitleText": "输入充电桩编码"
+			}
+		},
+		{
+			"path": "pages/Charge/Paychos",
+			"style": {
+				"navigationBarTitleText": "支付选择"
+			}
+		},
+		{
+			"path": "pages/Charge/PayYsq",
+			"style": {
+				"navigationBarTitleText": "预授权"
+			}
+		},
+		{
+			"path": "pages/Mine/Mine",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/Wallet/Wallet",
+			"style": {
+				"navigationBarTitleText": "我的钱包"
+			}
+		},
+		{
+			"path": "pages/Wallet/Txdetail",
+			"style": {
+				"navigationBarTitleText": "明细"
+			}
+		},
+		{
+			"path": "pages/Wallet/Cashin",
+			"style": {
+				"navigationBarTitleText": "充值"
+			}
+		},
+		{
+			"path": "pages/Wallet/Cashout",
+			"style": {
+				"navigationBarTitleText": "余额提现"
+			}
+		},
+		{
+			"path": "pages/Car/Carlist",
+			"style": {
+				"navigationBarTitleText": "我的爱车"
+			}
+		},
+		{
+			"path": "pages/Car/Carbind",
+			"style": {
+				"navigationBarTitleText": "绑定爱车"
+			}
+		},
+		{
+			"path": "pages/Car/Carnum",
+			"style": {
+				"navigationBarTitleText": "车牌号"
+			}
+		},
+		{
+			"path": "pages/Car/Carstyle",
+			"style": {
+				"navigationBarTitleText": "选择车型"
+			}
+		},
+		{
+			"path": "pages/Car/CarstyleSch",
+			"style": {
+				"navigationBarTitleText": "搜索车型"
+			}
+		},
+		{
+			"path": "pages/Car/Carother",
+			"style": {
+				"navigationBarTitleText": "其他车型反馈"
+			}
+		},
+		{
+			"path": "pages/Car/Carkind",
+			"style": {
+			}
+		},
+		{
+			"path": "pages/Car/Carchos",
+			"style": {
+			}
+		},
+		{
+			"path": "pages/Order/Orderlist",
+			"style": {
+				"navigationBarTitleText": "我的订单"
+			}
+		},
+		{
+			"path": "pages/Order/Orderlist_fix",
+			"style": {
+				"navigationBarTitleText": "我的订单"
+			}
+		},
+		{
+			"path": "pages/Order/Orderdetail",
+			"style": {
+				"navigationBarTitleText": "订单详情",
+				"navigationBarBackgroundColor": "#eff0f1"
+			}
+		},
+		{
+			"path": "pages/Order/Orderchart",
+			"style": {
+				"navigationBarTitleText": "充电曲线",
+				"navigationBarBackgroundColor": "#eff0f1"
+			}
+		},
+		{
+			"path": "pages/Site/Sitefav",
+			"style": {
+				"navigationBarTitleText": "收藏电站"
+			}
+		},
+		{
+			"path": "pages/Renz/Renzname",
+			"style": {
+				"navigationBarTitleText": "实名认证"
+			}
+		},
+		{
+			"path": "pages/Renz/Renzcard",
+			"style": {
+				"navigationBarTitleText": "我的银行卡"
+			}
+		},
+		{
+			"path": "pages/Renz/RenzcardDel",
+			"style": {
+				"navigationBarTitleText": "银行卡"
+			}
+		},
+		{
+			"path": "pages/Renz/RenzcardAdd",
+			"style": {
+				"navigationBarTitleText": "绑定银行卡"
+			}
+		},
+		{
+			"path": "pages/Bill/Billitem",
+			"style": {
+				"navigationBarTitleText": "发票报销"
+			}
+		},
+		{
+			"path": "pages/Bill/Billchose",
+			"style": {
+				"navigationBarTitleText": "选择订单"
+			}
+		},
+		{
+			"path": "pages/Bill/Billopen",
+			"style": {
+				"navigationBarTitleText": "开具发票"
+			}
+		},
+		{
+			"path": "pages/Bill/Billhistory",
+			"style": {
+				"navigationBarTitleText": "开票历史"
+			}
+		},
+		{
+			"path": "pages/Bill/Billdetail",
+			"style": {
+				"navigationBarTitleText": "发票详情"
+			}
+		},
+		{
+			"path": "pages/Mine/Fixsent",
+			"style": {
+				"navigationBarTitleText": "故障报修"
+			}
+		},
+		{
+			"path": "pages/Mine/Search",
+			"style": {
+				"navigationBarTitleText": "搜索"
+			}
+		},
+		{
+			"path": "pages/Mine/Contact",
+			"style": {
+				"navigationBarTitleText": "联系客服"
+			}
+		},
+		{
+			"path": "pages/Other/Wait",
+			"style": {
+				"navigationBarTitleText": "正在开发中"
+			}
+		},
+		{
+			"path": "pages/Login/Login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#ffffff",
+		"backgroundColor": "#ffffff"
+	}
+}

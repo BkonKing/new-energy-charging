@@ -1,0 +1,9 @@
+{
+    "id": "z-modal",
+    "name": "modal弹框",
+    "version": "1.0.0",
+    "description": "自定义的modal弹框，自定义按钮组，内容支持文字、input、textarea，支持输入内容校验",
+    "keywords": [
+        "modal，弹框，校验，自定义"
+    ]
+}

@@ -1,0 +1,595 @@
+@import '~@/uni.scss';
+
+page,
+view,
+scroll-view,
+text,
+image,
+textarea,
+button,
+input {
+	box-sizing: border-box !important;
+}
+
+page {
+	width: 100%;
+	height: 100%;
+	background: #eff0f1;
+	font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+}
+
+.container {
+	clear: both;
+	width: 100%;
+	height: 100%;
+}
+
+button {
+	margin: 0;
+
+	&[type='primary'] {
+		background-color: $uni-color-primary;
+		color: #ffffff;
+		font-size: $uni-font-size-base;
+
+		&[disabled] {
+			background-color: #d1d78c;
+		}
+
+		&[plain] {
+			color: $uni-color-primary;
+			border: 1rpx solid $uni-color-primary;
+
+			&.button-hover {
+				color: rgba($color: $uni-color-primary, $alpha: 0.5);
+				border: 1rpx solid rgba($color: $uni-color-primary, $alpha: 0.5);
+			}
+		}
+
+		&.button-hover {
+			background-color: #d5da91;
+		}
+
+		&::after {
+			border: 0;
+		}
+	}
+
+	&[type='default'] {
+		&[plain] {
+			color: $uni-text-color-grey;
+			border: 1rpx solid $uni-text-color-grey;
+
+			&.button-hover {
+				color: rgba($color: $uni-text-color-grey, $alpha: 0.5);
+				border: 1rpx solid rgba($color: $uni-text-color-grey, $alpha: 0.5);
+			}
+		}
+	}
+}
+
+uni-toast {
+	z-index: 10002;
+}
+
+.uni-mask {
+}
+
+uni-modal,
+uni-modal .uni-modal {
+}
+
+.uni-picker-container .uni-picker {
+}
+
+.bg-base {
+	background-color: $uni-bg-color;
+}
+
+.bg-white {
+	background-color: #ffffff;
+}
+
+.bg-transparent {
+	background-color: transparent !important;
+}
+
+.bg-primary {
+	background-color: $uni-color-primary;
+}
+
+.bg-warning {
+	background-color: $uni-color-warning;
+}
+
+.d-flex {
+	display: flex;
+}
+
+.d-none {
+	display: none !important;
+}
+
+.invisible {
+	visibility: hidden !important;
+}
+
+.d-inline {
+	display: inline !important;
+}
+
+.d-inline-block {
+	display: inline-block !important;
+}
+
+.d-block {
+	display: block !important;
+}
+
+.flex-column {
+	-ms-flex-direction: column !important;
+	flex-direction: column !important;
+}
+
+.justify-content-start {
+	justify-content: flex-start;
+}
+
+.justify-content-end {
+	justify-content: flex-end;
+}
+
+.justify-content-between {
+	justify-content: space-between;
+}
+
+.just-content-center {
+	justify-content: center;
+}
+
+.justify-content-evenly {
+	justify-content: space-evenly !important;
+}
+
+.just-content-around {
+	justify-content: space-around;
+}
+
+.align-items-start {
+	align-items: flex-start;
+}
+
+.align-items-end {
+	align-items: flex-end;
+}
+
+.align-items-center {
+	align-items: center;
+}
+
+.align-items-between {
+	align-items: space-between;
+}
+
+.align-items-around {
+	align-items: space-around;
+}
+
+.align-items-stretch {
+	align-items: stretch;
+}
+
+.align-items-baseline {
+	-ms-flex-align: baseline !important;
+	align-items: baseline !important;
+}
+
+.flex-fill {
+	-ms-flex: 1 1 auto !important;
+	flex: 1 1 auto !important;
+}
+
+.flex-wrap {
+	-ms-flex-wrap: wrap !important;
+	flex-wrap: wrap !important;
+}
+
+.flex-nowrap {
+	-ms-flex-wrap: nowrap !important;
+	flex-wrap: nowrap !important;
+}
+
+.flex-shrink-0 {
+	-ms-flex-negative: 0 !important;
+	flex-shrink: 0 !important;
+}
+
+.uni-font-size-base {
+	font-size: 28rpx;
+}
+
+.font-size-sm {
+	font-size: 24rpx;
+}
+
+.font-size-medium {
+	font-size: 26rpx;
+}
+
+.font-size-lg {
+	font-size: 32rpx;
+}
+
+.font-size-extra-lg {
+	font-size: 40rpx;
+}
+
+.uni-text-color {
+	color: $uni-text-color;
+}
+
+.uni-text-color-grey {
+	color: $uni-text-color-grey;
+}
+
+.text-uni-color-primary {
+	color: $uni-color-primary;
+}
+
+.text-color-danger {
+	color: $uni-color-error;
+}
+
+.text-color-white {
+	color: #ffffff;
+}
+
+.text-uni-color-warning {
+	color: $uni-color-warning;
+}
+
+.text-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.font-weight-bold {
+	font-weight: 700 !important;
+}
+
+.font-weight-light {
+	font-weight: 300 !important;
+}
+
+.font-weight-lighter {
+	font-weight: lighter !important;
+}
+
+.font-weight-normal {
+	font-weight: 400 !important;
+}
+
+.overflow-auto {
+	overflow: auto !important;
+}
+
+.overflow-hidden {
+	overflow: hidden !important;
+}
+
+.position-relative {
+	position: relative !important;
+}
+
+.position-absolute {
+	position: absolute !important;
+}
+
+.position-fixed {
+	position: fixed !important;
+}
+
+.fixed-top {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	z-index: 1030;
+}
+
+.fixed-bottom {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1030;
+}
+.posretiv {
+	position: relative;
+}
+.line-height-100 {
+	line-height: 100%;
+}
+
+.line-height-2 {
+	line-height: 2rem !important;
+}
+
+.line-height-50 {
+	line-height: 50rem !important;
+}
+
+.w-20 {
+	width: 20% !important;
+}
+.w-25 {
+	width: 25% !important;
+}
+
+.w-30 {
+	width: 30%;
+}
+.w-40 {
+	width: 40% !important;
+}
+
+.w-50 {
+	width: 50% !important;
+}
+
+.w-60 {
+	width: 60%;
+}
+
+.w-70 {
+	width: 70%;
+}
+
+.w-75 {
+	width: 75% !important;
+}
+
+.w-80 {
+	width: 80% !important;
+}
+
+.w-90 {
+	width: 90% !important;
+}
+
+.w-100 {
+	width: 100% !important;
+}
+
+.h-100 {
+	height: 100% !important;
+}
+
+.h-auto {
+	height: auto !important;
+}
+
+.text-left {
+	text-align: left !important;
+}
+
+.text-right {
+	text-align: right !important;
+}
+
+.text-center {
+	text-align: center !important;
+}
+
+.border-box {
+	box-sizing: border-box;
+}
+
+.rounded-circle {
+	border-radius: 50% !important;
+}
+
+.rounded-pill {
+	border-radius: 50rem !important;
+}
+
+.uni-border-radius-base {
+	border-radius: $uni-border-radius-base;
+}
+
+.pre-line {
+	white-space: pre-line;
+}
+
+.align-top {
+	vertical-align: top !important;
+}
+
+.align-middle {
+	vertical-align: middle !important;
+}
+
+.align-bottom {
+	vertical-align: bottom !important;
+}
+
+.align-text-bottom {
+	vertical-align: text-bottom !important;
+}
+
+.align-text-top {
+	vertical-align: text-top !important;
+}
+
+.mb-10 {
+	margin-bottom: 10rpx;
+}
+
+.mb-15 {
+	margin-bottom: 15rpx;
+}
+.mb-20 {
+	margin-bottom: 20rpx;
+}
+
+.mb-30 {
+	margin-bottom: 30rpx;
+}
+
+.mb-40 {
+	margin-bottom: 40rpx;
+}
+
+.mb-50 {
+	margin-bottom: 50rpx;
+}
+
+.mt-20 {
+	margin-top: 20rpx;
+}
+.mt-30 {
+	margin-top: 30rpx;
+}
+
+.mt-40 {
+	margin-top: 40rpx;
+}
+
+.ml-10 {
+	margin-left: 10rpx;
+}
+
+.ml-20 {
+	margin-left: 20rpx;
+}
+
+.ml-30 {
+	margin-left: 30rpx;
+}
+
+.mr-10 {
+	margin-right: 10rpx;
+}
+
+.mr-20 {
+	margin-right: 20rpx;
+}
+
+.mr-30 {
+	margin-right: 30rpx;
+}
+
+.mr-40 {
+	margin-right: 40rpx;
+}
+
+.pl-20 {
+	padding-left: 20rpx;
+}
+
+.pl-30 {
+	padding-left: 30rpx;
+}
+
+.pr-20 {
+	padding-right: 20rpx;
+}
+
+.p-30 {
+	padding: 30rpx;
+}
+
+.p-10 {
+	padding: 10rpx;
+}
+.ellipsis {
+	white-space: nowrap; /* 规定文本是否折行 */
+	overflow: hidden; /* 规定超出内容宽度的元素隐藏 */
+	text-overflow: ellipsis;
+}
+.disflex {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.disflex2 {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+}
+.disflex3 {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+.disflex4 {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+.disflex5 {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.disflex6 {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+button.combutton,
+uni-button.combutton {
+	line-height: 90rpx;
+	font-size: 34rpx;
+	width: 100%;
+	background: #33b048;
+	color: #fff;
+	font-weight: 500;
+	border: 1px solid #33b048;
+	border-radius: 100rpx;
+}
+.clearh {
+	clear: both;
+	display: block;
+	height: 160rpx;
+}
+
+/****************自适应start****************/
+/****************自适应start****************/
+/****************自适应start****************/
+/* 4s */
+@media only screen and (max-width: 320px) {
+}
+/* 5s */
+@media only screen and (min-width: 320px) and (max-width: 352px) {
+}
+/*--------------------------*/
+/* huawei 畅享6 */
+@media only screen and (min-width: 352px) and (max-width: 360px) {
+}
+/* 6 － 375  */
+@media only screen and (min-width: 361px) and (max-width: 384px) {
+}
+/* 6p */
+@media only screen and (min-width: 384px) and (max-width: 416px) {
+}
+/* 6寸 */
+@media only screen and (min-width: 416px) and (max-width: 448px) {
+}
+/* 6.5 寸 */
+@media only screen and (min-width: 448px) and (max-width: 480px) {
+}
+/* 7寸屏幕 */
+@media only screen and (min-width: 480px) and (max-width: 512px) {
+}
+@media only screen and (min-width: 512px) and (max-width: 544px) {
+}
+@media only screen and (min-width: 544px) and (max-width: 576px) {
+}
+@media only screen and (min-width: 576px) and (max-width: 608px) {
+}
+@media only screen and (min-width: 608px) and (max-width: 640px) {
+}
+@media only screen and (min-width: 640px) {
+}
