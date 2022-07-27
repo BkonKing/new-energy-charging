@@ -1,5 +1,6 @@
 <template>
 	<view class="container">
+    <uni-nav-bar title="首页" :border="false" statusBar="false"></uni-nav-bar>
 		<!-- 浮动显示 -->
 		<view class="float">
 			<!-- 定位搜索 -->

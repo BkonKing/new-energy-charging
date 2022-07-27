@@ -12,6 +12,12 @@
 				"navigationStyle": "custom"
 			}
 		},
+    {
+    	"path": "pages/Other/Wait",
+    	"style": {
+        "navigationStyle": "custom"
+    	}
+    },
 		{
 			"path": "pages/Charge/Charge",
 			"style": {
@@ -226,12 +232,6 @@
 			"path": "pages/Mine/Contact",
 			"style": {
 				"navigationBarTitleText": "联系客服"
-			}
-		},
-		{
-			"path": "pages/Other/Wait",
-			"style": {
-				"navigationBarTitleText": "正在开发中"
 			}
 		},
 		{

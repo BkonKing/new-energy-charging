@@ -8,7 +8,7 @@
 		<view class="ordul" v-for="t in 5" v-else>
 			<view class="stcode">
 				<text>充电桩编码：12345465456</text>
-				<image src="../../static/image/ico_10.png" mode="widthFix"></image>
+				<image src="../../static/image/ico_10.png" mode="widthFix" @click="setClipboardData(t)"></image>
 			</view>
 			<view @click="orderdetail">
 				<view class="stname">
@@ -47,6 +47,14 @@ export default {
 	},
 	onLoad() {},
 	methods: {
+    setClipboardData(data) {
+      uni.setClipboardData({
+      	data,
+      	success: function () {
+      		console.log('success');
+      	}
+      });
+    },
 		// 前往去充电首页
 		gosy() {
 			uni.navigateTo({

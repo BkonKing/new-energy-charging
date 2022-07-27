@@ -1,5 +1,6 @@
 <template>
 	<view class="container">
+    <uni-nav-bar title="正在开发中" :border="false" statusBar="false"></uni-nav-bar>
 		<view class="waitimg">
 			<image src="../../static/image/wait.gif" mode="widthFix"></image>
 			<view>商城开发中，敬请期待!</view>

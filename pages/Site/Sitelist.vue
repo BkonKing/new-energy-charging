@@ -1,5 +1,6 @@
 <template>
 	<view class="container" @touchmove.stop.prevent="moveHandle">
+    <uni-nav-bar title="站点" :border="false" statusBar="false"></uni-nav-bar>
 		<!-- 顶部搜索+筛选 -->
 		<view class="shead">
 			<!-- 定位搜索 -->

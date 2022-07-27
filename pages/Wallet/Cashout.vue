@@ -5,12 +5,12 @@
 				<view>提现金额</view>
 				<view class="outip disflex4">
 					<text>￥</text>
-					<input placeholder="0.00" type="digit" />
+					<input v-model="outMoney" placeholder="0.00" type="digit" />
 				</view>
 			</view>
 			<view class="cotip">
-				<text>可提现金额：￥20.01</text>
-				<text class="alltx">全部提现</text>
+				<text>可提现金额：￥{{allMoney}}</text>
+				<text class="alltx" @click="cashOutAll">全部提现</text>
 			</view>
 			<button class="suretx" @click="$refs.popA.show()">2小时内到账，确定提现</button>
 		</view>
@@ -25,7 +25,7 @@
 			<view class="tcwarp">
 				<view class="taxtA">
 					<view>余额提现</view>
-					<view class="taxnum">13.12</view>
+					<view class="taxnum">{{outMoney}}</view>
 				</view>
 				<scroll-view scroll-y="true" class="Dview">
 					<!-- 原路返回 -->
@@ -87,11 +87,16 @@ export default {
 	},
 	data() {
 		return {
-			isshow: true
+			isshow: true,
+      allMoney: 20.01,
+      outMoney: undefined
 		};
 	},
 	onLoad() {},
 	methods: {
+    cashOutAll() {
+      this.outMoney = this.allMoney
+    },
 		watchOpen() {},
 		watchClose() {},
 
@@ -161,7 +166,7 @@ export default {
 			uni-input {
 				color: #333;
 				width: 80%;
-				font-size: 80rpx;
+				font-size: 52rpx;
 				padding: 0rpx 0;
 			}
 			.uni-input-placeholder {
