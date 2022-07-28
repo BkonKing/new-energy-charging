@@ -228,6 +228,7 @@ export default {
 		button.ycz,
 		uni-button.ycz {
 			width: 25%;
+      height: 70rpx;
 			line-height: 70rpx;
 			font-size: 30rpx;
 			background: #33b048;
@@ -239,6 +240,7 @@ export default {
 		button.ytx,
 		uni-button.ytx {
 			width: 25%;
+      height: 70rpx;
 			line-height: 70rpx;
 			font-size: 30rpx;
 			background: #fff;

@@ -15,7 +15,7 @@
 				<text>1234</text>
 			</view>
 		</view>
-		<button class="suredel">解绑银行卡</button>
+		<button class="suredel" @click="unbound">解绑银行卡</button>
 	</view>
 </template>
 
@@ -25,7 +25,13 @@ export default {
 		return {};
 	},
 	onLoad() {},
-	methods: {}
+	methods: {
+    unbound() {
+      this.$tip.confirm('是否解除当前银行卡').then(() => {
+        
+      })
+    }
+  }
 };
 </script>
 

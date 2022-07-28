@@ -1,4 +1,4 @@
-const BASE_URL = 'http://8.142.149.12' // 开发环境
+const BASE_URL = 'http://localhost:9999/nenergy/api/v1' // 开发环境
 
 // const BASE_URL = 'https://wushui.cloudoptek.com' // 生产环境
 

@@ -49,7 +49,7 @@ export default {
 	methods: {
     setClipboardData(data) {
       uni.setClipboardData({
-      	data,
+      	data: `${data}`,
       	success: function () {
       		console.log('success');
       	}

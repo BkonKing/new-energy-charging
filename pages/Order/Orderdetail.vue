@@ -11,7 +11,7 @@
 			</view>
 			<view class="disflex4">
 				<text>订单编号：113564564546546456</text>
-				<text class="tcope">复制</text>
+				<text class="tcope" @click="setClipboardData()">复制</text>
 			</view>
 		</view>
 		<!-- 费用信息 -->
@@ -95,7 +95,7 @@
 				</view>
 				<view class="zdcode">
 					<text>终端编号：1321321131</text>
-					<text class="zdcope">复制</text>
+					<text class="zdcope" @click="setClipboardData">复制</text>
 				</view>
 			</view>
 		</view>
@@ -111,6 +111,14 @@ export default {
 	},
 	onLoad() {},
 	methods: {
+    setClipboardData(data) {
+      uni.setClipboardData({
+      	data: `${data}`,
+      	success: function () {
+      		console.log('success');
+      	}
+      });
+    },
 		// 前往充电曲线
 		orderchart() {
 			uni.navigateTo({

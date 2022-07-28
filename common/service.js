@@ -1,7 +1,7 @@
-import Request from '@/js_sdk/luch-request/index.js'
+import Request from '@/js_sdk/luch-request/luch-request/index.js'
 import {
   ACCESS_TOKEN
-} from '@/common/util/constants.js'
+} from '@/common/constants.js'
 import config from './config.js'
 import tip from '@/common/tip.js';
 // import api from '@/api/api.js';

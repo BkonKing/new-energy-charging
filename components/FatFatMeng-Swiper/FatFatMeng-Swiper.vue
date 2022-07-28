@@ -58,7 +58,7 @@
 			},
 			swiperStyleClass: {
 				type:Array,
-				default:''
+				default:() => []
 			},
 			swiperClassName: {
 				type:String,
@@ -81,7 +81,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	// 老项目样式---直接删除即可
 	// .swiperClassX {
 	// 	display: flex;
