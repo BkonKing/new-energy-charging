@@ -1,0 +1,24 @@
+{
+  "name": "new-energy-charging",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BkonKing/new-energy-charging.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BkonKing/new-energy-charging/issues"
+  },
+  "homepage": "https://github.com/BkonKing/new-energy-charging#readme",
+  "dependencies": {
+    "luch-request": "^3.0.7",
+    "uni-read-pages": "^1.0.5",
+    "uni-simple-router": "^2.0.8-beta.4"
+  }
+}

@@ -2,31 +2,31 @@
 	<view class="dylist">
 		<view class="leader">
 			<view class="ltitle">
-				<view @tap="changeShowType(1)" :class="showType == 1 ? 'activeContentA' : ''"><view>快充（空闲6 | 共24）</view></view>
-				<view @tap="changeShowType(2)" :class="showType == 2 ? 'activeContentB' : ''"><view>慢充（空闲3 | 共10）</view></view>
+				<view @tap="changeShowType(0)" :class="showType == 0 ? 'activeContentA' : ''"><view>快充（空闲6 | 共24）</view></view>
+				<view @tap="changeShowType(1)" :class="showType == 1 ? 'activeContentB' : ''"><view>慢充（空闲3 | 共10）</view></view>
 			</view>
 		</view>
 		<!-- 多个tab切换的时候，注意插件的isTab属性， 它可以用来防止两个tab之间用手滑动时造成的误操作-->
-		<swiper :current="showType - 1" @change="onChange">
-			<swiper-item><TerminalK ref="TerminalK"></TerminalK></swiper-item>
-			<swiper-item><TerminalM ref="TerminalM"></TerminalM></swiper-item>
+		<swiper :current="showType" @change="onChange">
+			<swiper-item><Terminal type="fast" ref="TerminalK"></Terminal></swiper-item>
+			<swiper-item><Terminal type="slow" ref="TerminalM"></Terminal></swiper-item>
 		</swiper>
 	</view>
 </template>
 
 <script>
 import hrPullLoad from '@/components/hr-pull-load/hr-pull-load.vue'; //加载
-import TerminalK from '../../components/Site/TerminalK.vue'; //快充
-import TerminalM from '../../components/Site/TerminalM.vue'; //慢充
+import Terminal from './components/Terminal.vue'; //快充
+// import TerminalM from './components/TerminalM.vue'; //慢充
 export default {
 	components: {
 		hrPullLoad,
-		TerminalK,
-		TerminalM
+		Terminal,
+		// TerminalM
 	},
 	data() {
 		return {
-			showType: 1
+			showType: 0
 		};
 	},
 	onLoad() {},
@@ -37,7 +37,7 @@ export default {
 		},
 		/* 手动滑动swiper触发的事件 */
 		onChange(e) {
-			this.showType = e.detail.current + 1;
+			this.showType = e.detail.current;
 		}
 	}
 };

@@ -11,7 +11,7 @@
 				</view>
 			</view>
 			<!-- 筛选 -->
-			<dropdown-screen></dropdown-screen>
+			<dropdown-screen @finish="getParams"></dropdown-screen>
 		</view>
 		<!-- 站点列表 -->
 		<view class="sitewarp"><Sitelist ref="Sitelist"></Sitelist></view>
@@ -21,10 +21,16 @@
 </template>
 
 <script>
+import { findSiteByKey } from '@/api/site.js';
 import dropdownScreen from '@/components/dropdown-screen/dropdown-screen'; //筛选
 import hrPullLoad from '@/components/hr-pull-load/hr-pull-load.vue'; //加载
 import Sitelist from '@/components/Site/Sitelist.vue'; //站点列表
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
+
+const paramKeys = {
+  0: 'equipmentAction',
+  1: 'parkType'
+}
 
 export default {
 	components: {
@@ -34,18 +40,34 @@ export default {
 		Sitelist
 	},
 	data() {
-		return {};
+		return {
+      params: {
+        equipmentAction : undefined,
+        parkType : undefined
+      },
+      siteListData: []
+    };
 	},
 	onLoad() {},
 	methods: {
 		// 前往搜索页面
 		search() {
 			uni.navigateTo({
-				url: '../Mine/Search'
+				url: '/pages/Mine/Search'
 			});
 		},
+    getListData() {
+      findSiteByKey({
+        ...this.params
+      }).then(({ result }) => {
+        this.siteListData = result || [];
+      });
+    },
+    getParams({$index, value}) {
+      this[paramKeys[$index]] = value
+    },
 		// 禁止外壳页面手指上下滑动
-		moveHandle: function() {
+		moveHandle() {
 			return false;
 		}
 	}

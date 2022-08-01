@@ -4,7 +4,7 @@
 		<view class="rzul">
 			<view class="rzli">
 				<text>姓名</text>
-				<input value="姓名" />
+				<input v-model="formData.bankHolder" value="姓名" />
 			</view>
 			<view class="rzli">
 				<text>身份证号</text>
@@ -12,7 +12,7 @@
 			</view>
 			<view class="rzli">
 				<text>银行卡号</text>
-				<input placeholder="输入您的银行账号" />
+				<input v-model="formData.cardNo" placeholder="输入您的银行账号" />
 			</view>
 			<view class="rzli">
 				<text>卡类型</text>
@@ -38,12 +38,23 @@
 </template>
 
 <script>
+import { addMemberBank } from '@/api/member.js'
 export default {
 	data() {
-		return {};
+		return {
+      formData: {
+        bankName: '',
+        bankHolder: '',
+        cardNo: '',
+      }
+    };
 	},
 	onLoad() {},
-	methods: {}
+	methods: {
+    addMemberBank() {
+      addMemberBank()
+    }
+  }
 };
 </script>
 

@@ -1,250 +1,312 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
-			"path": "pages/Index/Index",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/Site/Sitelist",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
+  "pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
-    	"path": "pages/Other/Wait",
-    	"style": {
+      "path": "pages/tabbar/index",
+      "style": {
         "navigationStyle": "custom"
-    	}
+      }
     },
-		{
-			"path": "pages/Charge/Charge",
-			"style": {
-				"navigationBarTitleText": ""
-			}
-		},
-		{
-			"path": "pages/Site/Sitedetail",
-			"style": {
-				"navigationBarTitleText": "电站详情"
-			}
-		},
-		{
-			"path": "pages/Site/Terminal",
-			"style": {
-				"navigationBarTitleText": "终端列表"
-			}
-		},
-		{
-			"path": "pages/Charge/Inputcode",
-			"style": {
-				"navigationBarTitleText": "输入充电桩编码"
-			}
-		},
-		{
-			"path": "pages/Charge/Paychos",
-			"style": {
-				"navigationBarTitleText": "支付选择"
-			}
-		},
-		{
-			"path": "pages/Charge/PayYsq",
-			"style": {
-				"navigationBarTitleText": "预授权"
-			}
-		},
-		{
-			"path": "pages/Mine/Mine",
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/Wallet/Wallet",
-			"style": {
-				"navigationBarTitleText": "我的钱包"
-			}
-		},
-		{
-			"path": "pages/Wallet/Txdetail",
-			"style": {
-				"navigationBarTitleText": "明细"
-			}
-		},
-		{
-			"path": "pages/Wallet/Cashin",
-			"style": {
-				"navigationBarTitleText": "充值"
-			}
-		},
-		{
-			"path": "pages/Wallet/Cashout",
-			"style": {
-				"navigationBarTitleText": "余额提现"
-			}
-		},
-		{
-			"path": "pages/Car/Carlist",
-			"style": {
-				"navigationBarTitleText": "我的爱车"
-			}
-		},
-		{
-			"path": "pages/Car/Carbind",
-			"style": {
-				"navigationBarTitleText": "绑定爱车"
-			}
-		},
-		{
-			"path": "pages/Car/Carnum",
-			"style": {
-				"navigationBarTitleText": "车牌号"
-			}
-		},
-		{
-			"path": "pages/Car/Carstyle",
-			"style": {
-				"navigationBarTitleText": "选择车型"
-			}
-		},
-		{
-			"path": "pages/Car/CarstyleSch",
-			"style": {
-				"navigationBarTitleText": "搜索车型"
-			}
-		},
-		{
-			"path": "pages/Car/Carother",
-			"style": {
-				"navigationBarTitleText": "其他车型反馈"
-			}
-		},
-		{
-			"path": "pages/Car/Carkind",
-			"style": {
-			}
-		},
-		{
-			"path": "pages/Car/Carchos",
-			"style": {
-			}
-		},
-		{
-			"path": "pages/Order/Orderlist",
-			"style": {
-				"navigationBarTitleText": "我的订单"
-			}
-		},
-		{
-			"path": "pages/Order/Orderlist_fix",
-			"style": {
-				"navigationBarTitleText": "我的订单"
-			}
-		},
-		{
-			"path": "pages/Order/Orderdetail",
-			"style": {
-				"navigationBarTitleText": "订单详情",
-				"navigationBarBackgroundColor": "#eff0f1"
-			}
-		},
-		{
-			"path": "pages/Order/Orderchart",
-			"style": {
-				"navigationBarTitleText": "充电曲线",
-				"navigationBarBackgroundColor": "#eff0f1"
-			}
-		},
-		{
-			"path": "pages/Site/Sitefav",
-			"style": {
-				"navigationBarTitleText": "收藏电站"
-			}
-		},
-		{
-			"path": "pages/Renz/Renzname",
-			"style": {
-				"navigationBarTitleText": "实名认证"
-			}
-		},
-		{
-			"path": "pages/Renz/Renzcard",
-			"style": {
-				"navigationBarTitleText": "我的银行卡"
-			}
-		},
-		{
-			"path": "pages/Renz/RenzcardDel",
-			"style": {
-				"navigationBarTitleText": "银行卡"
-			}
-		},
-		{
-			"path": "pages/Renz/RenzcardAdd",
-			"style": {
-				"navigationBarTitleText": "绑定银行卡"
-			}
-		},
-		{
-			"path": "pages/Bill/Billitem",
-			"style": {
-				"navigationBarTitleText": "发票报销"
-			}
-		},
-		{
-			"path": "pages/Bill/Billchose",
-			"style": {
-				"navigationBarTitleText": "选择订单"
-			}
-		},
-		{
-			"path": "pages/Bill/Billopen",
-			"style": {
-				"navigationBarTitleText": "开具发票"
-			}
-		},
-		{
-			"path": "pages/Bill/Billhistory",
-			"style": {
-				"navigationBarTitleText": "开票历史"
-			}
-		},
-		{
-			"path": "pages/Bill/Billdetail",
-			"style": {
-				"navigationBarTitleText": "发票详情"
-			}
-		},
-		{
-			"path": "pages/Mine/Fixsent",
-			"style": {
-				"navigationBarTitleText": "故障报修"
-			}
-		},
-		{
-			"path": "pages/Mine/Search",
-			"style": {
-				"navigationBarTitleText": "搜索"
-			}
-		},
-		{
-			"path": "pages/Mine/Contact",
-			"style": {
-				"navigationBarTitleText": "联系客服"
-			}
-		},
-		{
-			"path": "pages/Login/Login",
-			"style": {
-				"navigationBarTitleText": "登录"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "",
-		"navigationBarBackgroundColor": "#ffffff",
-		"backgroundColor": "#ffffff"
-	}
+    {
+      "path": "pages/tabbar/sitelist",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tabbar/wait",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/tabbar/mine",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    }
+  ],
+  "subPackages": [{
+    "root": "pages/Site",
+    "pages": [{
+        "path": "Sitedetail",
+        "style": {
+          "navigationBarTitleText": "电站详情"
+        }
+      },
+      {
+        "path": "Terminal",
+        "style": {
+          "navigationBarTitleText": "终端列表"
+        }
+      },
+      {
+        "path": "Sitefav",
+        "style": {
+          "navigationBarTitleText": "收藏电站"
+        }
+      }
+    ]
+  }, {
+    "root": "pages/Charge",
+    "pages": [{
+        "path": "Paychos",
+        "style": {
+          "navigationBarTitleText": "支付选择"
+        }
+      },
+      {
+        "path": "PayYsq",
+        "style": {
+          "navigationBarTitleText": "预授权"
+        }
+      },
+      {
+        "path": "Inputcode",
+        "style": {
+          "navigationBarTitleText": "输入充电桩编码"
+        }
+      },
+      {
+        "path": "Charge",
+        "style": {
+          "navigationBarTitleText": ""
+        }
+      }
+    ]
+  }, {
+    "root": "pages/Wallet",
+    "pages": [{
+        "path": "Txdetail",
+        "style": {
+          "navigationBarTitleText": "明细"
+        }
+      },
+      {
+        "path": "Cashin",
+        "style": {
+          "navigationBarTitleText": "充值"
+        }
+      },
+      {
+        "path": "Cashout",
+        "style": {
+          "navigationBarTitleText": "余额提现"
+        }
+      },
+      {
+        "path": "Wallet",
+        "style": {
+          "navigationBarTitleText": "我的钱包"
+        }
+      }
+    ]
+  }, {
+    "root": "pages/Car",
+    "pages": [{
+        "path": "Carlist",
+        "style": {
+          "navigationBarTitleText": "我的爱车"
+        }
+      },
+      {
+        "path": "Carbind",
+        "style": {
+          "navigationBarTitleText": "绑定爱车"
+        }
+      },
+      {
+        "path": "Carnum",
+        "style": {
+          "navigationBarTitleText": "车牌号"
+        }
+      },
+      {
+        "path": "Carstyle",
+        "style": {
+          "navigationBarTitleText": "选择车型"
+        }
+      },
+      {
+        "path": "CarstyleSch",
+        "style": {
+          "navigationBarTitleText": "搜索车型"
+        }
+      },
+      {
+        "path": "Carother",
+        "style": {
+          "navigationBarTitleText": "其他车型反馈"
+        }
+      },
+      {
+        "path": "Carkind",
+        "style": {}
+      },
+      {
+        "path": "Carchos",
+        "style": {}
+      }
+    ]
+  }, {
+    "root": "pages/Order",
+    "pages": [{
+        "path": "Orderlist",
+        "style": {
+          "navigationBarTitleText": "我的订单"
+        }
+      },
+      {
+        "path": "Orderlist_fix",
+        "style": {
+          "navigationBarTitleText": "我的订单"
+        }
+      },
+      {
+        "path": "Orderdetail",
+        "style": {
+          "navigationBarTitleText": "订单详情",
+          "navigationBarBackgroundColor": "#eff0f1"
+        }
+      },
+      {
+        "path": "Orderchart",
+        "style": {
+          "navigationBarTitleText": "充电曲线",
+          "navigationBarBackgroundColor": "#eff0f1"
+        }
+      }
+    ]
+  }, {
+    "root": "pages/Renz",
+    "pages": [{
+        "path": "Renzname",
+        "style": {
+          "navigationBarTitleText": "实名认证"
+        }
+      },
+      {
+        "path": "Renzcard",
+        "style": {
+          "navigationBarTitleText": "我的银行卡"
+        }
+      },
+      {
+        "path": "RenzcardDel",
+        "style": {
+          "navigationBarTitleText": "银行卡"
+        }
+      },
+      {
+        "path": "RenzcardAdd",
+        "style": {
+          "navigationBarTitleText": "绑定银行卡"
+        }
+      }
+    ]
+  }, {
+    "root": "pages/Bill",
+    "pages": [{
+        "path": "Billitem",
+        "style": {
+          "navigationBarTitleText": "发票报销"
+        }
+      },
+      {
+        "path": "Billchose",
+        "style": {
+          "navigationBarTitleText": "选择订单"
+        }
+      },
+      {
+        "path": "Billopen",
+        "style": {
+          "navigationBarTitleText": "开具发票"
+        }
+      },
+      {
+        "path": "Billhistory",
+        "style": {
+          "navigationBarTitleText": "开票历史"
+        }
+      },
+      {
+        "path": "Billdetail",
+        "style": {
+          "navigationBarTitleText": "发票详情"
+        }
+      }
+    ]
+  }, {
+    "root": "pages/Mine",
+    "pages": [{
+        "path": "Fixsent",
+        "style": {
+          "navigationBarTitleText": "故障报修"
+        }
+      },
+      {
+        "path": "Search",
+        "style": {
+          "navigationBarTitleText": "搜索"
+        }
+      },
+      {
+        "path": "Contact",
+        "style": {
+          "navigationBarTitleText": "联系客服"
+        }
+      }
+    ]
+  }],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#ffffff"
+  },
+  "condition": { //模式配置，仅开发期间生效
+    "current": 0, //当前激活的模式(list 的索引项)
+    "list": [{
+      "name": "站点详情",
+      "path": "pages/Site/Sitedetail"
+    }, {
+      "name": "终端列表",
+      "path": "pages/Site/Terminal",
+      "query": ""
+    }, {
+      "name": "充电桩查询",
+      "path": "pages/Charge/Inputcode",
+      "query": ""
+    }, {
+      "name": "充电桩",
+      "path": "pages/Charge/Paychos",
+      "query": ""
+    }, {
+      "name": "我的订单",
+      "path": "pages/Order/Orderlist",
+      "query": ""
+    }, {
+      "name": "我的钱包",
+      "path": "pages/Wallet/Wallet",
+      "query": ""
+    }, {
+      "name": "提现详情",
+      "path": "pages/Wallet/Txdetail",
+      "query": ""
+    }, {
+      "name": "我的银行卡",
+      "path": "pages/Renz/Renzcard",
+      "query": ""
+    }, {
+      "name": "登录",
+      "path": "pages/login/login",
+      "query": ""
+    }]
+  }
 }

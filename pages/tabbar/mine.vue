@@ -3,7 +3,7 @@
 		<view class="myul">
 			<!-- A -->
 			<view class="myliA disflex3">
-				<image src="../../static/image/logo.jpg" mode="widthFix" class="myico"></image>
+				<image src="/static/image/logo.jpg" mode="widthFix" class="myico"></image>
 				<view class="myname" @click="login" v-if="!isshow">请登录</view>
 				<view class="myname" v-else>昵称昵称</view>
 				<view class="yritem">
@@ -22,43 +22,43 @@
 		<!-- B -->
 		<view class="myliB">
 			<view @click="wallet">
-				<image src="../../static/image/my_01.png" mode="widthFix"></image>
+				<image src="/static/image/my_01.png" mode="widthFix"></image>
 				<text>我的钱包</text>
 			</view>
 			<!-- <view @click="mycar">
-				<image src="../../static/image/my_08.png" mode="widthFix"></image>
+				<image src="/static/image/my_08.png" mode="widthFix"></image>
 				<text>我的爱车</text>
 			</view> -->
 			<view @click="order">
-				<image src="../../static/image/my_02.png" mode="widthFix"></image>
+				<image src="/static/image/my_02.png" mode="widthFix"></image>
 				<text>我的订单</text>
 			</view>
 			<view @click="sitefav">
-				<image src="../../static/image/my_06.png" mode="widthFix"></image>
+				<image src="/static/image/my_06.png" mode="widthFix"></image>
 				<text>收藏电站</text>
 			</view>
 		</view>
 		<!-- C -->
 		<view class="myliB">
 			<view @click="renzname">
-				<image src="../../static/image/my_04.png" mode="widthFix"></image>
+				<image src="/static/image/my_04.png" mode="widthFix"></image>
 				<text>实名认证</text>
-				<text class="ztpos">已认证</text>
+				<text v-if="userInfo.hasCertification === '1'" class="ztpos">已认证</text>
 			</view>
 			<view @click="renzcard">
-				<image src="../../static/image/my_05.png" mode="widthFix"></image>
+				<image src="/static/image/my_05.png" mode="widthFix"></image>
 				<text>我的银行卡</text>
 			</view>
 			<view @click="billitem">
-				<image src="../../static/image/my_03.png" mode="widthFix"></image>
+				<image src="/static/image/my_03.png" mode="widthFix"></image>
 				<text>发票报销</text>
 			</view>
 			<view @click="fixsent">
-				<image src="../../static/image/my_07.png" mode="widthFix"></image>
+				<image src="/static/image/my_07.png" mode="widthFix"></image>
 				<text>故障报修</text>
 			</view>
 			<view @click="contact">
-				<image src="../../static/image/my_09.png" mode="widthFix"></image>
+				<image src="/static/image/my_09.png" mode="widthFix"></image>
 				<text>联系客服</text>
 			</view>
 		</view>
@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { findMemberById } from '@/api/member.js'
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 export default {
 	components: {
@@ -79,7 +80,8 @@ export default {
 	},
 	data() {
 		return {
-			isshow: false
+			isshow: false,
+      userInfo: {}
 		};
 	},
 	onLoad() {},
@@ -87,9 +89,16 @@ export default {
 		// 前往登录
 		login() {
 			uni.navigateTo({
-				url: '../Login/Login'
+				url: '/pages/login/login'
 			});
 		},
+    getUserInfo() {
+      findMemberById({
+        memberId: ''
+      }).then(({result}) => {
+        this.userInfo = result || {}
+      })
+    },
 		// 前往我的钱包
 		wallet() {
 			uni.navigateTo({
@@ -265,7 +274,7 @@ export default {
 
 	view {
 		position: relative;
-		background: url(../../static/image/arrow_02.png) right center no-repeat;
+		background: url(/static/image/arrow_02.png) right center no-repeat;
 		background-size: 20rpx 20rpx;
 		padding: 30rpx 0;
 		border-bottom: 1px solid #f1f1f1;

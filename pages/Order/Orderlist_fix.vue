@@ -45,7 +45,7 @@ export default {
 		// 前往去充电首页
 		gosy() {
 			uni.navigateTo({
-				url: '../Index/Index'
+				url: '/pages/tabbar/index'
 			});
 		},
 		// 前往订单详情

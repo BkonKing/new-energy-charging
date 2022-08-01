@@ -1,21 +1,22 @@
 <template>
   <div class="site-card">
-    <view @click="goSitedetail">
+    <view class="site-content" @click="goSitedetail">
+      <view v-if="isStoreTag && data.storeState === 1" class="fav_ico">
+        收藏
+      </view>
       <view class="fcname">
         <image
           v-if="data.pictures"
           :src="data.pictures"
           mode="heightFix"
         ></image>
-        <image
-          v-else
-          src="../../static/image/logo2.png"
-          mode="heightFix"
-        ></image>
+        <image v-else src="/static/image/logo2.png" mode="heightFix"></image>
         <view class="ellipsis">{{ data.siteName }}</view>
       </view>
       <view class="fctips">
-        <text class="favy">{{ data.storeState | storeState }}</text>
+        <text v-if="isStoreContent" class="favy">
+          {{ data.storeState | storeState }}
+        </text>
         <!-- <text class="xying">歇业中</text> -->
         <text>{{ data.businessTime }}</text>
         <text>
@@ -55,12 +56,33 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    storeType: {
+      type: Number,
+      default: 1
+    }
+  },
+  computed: {
+    isStoreContent() {
+      return this.storeType === 1;
+    },
+    isStoreTag() {
+      return this.storeType === 2;
+    }
+  },
+  filters: {
+    storeState(value) {
+      const status = {
+        1: '已收藏',
+        0: '未收藏'
+      };
+      return status[value];
     }
   },
   methods: {
     goSitedetail() {
       uni.navigateTo({
-        url: '/pages/Site/Sitedetail'
+        url: `/pages/Site/Sitedetail?id=${this.data.id}`
       });
     },
     // 前往地图APP
@@ -134,8 +156,25 @@ export default {
 
 <style lang="scss" scoped>
 .site-card {
+  position: relative;
   font-size: 22rpx;
   color: #999;
+  .fav_ico {
+    font-size: 22rpx;
+    color: #fff;
+    padding: 6rpx 14rpx;
+    background-image: linear-gradient(
+      to right bottom,
+      #ff696a,
+      #fa4655,
+      #f42542
+    );
+    border-radius: 0 14rpx 0 14rpx;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
   .fcname {
     width: 100%;
     padding: 34rpx 0 24rpx;
@@ -164,7 +203,7 @@ export default {
     text {
       display: inline-block;
       padding: 6rpx 10rpx;
-      margin-right: 10rpx;
+      margin-right: 20rpx;
       background: #f1f1f1;
       border-radius: 6rpx;
       margin-bottom: 10rpx;
@@ -194,7 +233,7 @@ export default {
   }
   .fcpark {
     width: 100%;
-    background: url(../../static/image/ico_03.png) left center no-repeat;
+    background: url(/static/image/ico_03.png) left center no-repeat;
     background-size: 30rpx 30rpx;
     padding-left: 36rpx;
     font-size: 22rpx;
@@ -211,7 +250,7 @@ export default {
     font-size: 24rpx;
     color: #333;
     font-weight: 500;
-    background: #f1f1f1;
+    background: #f9f9f9;
     border-radius: 6rpx;
     padding: 10rpx 15rpx;
     .colx {
@@ -229,7 +268,7 @@ export default {
       font-weight: normal;
     }
     .dwei {
-      background: url(../../static/image/ico_04.png) right center no-repeat;
+      background: url(/static/image/ico_04.png) right center no-repeat;
       background-size: 25rpx 25rpx;
       padding-right: 30rpx;
     }

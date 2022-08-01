@@ -1,4 +1,4 @@
-import Request from '@/js_sdk/luch-request/luch-request/index.js'
+import Request from 'luch-request'
 import {
   ACCESS_TOKEN
 } from '@/common/constants.js'

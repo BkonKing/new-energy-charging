@@ -31,10 +31,10 @@
 
 <script>
 const routeObj = {
-	'pages/Index/Index': 0,
-	'pages/Site/Sitelist': 1,
-	'pages/Other/Wait': 2,
-	'pages/Mine/Mine': 3,
+	'pages/tabbar/index': 0,
+	'pages/tabbar/sitelist': 1,
+	'pages/tabbar/wait': 2,
+	'pages/tabbar/mine': 3,
 }
 export default {
 	name: 'CustomTabBar',
@@ -51,13 +51,13 @@ export default {
 		// 前往首页
 		index() {
 			uni.reLaunch({
-				url: '../Index/Index'
+				url: '/pages/tabbar/index'
 			});
 		},
 		// 前往站点
 		sitelist() {
 			uni.reLaunch({
-				url: '../Site/Sitelist'
+				url: '/pages/tabbar/sitelist'
 			});
 		},
 		// 扫码前往
@@ -75,13 +75,13 @@ export default {
 		// 前往开发中页面
 		wait() {
 			uni.reLaunch({
-				url: '../Other/Wait'
+				url: '/pages/tabbar/wait'
 			});
 		},
 		// 前往我的
 		mine() {
 			uni.reLaunch({
-				url: '../Mine/Mine'
+				url: '/pages/tabbar/mine'
 			});
 		}
 	}
@@ -103,6 +103,8 @@ export default {
 	align-items: center;
 	justify-content: space-between;
 	box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.1);
+  padding-bottom: $iosAreaBottomConstant;
+  padding-bottom: $iosAreaBottomEnv;
 	.tm40 {
 		width: 38%;
 		display: flex;

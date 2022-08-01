@@ -2,89 +2,46 @@
   <view class="container">
     <uni-nav-bar title="首页" :border="false" statusBar="false"></uni-nav-bar>
     <!-- 浮动显示 -->
-    <view class="float">
+    <view class="float" :style="{ top: `${statusBarHeight + 44}px` }">
       <!-- 定位搜索 -->
       <view class="locsea" @click="search">
         <text>福州</text>
         <text>搜索你想要去的充电桩站点/目的地</text>
       </view>
       <!-- 充电中的设备-浮框 -->
-      <view class="fing disflex4" v-show="!fcshow" @click="charge">
-        <view class="fcmd">
-          <cCircle
-            :size="60"
-            :percent="percent"
-            :animation="true"
-            :animationSpeed="5"
-            :circleColor="circleColor"
-          >
-            <span slot="content" class="cmdtx">
-              <text>{{ percent }}%</text>
-            </span>
-          </cCircle>
-        </view>
-        <view class="vmt">
-          <view>闽AD59199</view>
-          <view class="fcsm">
-            <text>
-              实时费用：
-              <text class="fcfont">0.03</text>
-            </text>
-            <text>
-              预计剩余：
-              <text class="fcfont">00小时57分钟</text>
-            </text>
+      <view class="fing" v-show="orderVisible" @click="charge">
+        <view v-for="item in orderList" :key="item.id" class="disflex4">
+          <view class="fcmd">
+            <cCircle
+              :size="60"
+              :percent="item.soc"
+              :animation="true"
+              :animationSpeed="5"
+              :circleColor="circleColor"
+            >
+              <span slot="content" class="cmdtx">
+                <text>{{ item.soc }}%</text>
+              </span>
+            </cCircle>
+          </view>
+          <view class="vmt">
+            <view>{{ item.plateNo }}</view>
+            <view class="fcsm">
+              <text>
+                实时费用：
+                <text class="fcfont">{{ item.realAmount }}</text>
+              </text>
+              <text>
+                预计剩余：
+                <text class="fcfont">{{ item.remainChargeTime }}</text>
+              </text>
+            </view>
           </view>
         </view>
       </view>
       <!-- 站点浮窗信息 -->
       <view class="fcul" v-if="siteshow">
-        <view @click="sitedetail">
-          <view class="fcname">
-            <image
-              v-if="siteData.pictures"
-              :src="siteData.pictures"
-              mode="heightFix"
-            ></image>
-            <image
-              v-else
-              src="../../static/image/logo2.png"
-              mode="heightFix"
-            ></image>
-            <view class="ellipsis">{{ siteData.siteName }}</view>
-          </view>
-          <view class="fctips">
-            <text class="favy">{{ siteData.storeState | storeState }}</text>
-            <!-- <text class="xying">歇业中</text> -->
-            <text>{{ siteData.businessTime }}</text>
-            <text>
-              <!-- 对外开放 -->
-              {{ siteData.businessType }}
-            </text>
-            <text>
-              <!-- 互联互通 -->
-              {{ siteData.operateType }}
-            </text>
-          </view>
-          <view class="fcprice">
-            ￥
-            <text>{{ siteData.fee }}</text>
-          </view>
-          <view v-if="siteData.parkDesc" class="fcpark ellipsis">
-            停车收费：{{ siteData.parkDesc }}
-          </view>
-        </view>
-        <view class="fcsta" @click="gomap()">
-          <view>
-            <text>快</text>
-            <text class="colx">闲{{ siteData.freeFastNum }}</text>
-            <text class="gray">/{{ siteData.fastNum }}</text>
-            <text class="pl-30">慢</text>
-            <text class="colm">闲{{ siteData.freeSlowNum }}</text>
-            <text class="gray">/{{ siteData.slowNum }}</text>
-          </view>
-          <view class="dwei">{{ siteData.targetDistance }}m</view>
-        </view>
+        <site-card :data="siteData"></site-card>
       </view>
     </view>
     <!-- 输入电桩编码 -->
@@ -101,6 +58,7 @@
       :longitude="myMap.longitude"
       :markers="markers"
       :scale="myMap.scale"
+      :enable-rotate="false"
       @callouttap="callouttap"
       @regionchange="handleRegionchange"
       @tap="tap"
@@ -138,9 +96,13 @@
 </template>
 
 <script>
-import { findSiteByCoordinate, findSiteById } from '@/api/home.js';
+import { findSiteByCoordinate, findSiteById } from '@/api/site.js';
+import { findOrderByMemberId } from '@/api/member.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
+import SiteCard from '@/modules/SiteCard.vue';
+import { getLocationInfo } from '@/common/util.js';
+import { handlePermission } from '@/common/permission.js';
 
 const scaleObj = {
   3: 1000 * 1000,
@@ -166,7 +128,8 @@ const scaleObj = {
 export default {
   components: {
     CustomTabBar,
-    cCircle
+    cCircle,
+    SiteCard
   },
   data() {
     return {
@@ -183,39 +146,64 @@ export default {
       },
       markers: [],
       siteListData: [],
-      siteData: {}
+      siteData: {},
+      orderList: [],
+      statusBarHeight: 0
     };
   },
-  filters: {
-    storeState(value) {
-      const status = {
-        1: '已收藏',
-        0: '未收藏'
-      };
-      return status[value];
+  computed: {
+    orderVisible() {
+      return !!this.orderList.length;
     }
   },
-  onLoad() {},
+  onLoad() {
+    this.findOrderByMemberId();
+  },
+  mounted() {
+    this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+  },
   onReady() {
-    //   wx请求获取位置权限
-    this.getAuthorize()
-      .then(() => {
-        //   同意后获取
-        this.getLocationInfo();
+    getLocationInfo({
+      title: '请求授权当前位置',
+      message: '我们需要获取地理位置信息，为您推荐附近的站点'
+    })
+      .then(({ longitude, latitude }) => {
+        this.myMap.longitude = longitude;
+        this.myMap.latitude = latitude;
       })
       .catch(() => {
-        //   不同意给出弹框，再次确认
-        this.openConfirm()
-          .then(() => {
-            this.getLocationInfo();
-          })
-          .catch(() => {
-            this.rejectGetLocation();
-          });
+        this.rejectGetLocation();
       });
+    // handlePermission({
+    //   name: 'userLocation',
+    //   title: '请求授权当前位置',
+    //   message: '我们需要获取地理位置信息，为您推荐附近的站点'
+    // })
+    //   .then(({ longitude, latitude }) => {
+    //     this.myMap.longitude = longitude;
+    //     this.myMap.latitude = latitude;
+    //   })
+    //   .catch(() => {
+    //     this.rejectGetLocation();
+    //   });
+    //   wx请求获取位置权限
+    // this.getAuthorize()
+    //   .then(() => {
+    //     //   同意后获取
+    //     this.getLocationInfo();
+    //   })
+    //   .catch(() => {
+    //     //   不同意给出弹框，再次确认
+    //     this.openConfirm()
+    //       .then(() => {
+    //         this.getLocationInfo();
+    //       })
+    //       .catch(() => {
+    //         this.rejectGetLocation();
+    //       });
+    //   });
     this.findSiteByCoordinate();
   },
-  computed: {},
   methods: {
     // 前往搜索页面
     search() {
@@ -227,12 +215,6 @@ export default {
     inputcode() {
       uni.navigateTo({
         url: '../Charge/Inputcode'
-      });
-    },
-    // 前往电站详情
-    sitedetail() {
-      uni.navigateTo({
-        url: '../../pages/Site/Sitedetail'
       });
     },
     // 前往充电中
@@ -305,24 +287,31 @@ export default {
         });
       }
     },
-
     findSiteById(params) {
       findSiteById(params).then(({ result }) => {
-        console.log(result);
+        // console.log(result);
         this.siteData = result;
         this.siteshow = true;
       });
     },
+    findOrderByMemberId() {
+      findOrderByMemberId({
+        // memberId: '', // 会员id
+        findType: 2 // 0:全部订单，1:等待充电 2:充电中
+      }).then(({ result }) => {
+        this.orderList = result || [];
+      });
+    },
     //视野发生变化时触发
     handleRegionchange(e) {
-      console.log(e);
+      // console.log(e);
       const { type, detail } = e;
       if (e.type === 'end') {
         const { longitude: lon, latitude: lat } = detail.centerLocation;
         this.findSiteByCoordinate({
           lon,
           lat,
-          scale: detail.scale
+          distance: 1000
         });
       }
     },
@@ -361,71 +350,6 @@ export default {
         this.myMap.latitude = latitude;
         this.myMap.longitude = longitude;
       });
-    },
-    // 前往地图APP
-    gomap(e) {
-      // #ifdef H5
-      const that = this;
-      uni.showActionSheet({
-        title: '选择地图应用软件',
-        itemList: ['腾讯地图', '百度地图', '高德地图'],
-        success: e => {
-          let url = '';
-          let iosDownloadUrl = '';
-          let andriodDownloadUrl = '';
-          let longitude = 119.216452;
-          let latitude = 26.04243;
-          let name = '中青大厦'; //
-          let address = '福建省福州市闽侯县中青大厦'; //地址
-          switch (e.tapIndex) {
-            case 0:
-              url =
-                'qqmap://map/geocoder?coord=${latitude},${longitude}&referer=GOPBZ-RSWK6-Z2CSX-MKQ57-VNKQV-WZBMU'; //key
-              break;
-            case 1:
-              url =
-                'baidumap://map/marker?location=${latitude},${longitude}&title=${name}&coord_type=gcj02&src=andr.baidu.openAPIdemo';
-              break;
-            case 2:
-              if (this.platform == 'ios') {
-                url =
-                  'iosamap://viewMap?sourceApplication=applicationName&poiname=${name}&lat=${latitude}&lon=${longitude}&dev=0';
-              } else {
-                url =
-                  'androidamap://viewMap?sourceApplication=appname&poiname=${name}&lat=${latitude}&lon=${longitude}&dev=0';
-              }
-              break;
-            default:
-              break;
-          }
-          if (url != '') {
-            url = encodeURI(url);
-            Window.location.href = url;
-          }
-        },
-        fail(err) {}
-      });
-      // #endif
-      // #ifndef H5
-      uni.getLocation({
-        type: 'wgs84',
-        success: function(res) {
-          console.log('当前位置的经度：' + res.longitude);
-          console.log('当前位置的纬度：' + res.latitude);
-          let longitude = 119.216452;
-          let latitude = 26.04243;
-          let name = '中青大厦'; //
-          let address = '福建省福州市闽侯县中青大厦'; //地址
-          uni.openLocation({
-            latitude,
-            longitude,
-            name,
-            address,
-            scale: 18 //缩放比例
-          });
-        }
-      });
-      // #endif
     }
   }
 };
@@ -444,15 +368,17 @@ export default {
 }
 // 浮动显示
 .float {
-  width: 94%;
+  // width: 94%;
+  width: 100%;
   position: fixed;
-  left: 3%;
+  // left: 3%;
+  left: 0;
   top: 20rpx;
   z-index: 102;
   background: rgba(255, 255, 255, 0.95);
   padding: 16rpx;
-  border-radius: 14rpx;
-  box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 14rpx 14rpx;
+  // box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.1);
 
   //定位搜索
   .locsea {
@@ -480,104 +406,6 @@ export default {
   .fcul {
     font-size: 22rpx;
     color: #999;
-    .fcname {
-      width: 100%;
-      padding: 34rpx 0 24rpx;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      font-size: 32rpx;
-      color: #333;
-      font-weight: 500;
-      image {
-        width: auto;
-        height: 40rpx;
-        margin-right: 10rpx;
-      }
-      view {
-        width: calc(100% - 80rpx);
-        height: 40rpx;
-        line-height: 40rpx;
-      }
-    }
-    .fctips {
-      margin-bottom: 10rpx;
-      font-size: 22rpx;
-      line-height: 1.2;
-      color: #999;
-      text {
-        display: inline-block;
-        padding: 6rpx 10rpx;
-        margin-right: 10rpx;
-        background: #f1f1f1;
-        border-radius: 6rpx;
-        margin-bottom: 10rpx;
-      }
-      .favy {
-        color: #fff;
-        background-image: linear-gradient(
-          to right bottom,
-          #ff696a,
-          #fa4655,
-          #f42542
-        );
-      }
-      .xying {
-        background: #999;
-        color: #fff;
-      }
-    }
-    .fcprice {
-      font-size: 30rpx;
-      font-weight: 500;
-      color: #333;
-      text {
-        font-size: 50rpx;
-        font-weight: bold;
-      }
-    }
-    .fcpark {
-      width: 100%;
-      background: url(../../static/image/ico_03.png) left center no-repeat;
-      background-size: 30rpx 30rpx;
-      padding-left: 36rpx;
-      font-size: 22rpx;
-      color: #999;
-      margin: 10rpx 0 20rpx;
-      height: 40rpx;
-      line-height: 40rpx;
-    }
-    .fcsta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      font-size: 24rpx;
-      color: #333;
-      font-weight: 500;
-      background: #f1f1f1;
-      border-radius: 6rpx;
-      padding: 10rpx 15rpx;
-      .colx {
-        color: #f37c2c;
-        padding-left: 20rpx;
-        letter-spacing: 2px;
-      }
-      .colm {
-        color: #5581ff;
-        padding-left: 20rpx;
-        letter-spacing: 2px;
-      }
-      .gray {
-        color: #999;
-        font-weight: normal;
-      }
-      .dwei {
-        background: url(../../static/image/ico_04.png) right center no-repeat;
-        background-size: 25rpx 25rpx;
-        padding-right: 30rpx;
-      }
-    }
   }
   // 充电中的设备-浮框
   .fing {

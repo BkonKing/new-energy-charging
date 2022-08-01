@@ -4,7 +4,7 @@
     <view class="siteul">
       <view class="siteA">
         <view class="fsbiao">
-          <image src="../../static/image/logo2.png" mode="heightFix"></image>
+          <image src="/static/image/logo2.png" mode="heightFix"></image>
           <text>逸充新能源</text>
         </view>
         <view class="favBtn" @click="favClick">
@@ -14,66 +14,59 @@
             v-show="favshow"
           ></image>
         </view>
-        <view class="fcname ellipsis">
-          福州市规划设计研究院充电桩福州市规划设计研究院充电桩
-        </view>
+        <view class="fcname ellipsis">{{ siteData.siteName }}</view>
         <view class="fctips fpd20">
           <!-- <text class="xying">歇业中</text> -->
-          <text>对外开放</text>
-          <text>互联互通</text>
+          <text>{{ siteData.businessType }}</text>
+          <text>{{ siteData.operateType }}</text>
         </view>
         <view class="fpd20">
-          <view class="fctime">营业时间：00:00-24:00</view>
+          <view class="fctime">营业时间：{{ siteData.businessTime }}</view>
         </view>
         <view class="fpd20"><view class="fclw">最大功率120KW</view></view>
         <view class="fcsta">
-          <view class="dadr">
-            福建省福州市台江区设计费两款手机傅雷家书冷冻机房蓝思科技大富科技
-          </view>
-          <view class="dwei">910m</view>
+          <view class="dadr">{{ siteData.address }}</view>
+          <view class="dwei">{{ siteData.targetDistance }}m</view>
         </view>
       </view>
       <!-- 终端入口 -->
       <view class="siteB" @click="terminal">
         <view>
           <text class="Bico">快</text>
-          <text>空闲2 | 共50</text>
+          <text>空闲{{ siteData.freeFastNum }} | 共{{ siteData.fastNum }}</text>
         </view>
         <view>
           <text class="Bico">慢</text>
-          <text>空闲2 | 共21</text>
+          <text>空闲{{ siteData.freeSlowNum }} | 共{{ siteData.slowNum }}</text>
         </view>
       </view>
       <!-- 价格信息 -->
-      <view class="siteC">
+      <view v-if="postageList.length" class="siteC">
         <view class="Ctitle disflex2">
           <text>价格信息</text>
           <text class="clookv" @click="$refs.pop.show()">电价详情 >></text>
         </view>
-        <view class="Cul cnow">
+        <view
+          v-for="(item, index) in twoPostages"
+          :key="index"
+          class="Cul"
+          :class="{ cnow: item.isCurrent }"
+        >
           <view class="Cli-a">
-            <text class="clitime">19:00-21:00</text>
-            <text>当前时段</text>
+            <text class="clitime">{{ item.startTime }}-{{ item.endTime }}</text>
+            <text v-if="item.isCurrent">当前时段</text>
+            <text v-else-if="item.isLast">下一时段</text>
           </view>
           <view class="Cli-b">
             <view>
               ￥
-              <text class="clinum">0.9422</text>
+              <text class="clinum">{{ item.fee }}</text>
             </view>
-            <text class="clinote">电价0.5922元/度 | 服务费0.3500元/度</text>
-          </view>
-        </view>
-        <view class="Cul">
-          <view class="Cli-a">
-            <text class="clitime">19:00-21:00</text>
-            <text>下一时段</text>
-          </view>
-          <view class="Cli-b">
-            <view>
-              ￥
-              <text class="clinum">0.9422</text>
-            </view>
-            <text class="clinote">电价0.5922元/度 | 服务费0.3500元/度</text>
+            <text class="clinote">
+              电价{{ item.electricityFee }}元/度 | 服务费{{
+                item.serviceFee
+              }}元/度
+            </text>
           </view>
         </view>
       </view>
@@ -92,42 +85,29 @@
         <view class="tcwarp">
           <view class="tctitle">电价详情</view>
           <scroll-view scroll-y="true" class="Dview">
-            <view class="Cul" v-for="t in 8">
+            <view
+              v-for="(item, index) in postageList"
+              :key="index"
+              class="Cul"
+              :class="{ cnow: index === currentPostageIndex }"
+            >
               <view class="Cli-a">
-                <text class="clitime">19:00-21:00</text>
+                <text class="clitime">
+                  {{ item.startTime }}-{{ item.endTime }}
+                </text>
+                <text v-if="index === currentPostageIndex">当前时段</text>
+                <text v-else-if="index === lastPostageIndex">下一时段</text>
               </view>
               <view class="Cli-b">
                 <view>
                   ￥
-                  <text class="clinum">0.9422</text>
+                  <text class="clinum">{{ item.fee }}</text>
                 </view>
-                <text class="clinote">电价0.5922元/度 | 服务费0.3500元/度</text>
-              </view>
-            </view>
-            <view class="Cul cnow">
-              <view class="Cli-a">
-                <text class="clitime">19:00-21:00</text>
-                <text>当前时段</text>
-              </view>
-              <view class="Cli-b">
-                <view>
-                  ￥
-                  <text class="clinum">0.9422</text>
-                </view>
-                <text class="clinote">电价0.5922元/度 | 服务费0.3500元/度</text>
-              </view>
-            </view>
-            <view class="Cul">
-              <view class="Cli-a">
-                <text class="clitime">19:00-21:00</text>
-                <text>下一时段</text>
-              </view>
-              <view class="Cli-b">
-                <view>
-                  ￥
-                  <text class="clinum">0.9422</text>
-                </view>
-                <text class="clinote">电价0.5922元/度 | 服务费0.3500元/度</text>
+                <text class="clinote">
+                  电价{{ item.electricityFee }}元/度 | 服务费{{
+                    item.serviceFee
+                  }}元/度
+                </text>
               </view>
             </view>
           </scroll-view>
@@ -138,9 +118,7 @@
         <view class="Dtitle">停车服务</view>
         <view class="Dul">
           <text class="Dli-a">停车费用</text>
-          <text class="Dli-b">
-            半小时内免费，4小时内5元，超过4小时后，每小时加0.1元
-          </text>
+          <text class="Dli-b">{{ siteData.parkDesc }}</text>
         </view>
       </view>
       <!-- 营业信息 -->
@@ -148,7 +126,7 @@
         <view class="Dtitle">营业信息</view>
         <view class="Eul">
           <text class="Dli-a">开放时间</text>
-          <text class="Dli-b">00:00-24:00</text>
+          <text class="Dli-b">{{ siteData.businessTime }}</text>
         </view>
         <view class="Eul">
           <text class="Dli-a">服务提供</text>
@@ -169,7 +147,7 @@
     <view class="shopimg">
       <FatFatMeng-Swiper
         :swiperStyleClass="[{ height: '350rpx' }]"
-        :SwiperImglist="list"
+        :SwiperImglist="pictureList"
       ></FatFatMeng-Swiper>
     </view>
     <!-- 底部按钮 -->
@@ -188,11 +166,16 @@
 </template>
 
 <script>
+import { findSiteById, findPostageBySiteId } from '@/api/site.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 export default {
   components: { pop },
   data() {
     return {
+      id: 0,
+      siteData: {},
+      postageList: [],
+      currentTime: 0,
       favshow: false, //收藏与否
       // 轮播图
       list: [
@@ -208,8 +191,76 @@ export default {
       ]
     };
   },
-  onLoad() {},
+  computed: {
+    pictureList() {
+      if (!this.siteData.pictures) {
+        return '';
+      }
+      return this.siteData.pictures.split(',').map(image => ({
+        image
+      }));
+    },
+    currentPostageIndex() {
+      const date = new Date(this.currentTime);
+      const time = `${this.fillZero(date.getHours())}${this.fillZero(
+        date.getMinutes()
+      )}`;
+      return this.postageList.findIndex(obj => {
+        const startTime = +obj.startTime.replace(':', '');
+        const endTime = +obj.endTime.replace(':', '');
+        return time >= startTime && time <= endTime;
+      });
+    },
+    // 这样计算会有问题，中间如果缺了一个时间段(找不到当前时间段)，则下一个时间段永远是第一个，实际应该要重新遍历
+    lastPostageIndex() {
+      const index = this.currentPostageIndex;
+      const lastIndex = this.postageList.length - 1;
+      return index === lastIndex ? 0 : index + 1;
+    },
+    twoPostages() {
+      const currentPostage = {
+        isCurrent: true,
+        ...this.postageList[this.currentPostageIndex]
+      };
+      const lastPostage = {
+        isLast: true,
+        ...this.postageList[this.lastPostageIndex]
+      };
+      if (this.currentPostageIndex === this.lastPostageIndex) {
+        return [currentPostage];
+      }
+      if (this.currentPostageIndex === -1) {
+        return [lastPostage];
+      }
+      return [currentPostage, lastPostage];
+    }
+  },
+  onLoad({ id }) {
+    this.id = id;
+    this.findSiteById();
+    this.findPostageBySiteId();
+  },
   methods: {
+    findSiteById() {
+      findSiteById({
+        id: this.id
+      }).then(({ result }) => {
+        console.log(result);
+        this.siteData = result || {};
+      });
+    },
+    findPostageBySiteId() {
+      findPostageBySiteId({
+        siteId: this.id
+      }).then(({ result, timestamp }) => {
+        console.log(result);
+        this.currentTime = timestamp;
+        this.postageList = result || [];
+      });
+    },
+    fillZero(num) {
+      return num < 10 ? `0${num}` : num;
+    },
     // 收藏
     favClick(index) {
       this.favshow = !this.favshow;
