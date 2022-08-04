@@ -122,13 +122,13 @@ export default {
 		// 前往充电曲线
 		orderchart() {
 			uni.navigateTo({
-				url: 'Orderchart'
+				url: '/pages/Order/Orderchart'
 			});
 		},
 		// 前往终端详情
 		sitedetail() {
 			uni.navigateTo({
-				url: '../Site/Sitedetail'
+				url: '/pages/Site/Sitedetail'
 			});
 		}
 	}

@@ -8,11 +8,13 @@ export function getLocationInfo(params) {
     uni.getLocation({
       type: 'gcj02',
       success(res) {
+        console.log('res', res);
         resolve(res)
       },
       fail({
         errMsg
       }) {
+        console.log('getLocationInfo err: ', errMsg);
         if (errMsg === 'getLocation:fail auth deny') {
           handlePermission({
               name: 'userLocation',
@@ -74,4 +76,28 @@ export function getUserInfo(params) {
       }
     });
   })
+}
+
+export function validateForm(arr) {
+  const status = arr.some(obj => {
+    return validateEmpty(obj.value, obj.message)
+  })
+  return new Promise((resolve, reject) => {
+    if (!status) {
+      resolve(status)
+    } else {
+      reject(status)
+    }
+  })
+}
+
+export function validateEmpty(val, message) {
+  const status = typeof val === 'undefined' || val === null || val === ''
+  if (status) {
+    uni.showToast({
+      title: message || '值不能为空',
+      icon: 'none'
+    })
+  }
+  return status
 }

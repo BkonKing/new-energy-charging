@@ -49,7 +49,7 @@ http.validateStatus = (statusCode) => {
 http.interceptors.request.use((config) => { // 可使用async await 做异步操作
   config.header = {
     ...config.header,
-    'X-Access-Token': getTokenStorage() // 演示拦截器header加参
+    'X-YcEnergy-Token': getTokenStorage() // 演示拦截器header加参
   }
   // 演示custom 用处
   // if (config.custom.auth) {

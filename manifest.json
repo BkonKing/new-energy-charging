@@ -60,7 +60,11 @@
             "scope.userLocation" : {
                 "desc" : "请求具体定位"
             }
-        }
+        },
+        "requiredPrivateInfos": [
+            "getLocation",
+            "chooseLocation"
+        ]
     },
     "mp-alipay" : {
         "usingComponents" : true

@@ -4,14 +4,14 @@
       <template v-if="isshow">
         <view class="wslogen">欢迎来到逸充新能源</view>
         <image
-          src="../../static/image/logo.png"
+          src="/static/image/logo.png"
           mode="widthFix"
           class="wlogo"
         ></image>
         <text>该程序将获取以下授权:</text>
         <text class="wtips">获得您的公开信息（昵称、头像等）</text>
         <button class="wbtA" @click="getUserInfo">允许</button>
-        <view class="wreject">拒绝</view>
+        <view class="wreject" @click="goBack">拒绝</view>
       </template>
       <template v-else>
         <button
@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import { getSession, login, getPhoneNumber } from '@/api/user.js';
 import { getUserInfo } from '@/common/util.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 
@@ -86,18 +87,54 @@ export default {
   },
   data() {
     return {
+      wxCode: '',
       isshow: true,
-      userInfo: {}
+      userInfo: {},
+      phoneInfo: {},
+      wxSession: {}
     };
   },
-  onLoad() {},
+  onLoad() {
+    this.wxLogin();
+  },
   methods: {
-    login() {
+    wxLogin() {
       uni.login({
         provider: 'weixin',
-        success: function(loginRes) {
-          console.log(loginRes.authResult);
+        success: loginRes => {
+          this.wxCode = loginRes.code;
+          this.getSession();
         }
+      });
+    },
+    login() {
+      login({
+        wxCode: this.wxCode,
+        userInfo: this.userInfo,
+        phoneInfo: this.phoneInfo,
+        wxSession: this.wxSession
+      }).then(({ result, success }) => {
+        console.log('result', result);
+        if (success) {
+          this.$tip.success('登录成功')
+          uni.navigateBack({
+            delta: 1
+          })
+        }
+      });
+    },
+    setPhoneNumber(params) {
+      getPhoneNumber(params).then(({ result }) => {
+        console.log('result', result);
+        this.phoneInfo = result || {};
+      });
+    },
+    getSession() {
+      getSession({
+        wxCode: this.wxCode
+      }).then(({ result }) => {
+        console.log(result);
+        this.wxSession = result || {};
       });
     },
     openPop() {
@@ -112,17 +149,21 @@ export default {
         success: res => {
           console.log('res.userInfo', res.userInfo);
           this.userInfo = res.userInfo || {};
-        },
-        complete: res => {
           this.isshow = false;
         }
       });
     },
     getPhoneNumber(e) {
       console.log(e);
-      console.log(e.detail.errMsg);
+      console.log(e.detail.code);
       console.log(e.detail.iv);
       console.log(e.detail.encryptedData);
+      this.setPhoneNumber(e.detail);
+    },
+    goBack() {
+      uni.navigateBack({
+        delta: 1
+      })
     }
   }
 };

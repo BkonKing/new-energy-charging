@@ -57,12 +57,16 @@
           <view class="taxfor" @click="$refs.popB.show()" v-else>
             <text>提现至</text>
             <view class="txfid">
-              <image src="" mode="widthFix"></image>
-              <text>农业银行（1234）</text>
+              <image :src="activeBank.logo" mode="widthFix"></image>
+              <text>
+                {{ activeBank.bankName }}（{{
+                  activeBank.cardNo.substr(-4, 4)
+                }}）
+              </text>
             </view>
           </view>
         </scroll-view>
-        <button class="sureco">确认提现</button>
+        <button class="sureco" @click="handleWithdraw">确认提现</button>
       </view>
     </pop>
 
@@ -81,73 +85,88 @@
       <view class="tcwarp">
         <view class="tctitle">请选择</view>
         <scroll-view scroll-y="true" class="radiowp">
-          <radio-group @change="radioChange">
-            <label class="radioli">
+          <radio-group v-model="bankId" @change="radioChange">
+            <label v-for="item in bankList" class="radioli" :key="item.id">
               <view class="radname">
-                <image src="" mode="widthFix"></image>
-                <text>建设银行（1234）</text>
+                <image :src="item.logo" mode="widthFix"></image>
+                <text>
+                  {{ item.bankName }}（{{ item.cardNo.substr(-4, 4) }}）
+                </text>
               </view>
-              <radio value="1" color="#33b048" checked="" />
-            </label>
-            <label class="radioli">
-              <view class="radname">
-                <image src="" mode="widthFix"></image>
-                <text>农业银行（1234）</text>
-              </view>
-              <radio value="2" color="#33b048" />
+              <radio :value="item.id" color="#33b048" />
             </label>
           </radio-group>
         </scroll-view>
-        <view class="glcard" @click="renzcard">管理银行卡</view>
+        <view class="glcard" @click="goRenzcard">管理银行卡</view>
       </view>
     </pop>
   </view>
 </template>
 
 <script>
+import { findMemberBanks } from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
+
 export default {
-	components: {
-		pop
-	},
-	data() {
-		return {
-			isshow: true,
+  components: {
+    pop
+  },
+  data() {
+    return {
+      isshow: true,
       allMoney: 20.01,
-      outMoney: undefined
-		};
-	},
-	onLoad() {},
-	methods: {
+      outMoney: undefined,
+      bankId: '',
+      activeBank: {},
+      bankList: []
+    };
+  },
+  onLoad() {
+    this.findMemberBanks();
+  },
+  methods: {
+    findMemberBanks() {
+      findMemberBanks().then(({ result }) => {
+        this.bankList = result || [];
+        this.activeBank = result[0];
+        this.bankId = this.activeBank.id
+      });
+    },
     cashOutAll() {
-      this.outMoney = this.allMoney
+      this.outMoney = this.allMoney;
     },
     handleBlur() {
       if (this.outMoney > this.allMoney) {
-        this.outMoney = this.allMoney
+        this.outMoney = this.allMoney;
       }
     },
     openBank() {
       if (parseFloat(this.outMoney) > 0) {
-        this.$refs.popA.show()
+        this.$refs.popA.show();
       } else {
-        this.$tip.toast('请输入提现金额')
+        this.$tip.toast('请输入提现金额');
       }
     },
-		watchOpen() {},
-		watchClose() {},
+    watchOpen() {},
+    watchClose() {},
 
-		// 弹框支付方式单选
-		radioChange() {
-			this.$refs.popB.close();
-		},
-		// 前往银行卡
-		renzcard() {
-			uni.navigateTo({
-				url: '../Renz/Renzcard'
-			});
-		}
-	}
+    // 弹框支付方式单选
+    radioChange(event) {
+      this.bankId = event.detail.value;
+      this.activeBank = this.bankList.find(obj => obj.id === this.bankiD);
+
+      this.$refs.popB.close();
+    },
+    handleWithdraw() {
+      
+    },
+    // 前往银行卡
+    goRenzcard() {
+      uni.navigateTo({
+        url: '/pages/Renz/Renzcard'
+      });
+    }
+  }
 };
 </script>
 

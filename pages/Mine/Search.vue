@@ -1,33 +1,42 @@
 <template>
   <view class="container">
-    <view class="fav_sch">
-      <input v-model="searchText" placeholder="输入电站关键字" />
-      <button class="favbt" @click="handleSearch">搜索</button>
-    </view>
-    <!-- 搜索结果 -->
-    <view class="sch_ul">
-      <text v-for="key in keyList" @click="setSearchText(key)">{{key}}</text>
-      <image
-        v-if="keyList.length"
-        src="../../static/image/ico_11.png"
-        mode="widthFix"
-        @click="removeKey"
-      ></image>
-    </view>
     <!-- 搜索列表 -->
-    <template v-if="siteListData && siteListData.length">
-      <view
-        v-for="item in siteListData"
-        :key="item.id"
-        class="fav_ul"
-        @click="sitedetail"
-      >
-        <site-card :data="item" :storeType="2"></site-card>
-      </view>
-      <view class="clearit"></view>
-    </template>
-    <!-- 搜索无结果 显示 -->
-    <view class="nodata" v-else>- 未搜索到您所要的 -</view>
+    <z-paging
+      v-model="siteListData"
+      ref="paging"
+      :fixed="true"
+      @query="queryList"
+    >
+      <template slot="top">
+        <view class="fav_sch">
+          <input v-model="searchText" placeholder="输入电站关键字" />
+          <button class="favbt" @click="handleSearch">搜索</button>
+        </view>
+        <!-- 搜索结果 -->
+        <view class="sch_ul">
+          <text v-for="key in keyList" @click="setSearchText(key)">
+            {{ key }}
+          </text>
+          <image
+            v-if="keyList.length"
+            src="/static/image/ico_11.png"
+            mode="widthFix"
+            @click="removeKey"
+          ></image>
+        </view>
+      </template>
+      <template v-if="siteListData && siteListData.length">
+        <view
+          v-for="item in siteListData"
+          :key="item.id"
+          class="fav_ul"
+          @click="sitedetail"
+        >
+          <site-card :data="item" :storeType="2"></site-card>
+        </view>
+        <view class="clearit"></view>
+      </template>
+    </z-paging>
   </view>
 </template>
 
@@ -53,34 +62,63 @@ export default {
       if (!key) {
         return;
       }
-      this.saveKey(key)
+      this.saveKey(key);
+      // findSiteByKey({
+      //   key
+      // }).then(({ result }) => {
+      //   this.siteListData = result || [];
+      // });
+      this.queryList(1, 10);
+    },
+    queryList(pageNo, pageSize) {
+      const key = this.searchText;
+      if (!key) {
+        return;
+      }
+      this.$tip.loading();
+      //组件加载时会自动触发此方法，因此默认页面加载时会自动触发，无需手动调用
       findSiteByKey({
-        key
-      }).then(({ result }) => {
-        this.siteListData = result || [];
-      });
+        key,
+        pageNo,
+        pageSize
+      })
+        .then(({ result }) => {
+          // this.siteListData = result || [];
+          if (result.length > 0) {
+            this.$refs.paging.complete(result);
+          } else {
+            this.$refs.paging.complete([]);
+          }
+        })
+        .finally(() => {
+          this.$tip.loaded();
+        });
+      //防止某些原因导致加载框不隐藏
+      setTimeout(() => {
+        this.$tip.loaded();
+      }, 10000);
     },
     setSearchText(key) {
       if (this.searchText === key) {
-        return
+        return;
       }
-      this.searchText = key
-      this.handleSearch()
+      this.searchText = key;
+      this.handleSearch();
     },
     getKey() {
       const value = uni.getStorageSync('storage_key');
       if (value) {
-        this.keyList = value.split(',')
+        this.keyList = value.split(',');
       }
     },
     saveKey(key) {
       if (this.keyList.includes(key)) {
-        return
+        return;
       }
       if (this.keyList.length === 6) {
-        this.keyList.pop()
+        this.keyList.pop();
       }
-      this.keyList.unshift(key)
+      this.keyList.unshift(key);
       uni.setStorage({
         key: 'site_key',
         data: this.keyList.join(','),
@@ -92,9 +130,9 @@ export default {
     removeKey() {
       uni.removeStorage({
         key: 'site_key',
-        success: (res) => {
+        success: res => {
           console.log('success');
-          this.keyList = []
+          this.keyList = [];
         }
       });
     }
@@ -103,16 +141,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  padding-top: 30rpx;
-}
 // 搜索
 .fav_sch {
   width: 94%;
   background: #fff;
   box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.03);
   border-radius: 100rpx;
-  margin: 0 auto 50rpx;
+  margin: 30rpx auto 50rpx;
   padding: 20rpx 40rpx;
   display: flex;
   align-items: center;

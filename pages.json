@@ -287,6 +287,10 @@
       "name": "充电桩",
       "path": "pages/Charge/Paychos",
       "query": ""
+    },{
+      "name": "充值",
+      "path": "pages/Wallet/Cashin",
+      "query": ""
     }, {
       "name": "我的订单",
       "path": "pages/Order/Orderlist",
@@ -294,6 +298,10 @@
     }, {
       "name": "我的钱包",
       "path": "pages/Wallet/Wallet",
+      "query": ""
+    }, {
+      "name": "余额提现",
+      "path": "pages/Wallet/Cashout",
       "query": ""
     }, {
       "name": "提现详情",
@@ -306,6 +314,18 @@
     }, {
       "name": "登录",
       "path": "pages/login/login",
+      "query": ""
+    }, {
+      "name": "故障维修",
+      "path": "pages/Mine/Fixsent",
+      "query": ""
+    }, {
+      "name": "实名认证",
+      "path": "pages/Renz/Renzname",
+      "query": ""
+    }, {
+      "name": "搜索",
+      "path": "pages/Mine/Search",
       "query": ""
     }]
   }

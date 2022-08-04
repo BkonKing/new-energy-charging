@@ -83,6 +83,42 @@ const mock = {
         "freeSlowNum": "xxxxx",
         "slowNum": "xxxxx",
         "targetDistance": "xxxxx"
+      },
+      {
+        "id": 3,
+        "storeState": 0,
+        "siteName": "xxxxx",
+        "pictures": "",
+        "parkDesc": "xxxxx",
+        "longitude": "xxxxx",
+        "latitude": "xxxxx",
+        "fee": "xxxxx",
+        "businessTime": "xxxxx",
+        "businessType": "xxxxx",
+        "operateType": "xxxxx",
+        "freeFastNum": "xxxxx",
+        "fastNum": "xxxxx",
+        "freeSlowNum": "xxxxx",
+        "slowNum": "xxxxx",
+        "targetDistance": "xxxxx"
+      },
+      {
+        "id": 4,
+        "storeState": 0,
+        "siteName": "xxxxx",
+        "pictures": "",
+        "parkDesc": "xxxxx",
+        "longitude": "xxxxx",
+        "latitude": "xxxxx",
+        "fee": "xxxxx",
+        "businessTime": "xxxxx",
+        "businessType": "xxxxx",
+        "operateType": "xxxxx",
+        "freeFastNum": "xxxxx",
+        "fastNum": "xxxxx",
+        "freeSlowNum": "xxxxx",
+        "slowNum": "xxxxx",
+        "targetDistance": "xxxxx"
       }
     ]
   },

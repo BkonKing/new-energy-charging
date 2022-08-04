@@ -92,9 +92,9 @@ const mock = {
     "timestamp": 1658930171207,
     "result": {
       "id": "xxxxx",
-      "totalAssets": "xxxxx",
-      "balances": "xxxxx",
-      "frozenAmount": "xxxxx",
+      "totalAssets": 5,
+      "balances": 3,
+      "frozenAmount": 2,
       "inSummary": "xxxxx",
       "expSummary": "xxxxx"
     }
@@ -182,6 +182,53 @@ const mock = {
     "success": true,
     "timestamp": 1658930171207,
     "result": {}
+  },
+  updateMemberByAuthData: {
+    "code": "200",
+    "message": "操作成功！",
+    "success": true,
+    "timestamp": 1658930171207,
+    "result": {}
+  },
+  rechargeMemberData: {
+    "code": "200",
+    "message": "操作成功！",
+    "success": true,
+    "timestamp": 1658930171207,
+    "result": {}
+  },
+  withdrawalMemberData: {
+    "code": "200",
+    "message": "操作成功！",
+    "success": true,
+    "timestamp": 1658930171207,
+    "result": [{
+        "id": "xxxxx",
+        "bankName": "xxxxx",
+        "cardNo": "xxxxx",
+        "logo": "xxxxx"
+      },
+      {
+        "id": "xxxxx",
+        "bankName": "xxxxx",
+        "cardNo": "xxxxx",
+        "logo": "xxxxx"
+      }
+    ]
+  },
+  startChargeData: {
+    "code": "200",
+    "message": "操作成功！",
+    "success": true,
+    "timestamp": 1658930171207,
+    "result": {}
+  },
+  stopChargeData: {
+    "code": "200",
+    "message": "操作成功！",
+    "success": true,
+    "timestamp": 1658930171207,
+    "result": {}
   }
 }
 
@@ -229,4 +276,34 @@ export function addMemberBank() {
 export function removeMemberBank() {
   return Promise.resolve(mock.removeMemberBankData)
   return http.delete('/member/removeMemberBank', params)
+}
+
+// 实名认证（会员）
+export function updateMemberByAuth() {
+  return Promise.resolve(mock.updateMemberByAuthData)
+  return http.put('/member/updateMemberByAuth', params)
+}
+
+// 充值（会员）
+export function rechargeMember() {
+  return Promise.resolve(mock.rechargeMemberData)
+  return http.post('/member/rechargeMember', params)
+}
+
+// 提现（会员）
+export function withdrawalMember() {
+  return Promise.resolve(mock.withdrawalMemberData)
+  return http.post('/member/withdrawalMember', params)
+}
+
+// 充电（会员）
+export function startCharge() {
+  return Promise.resolve(mock.startChargeData)
+  return http.post('/member/startCharge', params)
+}
+
+// 断电（会员）
+export function stopCharge() {
+  return Promise.resolve(mock.stopChargeData)
+  return http.put('/member/stopCharge', params)
 }

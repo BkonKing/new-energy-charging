@@ -9,7 +9,7 @@
         </view>
         <view class="cinip disflex4">
           <text>￥</text>
-          <input v-model="money" placeholder="0.00" type="digit" />
+          <input v-model="amount" placeholder="0.00" type="digit" />
         </view>
       </view>
       <view class="cinB">
@@ -33,14 +33,14 @@
         <radio-group @change="radioChange">
           <label class="radioli">
             <view class="radname">
-              <image src="../../static/image/wx.png" mode="widthFix"></image>
+              <image src="/static/image/wx.png" mode="widthFix"></image>
               <text>微信钱包</text>
             </view>
             <radio value="1" checked color="#33b048" />
           </label>
           <label class="radioli">
             <view class="radname">
-              <image src="../../static/image/zfb.png" mode="widthFix"></image>
+              <image src="/static/image/zfb.png" mode="widthFix"></image>
               <text>支付宝钱包</text>
             </view>
             <radio value="2" color="#33b048" />
@@ -49,29 +49,92 @@
       </view>
     </view>
     <!-- #endif -->
-    <view class="paywarp"><button class="surepay">充值</button></view>
+    <view class="paywarp">
+      <button class="surepay" @click="submit">充值</button>
+    </view>
   </view>
 </template>
 
 <script>
+import { rechargeMember } from '@/api/member.js';
+
 export default {
-	data() {
-		return {
-			cinlist: [{ price: 5 }, { price: 10 }, { price: 20 }, { price: 50 }, { price: 100 }, { price: 200 }, { price: 500 }, { price: 1000 }],
-			current: undefined,
-      money: undefined
-		};
-	},
-	onLoad() {},
-	methods: {
-		// 选中充值金额
-		cincheck(data, index) {
-			this.current = index;
-      this.money = data.price
-		},
-		// 选择支付方式
-		radioChange() {}
-	}
+  data() {
+    return {
+      cinlist: [
+        { price: 5 },
+        { price: 10 },
+        { price: 20 },
+        { price: 50 },
+        { price: 100 },
+        { price: 200 },
+        { price: 500 },
+        { price: 1000 }
+      ],
+      current: undefined,
+      amount: undefined,
+      channel: undefined
+    };
+  },
+  onLoad() {},
+  methods: {
+    // 选中充值金额
+    cincheck(data, index) {
+      this.current = index;
+      this.amount = data.price;
+    },
+    // 选择支付方式
+    radioChange() {},
+    submit() {
+      if (!this.amount) {
+        this.$tip.toast('请输入充值金额');
+        return;
+      }
+      if (parseFloat(this.amount) < 1) {
+        this.$tip.toast('￥1.00起充');
+        return;
+      }
+      let channel = 0;
+      // #ifdef MP-WEIXIN
+      channel = 2;
+      // #endif
+      // #ifdef MP-ALIPAY
+      channel = 3;
+      // #endif
+      this.rechargeMember({
+        amount: this.amount,
+        channel
+      });
+    },
+    rechargeMember(params) {
+      rechargeMember(params).then(({ result }) => {
+        this.requestPayment(result);
+      });
+    },
+    requestPayment() {
+      let provider = 'wxpay';
+      // #ifdef MP-WEIXIN
+      provider = 'wxpay';
+      // #endif
+      // #ifdef MP-ALIPAY
+      provider = 'alipay';
+      // #endif
+      uni.requestPayment({
+        provider,
+        orderInfo: {
+          appid: 'wx499********7c70e', // 微信开放平台 - 应用 - AppId，注意和微信小程序、公众号 AppId 可能不一致
+          noncestr: 'c5sEwbaNPiXAF3iv', // 随机字符串
+          package: 'Sign=WXPay', // 固定值
+          partnerid: '148*****52', // 微信支付商户号
+          prepayid: 'wx202254********************fbe90000', // 统一下单订单号
+          timestamp: 1597935292, // 时间戳（单位：秒）
+          sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0' // 签名，这里用的 MD5/RSA 签名
+        },
+        success(res) {},
+        fail(e) {}
+      });
+    }
+  }
 };
 </script>
 

@@ -50,7 +50,8 @@
     <custom-tab-bar></custom-tab-bar>
     <!-- 地图 -->
     <map
-      id="myMap"
+      id="map"
+      ref="map"
       style="width: 100%; height: 100%;"
       :show-location="true"
       :enable-zoom="true"
@@ -66,7 +67,7 @@
       <cover-view class="cover-view" @click="onControltap">
         <cover-image
           class="cover-image"
-          src="../../static/image/map_02.png"
+          src="/static/image/map_02.png"
         ></cover-image>
       </cover-view>
       <cover-view slot="callout">
@@ -102,7 +103,6 @@ import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import SiteCard from '@/modules/SiteCard.vue';
 import { getLocationInfo } from '@/common/util.js';
-import { handlePermission } from '@/common/permission.js';
 
 const scaleObj = {
   3: 1000 * 1000,
@@ -148,7 +148,8 @@ export default {
       siteListData: [],
       siteData: {},
       orderList: [],
-      statusBarHeight: 0
+      statusBarHeight: 0,
+      mapContext: null
     };
   },
   computed: {
@@ -161,111 +162,25 @@ export default {
   },
   mounted() {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
+    this.mapContext = uni.createMapContext('map', this);
   },
   onReady() {
-    getLocationInfo({
-      title: '请求授权当前位置',
-      message: '我们需要获取地理位置信息，为您推荐附近的站点'
-    })
-      .then(({ longitude, latitude }) => {
-        this.myMap.longitude = longitude;
-        this.myMap.latitude = latitude;
-      })
-      .catch(() => {
-        this.rejectGetLocation();
-      });
-    // handlePermission({
-    //   name: 'userLocation',
-    //   title: '请求授权当前位置',
-    //   message: '我们需要获取地理位置信息，为您推荐附近的站点'
-    // })
-    //   .then(({ longitude, latitude }) => {
-    //     this.myMap.longitude = longitude;
-    //     this.myMap.latitude = latitude;
-    //   })
-    //   .catch(() => {
-    //     this.rejectGetLocation();
-    //   });
-    //   wx请求获取位置权限
-    // this.getAuthorize()
-    //   .then(() => {
-    //     //   同意后获取
-    //     this.getLocationInfo();
-    //   })
-    //   .catch(() => {
-    //     //   不同意给出弹框，再次确认
-    //     this.openConfirm()
-    //       .then(() => {
-    //         this.getLocationInfo();
-    //       })
-    //       .catch(() => {
-    //         this.rejectGetLocation();
-    //       });
-    //   });
+    this.getLocationInfo();
     this.findSiteByCoordinate();
   },
   methods: {
-    // 前往搜索页面
-    search() {
-      uni.navigateTo({
-        url: '../Mine/Search'
-      });
-    },
-    // 前往输入充电桩编码
-    inputcode() {
-      uni.navigateTo({
-        url: '../Charge/Inputcode'
-      });
-    },
-    // 前往充电中
-    charge() {
-      uni.navigateTo({
-        url: '../Charge/Charge'
-      });
-    },
-    //   初次位置授权
-    getAuthorize() {
-      return new Promise((resolve, reject) => {
-        uni.authorize({
-          scope: 'scope.userLocation',
-          success: () => {
-            this.getLocationInfo(); // 允许授权
-          },
-          fail: () => {
-            this.openConfirm(); // 拒绝授权
-          }
-        });
-      });
-    },
-    // 确认授权后，获取用户位置
     getLocationInfo() {
-      return new Promise((resolve, reject) => {
-        uni.getLocation({
-          type: 'wgs84',
-          success: res => {
-            console.log('当前位置的经度：' + res.longitude);
-            console.log('当前位置的纬度：' + res.latitude);
-            resolve(res);
-          }
+      getLocationInfo({
+        title: '请求授权当前位置',
+        message: '我们需要获取地理位置信息，为您推荐附近的站点'
+      })
+        .then(({ longitude, latitude }) => {
+          this.myMap.longitude = longitude;
+          this.myMap.latitude = latitude;
+        })
+        .catch(() => {
+          this.rejectGetLocation();
         });
-      });
-    },
-    // 拒绝授权后，弹框提示是否手动打开位置授权
-    openConfirm() {
-      return new Promise((resolve, reject) => {
-        uni.showModal({
-          title: '请求授权当前位置',
-          content: '我们需要获取地理位置信息，为您推荐附近的站点',
-          success: res => {
-            if (res.confirm) {
-              console.log(res, '同意授权');
-            } else if (res.cancel) {
-              reject();
-              this.rejectGetLocation();
-            }
-          }
-        });
-      });
     },
     // 彻底拒绝位置获取
     rejectGetLocation() {
@@ -289,15 +204,15 @@ export default {
     },
     findSiteById(params) {
       findSiteById(params).then(({ result }) => {
-        // console.log(result);
         this.siteData = result;
         this.siteshow = true;
       });
     },
     findOrderByMemberId() {
       findOrderByMemberId({
-        // memberId: '', // 会员id
-        findType: 2 // 0:全部订单，1:等待充电 2:充电中
+        findType: 2, // 0:全部订单，1:等待充电 2:充电中
+        pageSize: 3,
+        pageNo: 1
       }).then(({ result }) => {
         this.orderList = result || [];
       });
@@ -308,10 +223,21 @@ export default {
       const { type, detail } = e;
       if (e.type === 'end') {
         const { longitude: lon, latitude: lat } = detail.centerLocation;
-        this.findSiteByCoordinate({
-          lon,
-          lat,
-          distance: 1000
+        this.mapContext.getScale({
+          success: ({ scale }) => {
+            this.findSiteByCoordinate({
+              lon,
+              lat,
+              distance: scaleObj[Math.floor(scale)]
+            });
+          },
+          fail: () => {
+            this.findSiteByCoordinate({
+              lon,
+              lat,
+              distance: 1000
+            });
+          }
         });
       }
     },
@@ -321,7 +247,7 @@ export default {
           return this.setMarker(data);
         });
         this.siteListData = result;
-        console.log(result);
+        // console.log(result);
       });
     },
     setMarker({ id, longitude, latitude }) {
@@ -329,7 +255,7 @@ export default {
         id,
         longitude,
         latitude,
-        iconPath: '../../static/image/map_no.png', //图标为空白透明图片
+        iconPath: '/static/image/map_no.png', //图标为空白透明图片
         rotate: 0, // Number - 顺时针旋转的角度，范围 0 ~ 360，默认为 0
         alpha: 1, // 默认1，无透明，范围 0 ~ 1
         width: 0,
@@ -344,11 +270,28 @@ export default {
       this.siteshow = false;
     },
     onControltap() {
-      this.getLocationInfo().then(res => {
-        console.log(res);
-        const { longitude, latitude } = res;
-        this.myMap.latitude = latitude;
-        this.myMap.longitude = longitude;
+      this.mapContext.moveToLocation({
+        //moveToLocation将地图中心移动到当前定位点，需要配合map组件的show-location使用
+        latitude: this.myMap.latitude,
+        longitude: this.myMap.longitude
+      });
+    },
+    // 前往搜索页面
+    search() {
+      uni.navigateTo({
+        url: '/pages/Mine/Search'
+      });
+    },
+    // 前往输入充电桩编码
+    inputcode() {
+      uni.navigateTo({
+        url: '/pages/Charge/Inputcode'
+      });
+    },
+    // 前往充电中
+    charge() {
+      uni.navigateTo({
+        url: '/pages/Charge/Charge'
       });
     }
   }
@@ -356,6 +299,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  overflow: hidden;
+}
 .cover-view {
   position: fixed;
   right: 3%;

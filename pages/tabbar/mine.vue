@@ -150,13 +150,13 @@ export default {
 		// 前往故障报修
 		fixsent() {
 			uni.navigateTo({
-				url: './Fixsent'
+				url: '/pages/Mine/Fixsent'
 			});
 		},
 		// 联系客服
 		contact() {
 			uni.navigateTo({
-				url: './Contact'
+				url: '/pages/Mine/Contact'
 			});
 		},
 		// 前往发票报销

@@ -11,17 +11,15 @@
           <text class="zdcope" @click="setClipboardData">复制</text>
         </view>
         <view class="zdtime">
-          当前时段：{{ terminalData.startTime }}-{{
-            terminalData.endTime
-          }}
+          当前时段：{{ terminalData.startTime }}-{{ terminalData.endTime }}
         </view>
         <view class="zdprice">
-          <text>{{terminalData.fee}}</text>
+          <text>{{ terminalData.fee }}</text>
           元/度
         </view>
         <view class="zdtime">
-          <text>电费：{{terminalData.electricityFee}}元/度</text>
-          <text>服务费：{{terminalData.serviceFee}}元/度</text>
+          <text>电费：{{ terminalData.electricityFee }}元/度</text>
+          <text>服务费：{{ terminalData.serviceFee }}元/度</text>
         </view>
         <view class="zdtips">只充电，不占位；充电结束后请及时离场，谢谢！</view>
       </view>
@@ -39,16 +37,16 @@
           {{ item }}
         </text>
       </view>
-      <view class="otli">
+      <!-- <view class="otli">
         <text>电站优惠</text>
         <view class="fufei">服务费6.5折</view>
-      </view>
+      </view> -->
       <!-- 余额付 -->
       <view class="payYue" v-if="paykindcurrent == 0">
-        <view>预付金额</view>
-        <view class="py_sm">预计可充电1.09度，可行驶22.95公里</view>
+        <!-- <view>预付金额</view>
+        <view class="py_sm">预计可充电1.09度，可行驶22.95公里</view> -->
         <view class="disflex">
-          <text class="py_num">￥5.00</text>
+          <text class="py_num">￥{{ walletData.totalAssets }}</text>
           <text class="py_gcz" @click="cashin">充值</text>
         </view>
       </view>
@@ -129,13 +127,17 @@
           </text>
         </view>
       </view>
-      <view class="otli" v-if="planCdcurrent == 1">
+      <view class="otli" v-if="planCdcurrent == 0">
         <view>
           <view>限定金额</view>
-          <view class="ot_sm">可用余额：0.00元</view>
+          <view class="ot_sm">可用余额：{{ walletData.balances }}元</view>
         </view>
         <view class="otxip">
-          <input placeholder="请输入充电金额(￥)" type="digit" />
+          <input
+            v-model="amount"
+            placeholder="请输入充电金额(￥)"
+            type="digit"
+          />
         </view>
       </view>
     </view>
@@ -152,34 +154,40 @@
 		</view> -->
     <view class="clearw"></view>
     <view class="wfoot">
-      <button class="combutton" @click="charge">启动充电</button>
+      <button class="combutton" @click="submitCharge">启动充电</button>
     </view>
   </view>
 </template>
 
 <script>
 import { findConnectorByNum } from '@/api/site.js';
+import { findMemberByWallet, startCharge } from '@/api/member.js';
 export default {
   data() {
     return {
       connectorNum: '',
       terminalData: {},
       // 支付方式
-      paykind: ['余额付', '预授权', '信用付'],
-      paykindcurrent: 1,
+      paykind: ['余额付' /* , '预授权', '信用付' */],
+      paykindcurrent: 0,
       // 充电策略
-      planCd: ['自动充满', '限定金额'],
+      planCd: [/* '自动充满', */ '限定金额'],
       planCdcurrent: 0,
       // 结算策略
       planAs: ['自动结算', '手动结算'],
       planAscurrent: 0,
       //开通信用-显示
-      xyshow: true
+      xyshow: true,
+      amount: undefined,
+      walletData: {}
     };
   },
   onLoad({ connectorNum }) {
     this.connectorNum = connectorNum;
+  },
+  onShow() {
     this.findConnectorByNum();
+    this.findMemberByWallet();
   },
   methods: {
     findConnectorByNum() {
@@ -187,6 +195,12 @@ export default {
         connectorNum: this.connectorNum
       }).then(({ result }) => {
         this.terminalData = result || {};
+      });
+    },
+    findMemberByWallet() {
+      findMemberByWallet().then(({ result }) => {
+        this.walletData = result || {};
+        console.log('wallet', this.walletData);
       });
     },
     // 前往终端详情
@@ -198,7 +212,7 @@ export default {
     setClipboardData(data) {
       uni.setClipboardData({
         data: this.terminalData.connectorNum
-      })
+      });
     },
     // 选中支付方式
     paykindcheck(index) {
@@ -224,10 +238,40 @@ export default {
         url: './PayYsq'
       });
     },
+    submitCharge() {
+      const value = parseFloat(this.amount);
+      if (!value) {
+        this.$tip.toast('请输入金额');
+        return;
+      }
+      if (value > this.walletData.balances) {
+        this.$tip.toast('余额不足，请先充值');
+        return;
+      }
+      const max = 500
+      const min = 5
+      if (value < min) {
+        this.$tip.toast(`限定金额最少为${min}元`);
+        return;
+      }
+      if (value > max) {
+        this.$tip.toast(`限定金额最大为${max}元`);
+        return;
+      }
+      this.startCharge()
+    },
+    startCharge() {
+      startCharge({
+        amount: this.amount,
+        connectorNum: this.connectorNum
+      }).then(() => {
+        this.goCharge()
+      })
+    },
     // 前往开始充电
-    charge() {
+    goCharge() {
       uni.navigateTo({
-        url: './Charge'
+        url: `/pages/Charge/Charge?connectorNum=${this.connectorNum}`
       });
     },
     // 前往车辆选择
