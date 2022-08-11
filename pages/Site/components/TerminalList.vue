@@ -1,38 +1,20 @@
 <template>
   <view class="example">
-    <hr-pull-load
-      @refresh="refresh"
-      @loadMore="loadMore"
-      :height="-1"
-      :pullHeight="50"
-      :maxHeight="100"
-      :lowerThreshold="20"
-      :bottomTips="bottomTips"
-      :isAllowPull="true"
-      :isTab="true"
-      ref="hrPullLoad"
+    <z-paging
+      v-model="terminalList"
+      ref="paging"
+      :fixed="true"
+      @query="queryList"
+      @onRefresh="onRefresh"
     >
-      <!-- 暂无记录 显示 -->
-      <view class="nodata" v-show="isshow">- 暂无数据 -</view>
-      <!-- 去充电时显示确认弹框 -->
-      <z-modal
-        :show="modalShow"
-        :btnGroup="btnGroup"
-        :contentType="1"
-        :contentText="contentText"
-        :titleText="titleText"
-        @cancle="cancle"
-        @sure="sure"
-      ></z-modal>
-      <!-- 插入自己的数据-->
       <view
-        class="ter_ul"
         v-for="(item, index) in terminalList"
         :key="index"
+        class="ter_ul"
         :class="type"
       >
         <view
-          v-if="item.connectorStatus === '1'"
+          v-if="item.connectorStatus === 1"
           class="ter_go"
           @click="noteshow(item)"
         >
@@ -50,7 +32,7 @@
               <!-- <text>空闲</text> -->
               <!-- <text>已插枪</text> -->
               <!-- <text>故障</text> -->
-              <template v-if="item.connectorStatus === '1'">
+              <template v-if="item.connectorStatus === 3">
                 <text>{{ item.soc }}%</text>
                 <text>充电中</text>
               </template>
@@ -87,11 +69,23 @@
           <view class="ter_nr">
             <text>{{ item.equipmentType | electricityType }}</text>
             <text>| 最大功率{{ item.powerUpperLimits }}KW</text>
-            <text>| {{ item.nationalStandard }}</text>
+            <text v-if="item.nationalStandard">
+              | {{ item.nationalStandard }}
+            </text>
           </view>
         </view>
       </view>
-    </hr-pull-load>
+    </z-paging>
+    <!-- 去充电时显示确认弹框 -->
+    <z-modal
+      :show="modalShow"
+      :btnGroup="btnGroup"
+      :contentType="1"
+      :contentText="contentText"
+      :titleText="titleText"
+      @sure="sure"
+      @cancle="cancle"
+    ></z-modal>
   </view>
 </template>
 
@@ -147,16 +141,18 @@ export default {
       },
       default: 'fast'
     },
-    id: {
+    siteId: {
+      type: String,
+      default: ''
+    },
+    name: {
       type: String,
       default: ''
     }
   },
   data() {
     return {
-      isshow: false,
       terminalList: [],
-      bottomTips: '',
       currentPage: 1,
       activeTerminal: null,
       // 确认弹框
@@ -181,9 +177,7 @@ export default {
           eventName: 'sure'
         }
       ],
-      titleText: '',
-      contentText:
-        '请确保您的车和某某某站的终端（11231321）已连接，点击确认，进入支付选择页面'
+      titleText: ''
     };
   },
   filters: {
@@ -194,10 +188,29 @@ export default {
       return connectorStatus[key];
     }
   },
-  created() {
-    this.getExampleData(1);
+  computed: {
+    contentText() {
+      return `请确保您的车和${this.name}站的终端（${
+        this.activeTerminal?.connectorNum
+      }）已连接，点击确认，进入支付选择页面`;
+    }
   },
   methods: {
+    queryList(pageNo, pageSize) {
+      findConnectorBySiteId({
+        siteId: this.siteId,
+        equipmentAction: equipmentAction[this.type],
+        pageNo,
+        pageSize
+      }).then(({ result }) => {
+        const records = result?.connector?.records || [];
+        if (records.length > 0) {
+          this.$refs.paging.complete(records);
+        } else {
+          this.$refs.paging.complete([]);
+        }
+      });
+    },
     // 空闲时：percent=100；已插枪：percent=100；充电中：percent=实时；故障：percent=0；
     socPercent(data) {
       // connectorStatus: 1：空闲；2：准备充电；3：充电中；4 ：充电结束；5： 故障
@@ -222,69 +235,24 @@ export default {
         data: connectorNum
       });
     },
-    getExampleData(type) {
-      /* type 1代表下拉刷新 2代表加载更多 */
-      setTimeout(async () => {
-        /* 接口获取到的数据 */
-        const { result: data } = await findConnectorBySiteId({
-          siteId: this.id,
-          equipmentAction: equipmentAction[this.type]
-        });
-        /* 拿到数据后的处理 */
-        if (data.length > 0) {
-          if (type == 1) {
-            this.terminalList = data;
-          } else if (type == 2) {
-            this.terminalList = this.terminalList.concat(data);
-          }
-          /* 这里的5是每次调用后台接口返回的最大数据条数，可以自定义 */
-          if (this.terminalList.length < 5) {
-            this.bottomTips = 'nomore';
-          } else {
-            this.bottomTips = 'more';
-          }
-        } else {
-          if (type == 1) {
-            this.terminalList = [];
-          } else if (type == 2) {
-            this.currentPage--;
-          }
-          this.bottomTips = 'nomore';
-        }
-        /* 这里300毫秒的延时，主要是为了优化视觉效果 */
-        setTimeout(() => {
-          this.$refs.hrPullLoad.reSet();
-        }, 300);
-      }, 500);
-    },
-    //自定义上拉加载更多
-    loadMore() {
-      this.currentPage++;
-      this.bottomTips = 'loading';
-      this.getExampleData(2);
-    },
-    //自定义下拉刷新
-    refresh() {
-      this.currentPage = 1;
-      this.getExampleData(1);
+    onRefresh() {
+      this.$emit('refresh')
     },
     //确认弹框
     noteshow(data) {
       const { connectorNum } = data;
       this.activeTerminal = data;
-      this.contentText = `请确保您的车和某某某站的终端（${connectorNum}）已连接，点击确认，进入支付选择页面`;
       this.modalShow = !this.modalShow;
     },
-    cancle(e) {
-      this.modalShow = false;
-    },
     sure(e) {
-      console.log(e);
       uni.navigateTo({
         url: `/pages/Charge/Paychos?connectorNum=${
           this.activeTerminal.connectorNum
         }`
       });
+    },
+    cancle(e) {
+      this.modalShow = false;
     }
   }
 };

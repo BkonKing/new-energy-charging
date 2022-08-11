@@ -13,7 +13,7 @@
 				<text>站点</text>
 			</view>
 		</view>
-		<view class="tmscan" @click="scango"><image src="/static/image/scan.png" mode="widthFix"></image></view>
+		<view class="tmscan" @click="handleScan"><image src="/static/image/scan.png" mode="widthFix"></image></view>
 		<view class="tm40">
 			<view @click="wait">
 				<image v-if="active === 2" src="/static/image/bar_03a.png" mode="widthFix"></image>
@@ -36,8 +36,11 @@ const routeObj = {
 	'pages/tabbar/wait': 2,
 	'pages/tabbar/mine': 3,
 }
+
+import scanCode from '@/mixins/scanCode.js'
 export default {
 	name: 'CustomTabBar',
+  mixins: [scanCode],
 	data() {
 		return {
 			active: 0
@@ -58,18 +61,6 @@ export default {
 		sitelist() {
 			uni.reLaunch({
 				url: '/pages/tabbar/sitelist'
-			});
-		},
-		// 扫码前往
-		scango() {
-			uni.scanCode({
-				success: function(res) {
-					console.log('条码类型：' + res.scanType);
-					console.log('条码内容：' + res.result);
-					uni.navigateTo({
-						url: '../Charge/Paychos'
-					});
-				}
 			});
 		},
 		// 前往开发中页面

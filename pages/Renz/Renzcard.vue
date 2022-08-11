@@ -17,6 +17,7 @@
 
 <script>
 import { findMemberBanks } from '@/api/member.js';
+import { mapGetters } from 'vuex'
 import BankCard from './components/BankCard.vue'
 export default {
   components: {
@@ -26,6 +27,9 @@ export default {
     return {
       bankList: []
     };
+  },
+  computed: {
+    ...mapGetters(['hasCertification'])
   },
   onShow() {
     this.findMemberBanks();
@@ -44,6 +48,14 @@ export default {
     },
     // 前往绑定银行卡
     goCardAdd() {
+      // if (!this.hasCertification) {
+      //   this.$tip.confirm('请先完成实名认证，是否前往？').then(() => {
+      //     uni.navigateTo({
+      //       url: '/pages/Renz/Renzname'
+      //     })
+      //   })
+      //   return
+      // }
       uni.navigateTo({
         url: '/pages/Renz/RenzcardAdd'
       });

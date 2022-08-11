@@ -32,12 +32,11 @@ export default {
       removeMemberBank({
         id: this.id
       }).then(() => {
-        this.$tip.success('解绑成功');
-        setTimeout(() => {
+        this.$tip.success('解绑成功').then(() => {
           uni.navigateBack({
             delta: 1
           });
-        }, 1500);
+        });
       });
     }
   }

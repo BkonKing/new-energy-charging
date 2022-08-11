@@ -3,7 +3,7 @@
     <view class="PcoA">
       <view class="zduan">
         <view class="zdshop ellipsis" @click="goSitedetail">
-          <text class="zdkind">自营</text>
+          <text class="zdkind">{{ operateTypeText }}</text>
           <text>{{ terminalData.siteName }}</text>
         </view>
         <view class="zdcode">
@@ -72,7 +72,7 @@
             <view class="Xyopen" v-if="xyshow">去开通</view>
             <image
               class="xyget"
-              src="../../static/image/ico_13.png"
+              src="/static/image/ico_13.png"
               mode="widthFix"
               v-else
             ></image>
@@ -162,6 +162,14 @@
 <script>
 import { findConnectorByNum } from '@/api/site.js';
 import { findMemberByWallet, startCharge } from '@/api/member.js';
+
+const operateTypeDict = {
+  1: '直营',
+  2: '联营',
+  3: '互联互通',
+  4: '他营'
+};
+
 export default {
   data() {
     return {
@@ -181,6 +189,11 @@ export default {
       amount: undefined,
       walletData: {}
     };
+  },
+  computed: {
+    operateTypeText() {
+      return operateTypeDict[this.terminalData.operateType] || '';
+    }
   },
   onLoad({ connectorNum }) {
     this.connectorNum = connectorNum;
@@ -248,8 +261,8 @@ export default {
         this.$tip.toast('余额不足，请先充值');
         return;
       }
-      const max = 500
-      const min = 5
+      const max = 500;
+      const min = 5;
       if (value < min) {
         this.$tip.toast(`限定金额最少为${min}元`);
         return;
@@ -258,15 +271,15 @@ export default {
         this.$tip.toast(`限定金额最大为${max}元`);
         return;
       }
-      this.startCharge()
+      this.startCharge();
     },
     startCharge() {
       startCharge({
         amount: this.amount,
         connectorNum: this.connectorNum
       }).then(() => {
-        this.goCharge()
-      })
+        this.goCharge();
+      });
     },
     // 前往开始充电
     goCharge() {

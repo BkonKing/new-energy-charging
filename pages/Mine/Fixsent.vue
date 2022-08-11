@@ -11,16 +11,16 @@
       <view class="fixitem">
         <view>
           <view>扫描终端二维码</view>
-          <view class="fixsm">{{terminationID || '终端ID'}}</view>
+          <view class="fixsm">{{ terminationID || '终端ID' }}</view>
         </view>
         <view class="fixcb" @click="handleScan">扫码关联</view>
       </view>
       <view class="fixitem">
         <view>
           <view>选择近期订单</view>
-          <view class="fixsm">终端ID</view>
+          <view class="fixsm">{{terminationID || '终端ID'}}</view>
         </view>
-        <view class="fixcb" @click="myorder">选择订单</view>
+        <view class="fixcb" @click="goSelectOrder">选择订单</view>
       </view>
     </view>
     <!--异常原因 -->
@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import { validateForm } from '@/common/util.js';
+
 export default {
   data() {
     return {
@@ -95,28 +97,55 @@ export default {
       ]
     };
   },
-  onLoad() {},
+  onLoad() {
+    uni.$on('selectOrder', this.handleSelectOrder)
+  },
+  onUnload() {
+    uni.$off('selectOrder', this.handleSelectOrder)
+  },
   methods: {
     // 异常原因多选
-    checkboxChange: function(e) {
+    checkboxChange(e) {
       this.ycValues = e.detail.value;
     },
-    // 前往我的订单
-    myorder() {
+    // 前往我的订单 - 选择
+    goSelectOrder() {
       uni.navigateTo({
-        url: '../Order/Orderlist_fix'
+        url: '/pages/Order/Orderlist?type=select'
       });
+    },
+    // 没有终端id
+    handleSelectOrder({connectorNum}) {
+      this.terminationID = connectorNum
     },
     handleScan() {
       uni.scanCode({
         success: res => {
           console.log('条码类型：' + res.scanType);
           console.log('条码内容：' + res.result);
-          this.terminationID = res.result
+          this.terminationID = res.result;
         }
       });
     },
-    submit() {}
+    submit() {
+      const requiredArray = [
+        {
+          value: this.phoneNumber,
+          message: '请输入联系人手机号'
+        },
+        {
+          value: this.terminationID,
+          message: '请关联终端'
+        },
+        {
+          value: this.ycValues,
+          message: '请选择异常原因'
+        },
+      ]
+      validateForm(requiredArray).then(() => {
+        
+      })
+    }
   }
 };
 </script>

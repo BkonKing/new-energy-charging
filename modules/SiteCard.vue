@@ -7,7 +7,7 @@
       <view class="fcname">
         <image
           v-if="data.pictures"
-          :src="data.pictures"
+          :src="pictures"
           mode="heightFix"
         ></image>
         <image v-else src="/static/image/logo2.png" mode="heightFix"></image>
@@ -18,19 +18,19 @@
           {{ data.storeState | storeState }}
         </text>
         <!-- <text class="xying">歇业中</text> -->
-        <text>{{ data.businessTime }}</text>
-        <text>
+        <text v-if="businessTime">{{ businessTime }}</text>
+        <text v-if="data.businessType">
           <!-- 对外开放 -->
           {{ data.businessType }}
         </text>
-        <text>
+        <text v-if="data.operateType">
           <!-- 互联互通 -->
           {{ data.operateType }}
         </text>
       </view>
       <view class="fcprice">
         ￥
-        <text>{{ data.fee }}</text>
+        <text>{{ data.fee || 0 }}</text>
       </view>
       <view v-if="data.parkDesc" class="fcpark ellipsis">
         停车收费：{{ data.parkDesc }}
@@ -39,11 +39,11 @@
     <view class="fcsta" @click="gomap()">
       <view>
         <text>快</text>
-        <text class="colx">闲{{ data.freeFastNum }}</text>
-        <text class="gray">/{{ data.fastNum }}</text>
+        <text class="colx">闲{{ data.freeFastNum || 0 }}</text>
+        <text class="gray">/{{ data.fastNum || 0 }}</text>
         <text class="pl-30">慢</text>
-        <text class="colm">闲{{ data.freeSlowNum }}</text>
-        <text class="gray">/{{ data.slowNum }}</text>
+        <text class="colm">闲{{ data.freeSlowNum || 0 }}</text>
+        <text class="gray">/{{ data.slowNum || 0 }}</text>
       </view>
       <view class="dwei">{{ data.targetDistance }}m</view>
     </view>
@@ -68,6 +68,18 @@ export default {
     },
     isStoreTag() {
       return this.storeType === 2;
+    },
+    pictures() {
+      if (this.data.pictures) {
+        return this.data.pictures.split(',')[0]
+      }
+      return ''
+    },
+    businessTime() {
+      if (this.data.businessTime) {
+        return this.data.businessTime.split(',').join(' ~ ')
+      }
+      return ''
     }
   },
   filters: {
@@ -130,23 +142,12 @@ export default {
       });
       // #endif
       // #ifndef H5
-      uni.getLocation({
-        type: 'wgs84',
-        success: function(res) {
-          console.log('当前位置的经度：' + res.longitude);
-          console.log('当前位置的纬度：' + res.latitude);
-          let longitude = 119.216452;
-          let latitude = 26.04243;
-          let name = '中青大厦'; //
-          let address = '福建省福州市闽侯县中青大厦'; //地址
-          uni.openLocation({
-            latitude,
-            longitude,
-            name,
-            address,
-            scale: 18 //缩放比例
-          });
-        }
+      uni.openLocation({
+        latitude: +this.data.latitude,
+        longitude: +this.data.longitude,
+        name: this.data.siteName,
+        address: this.data.address,
+        scale: 18 //缩放比例
       });
       // #endif
     }
@@ -187,11 +188,11 @@ export default {
     image {
       width: auto;
       height: 40rpx;
-      margin-right: 10rpx;
     }
     view {
       width: calc(100% - 80rpx);
       height: 40rpx;
+      margin-left: 10rpx;
       line-height: 40rpx;
     }
   }
@@ -235,6 +236,7 @@ export default {
     width: 100%;
     background: url(/static/image/ico_03.png) left center no-repeat;
     background-size: 30rpx 30rpx;
+    background-position: 0 4rpx;
     padding-left: 36rpx;
     font-size: 22rpx;
     color: #999;

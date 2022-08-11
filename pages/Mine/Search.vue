@@ -21,7 +21,7 @@
             v-if="keyList.length"
             src="/static/image/ico_11.png"
             mode="widthFix"
-            @click="removeKey"
+            @click="clearAllKey"
           ></image>
         </view>
       </template>
@@ -42,6 +42,7 @@
 
 <script>
 import { findSiteByKey } from '@/api/site.js';
+import { getLocationInfo } from '@/common/util.js';
 import SiteCard from '@/modules/SiteCard.vue';
 export default {
   components: {
@@ -52,26 +53,42 @@ export default {
       searchText: '',
       isshow: false,
       keyList: [],
-      siteListData: []
+      siteListData: [],
+      currentLocation: {
+        lon: 0,
+        lat: 0
+      }
     };
   },
-  onLoad() {},
+  onLoad() {
+    this.getLocationInfo();
+  },
   methods: {
+    getLocationInfo() {
+      getLocationInfo({
+        title: '请求授权当前位置',
+        message: '我们需要获取地理位置信息，为您推荐附近的站点'
+      })
+        .then(({ longitude, latitude }) => {
+          this.currentLocation.lon = longitude;
+          this.currentLocation.lat = latitude;
+          // this.findSiteByCoordinate();
+        })
+        .catch(() => {
+          this.rejectGetLocation();
+        });
+    },
     handleSearch() {
       const key = this.searchText;
       if (!key) {
         return;
       }
       this.saveKey(key);
-      // findSiteByKey({
-      //   key
-      // }).then(({ result }) => {
-      //   this.siteListData = result || [];
-      // });
-      this.queryList(1, 10);
+      this.$refs.paging.reload(true);
     },
     queryList(pageNo, pageSize) {
       const key = this.searchText;
+      // 为防止z-paging加载自动触发@query
       if (!key) {
         return;
       }
@@ -80,12 +97,13 @@ export default {
       findSiteByKey({
         key,
         pageNo,
-        pageSize
+        pageSize,
+        ...this.currentLocation
       })
         .then(({ result }) => {
-          // this.siteListData = result || [];
-          if (result.length > 0) {
-            this.$refs.paging.complete(result);
+          const records = result?.siteInfo?.records || []
+          if (records?.length > 0) {
+            this.$refs.paging.complete(records);
           } else {
             this.$refs.paging.complete([]);
           }
@@ -93,10 +111,6 @@ export default {
         .finally(() => {
           this.$tip.loaded();
         });
-      //防止某些原因导致加载框不隐藏
-      setTimeout(() => {
-        this.$tip.loaded();
-      }, 10000);
     },
     setSearchText(key) {
       if (this.searchText === key) {
@@ -106,7 +120,7 @@ export default {
       this.handleSearch();
     },
     getKey() {
-      const value = uni.getStorageSync('storage_key');
+      const value = uni.getStorageSync('site_key');
       if (value) {
         this.keyList = value.split(',');
       }
@@ -121,17 +135,13 @@ export default {
       this.keyList.unshift(key);
       uni.setStorage({
         key: 'site_key',
-        data: this.keyList.join(','),
-        success: () => {
-          console.log('success');
-        }
+        data: this.keyList.join(',')
       });
     },
-    removeKey() {
+    clearAllKey() {
       uni.removeStorage({
         key: 'site_key',
         success: res => {
-          console.log('success');
           this.keyList = [];
         }
       });
@@ -225,14 +235,6 @@ export default {
       padding: 10rpx 20rpx;
     }
   }
-}
-// 暂无数据
-.nodata {
-  display: block;
-  font-size: 28rpx;
-  color: #999;
-  line-height: 200rpx;
-  text-align: center;
 }
 .clearit {
   height: 30rpx;

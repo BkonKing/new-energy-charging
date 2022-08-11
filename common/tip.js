@@ -102,7 +102,7 @@ export default class Tips {
   /**
    * 弹出加载提示
    */
-  static loading(title = "加载中") {
+  static loading(title = "加载中", autoClose = true, autoCloseTime = 10000) {
     if (Tips.isLoading) {
       return;
     }
@@ -111,6 +111,12 @@ export default class Tips {
       title: title,
       mask: true
     });
+    //防止某些原因导致加载框不隐藏
+    if (autoClose) {
+      setTimeout(() => {
+        Tips.isLoading && this.loaded()
+      }, autoCloseTime)
+    }
   }
 
   /**

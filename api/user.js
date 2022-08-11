@@ -15,3 +15,7 @@ export function login(params) {
 export function getPhoneNumber(params) {
   return http.post('/wxAuth/getPhoneNumber', params)
 }
+
+export function logout(params) {
+  return http.post('/wxAuth/logout', params)
+}

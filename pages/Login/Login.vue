@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { getSession, login, getPhoneNumber } from '@/api/user.js';
+import { getSession, getPhoneNumber } from '@/api/user.js';
 import { getUserInfo } from '@/common/util.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 
@@ -103,30 +103,28 @@ export default {
         provider: 'weixin',
         success: loginRes => {
           this.wxCode = loginRes.code;
-          this.getSession();
+          // this.getSession();
         }
       });
     },
     login() {
-      login({
+      this.$store.dispatch('login', {
         wxCode: this.wxCode,
         userInfo: this.userInfo,
         phoneInfo: this.phoneInfo,
-        wxSession: this.wxSession
-      }).then(({ result, success }) => {
-        console.log('result', result);
-        if (success) {
-          this.$tip.success('登录成功')
-          uni.navigateBack({
-            delta: 1
-          })
-        }
+        // wxSession: this.wxSession
+      }).then(() => {
+        this.$tip.success('登录成功')
+        uni.navigateBack({
+          delta: 1
+        })
       });
     },
     setPhoneNumber(params) {
       getPhoneNumber(params).then(({ result }) => {
         console.log('result', result);
         this.phoneInfo = result || {};
+        this.login()
       });
     },
     getSession() {

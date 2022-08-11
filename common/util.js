@@ -8,7 +8,7 @@ export function getLocationInfo(params) {
     uni.getLocation({
       type: 'gcj02',
       success(res) {
-        console.log('res', res);
+        console.log('getLocationInfo', res);
         resolve(res)
       },
       fail({
@@ -91,13 +91,16 @@ export function validateForm(arr) {
   })
 }
 
-export function validateEmpty(val, message) {
-  const status = typeof val === 'undefined' || val === null || val === ''
+export function validateEmpty(value, message) {
+  let status = typeof value === 'undefined' || value === null || value === ''
   if (status) {
     uni.showToast({
       title: message || '值不能为空',
       icon: 'none'
     })
+  }
+  if (Array.isArray(value)) {
+    status = value.length === 0
   }
   return status
 }

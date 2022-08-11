@@ -3,25 +3,41 @@
     {
       "path": "pages/tabbar/index",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "mp-alipay": {
+          "transparentTitle": "always",
+          "titlePenetrate": "YES"
+        }
       }
     },
     {
       "path": "pages/tabbar/sitelist",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "mp-alipay": {
+          "transparentTitle": "always",
+          "titlePenetrate": "YES"
+        }
       }
     },
     {
       "path": "pages/tabbar/wait",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "mp-alipay": {
+          "transparentTitle": "always",
+          "titlePenetrate": "YES"
+        }
       }
     },
     {
       "path": "pages/tabbar/mine",
       "style": {
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "mp-alipay": {
+          "transparentTitle": "always",
+          "titlePenetrate": "YES"
+        }
       }
     },
     {
@@ -162,12 +178,6 @@
         }
       },
       {
-        "path": "Orderlist_fix",
-        "style": {
-          "navigationBarTitleText": "我的订单"
-        }
-      },
-      {
         "path": "Orderdetail",
         "style": {
           "navigationBarTitleText": "订单详情",
@@ -274,11 +284,12 @@
     "current": 0, //当前激活的模式(list 的索引项)
     "list": [{
       "name": "站点详情",
-      "path": "pages/Site/Sitedetail"
+      "path": "pages/Site/Sitedetail",
+      "query": "id=a496c6a945e45c30fd99eef92cf2d620"
     }, {
       "name": "终端列表",
       "path": "pages/Site/Terminal",
-      "query": ""
+      "query": "id=a496c6a945e45c30fd99eef92cf2d620"
     }, {
       "name": "充电桩查询",
       "path": "pages/Charge/Inputcode",
@@ -286,8 +297,8 @@
     }, {
       "name": "充电桩",
       "path": "pages/Charge/Paychos",
-      "query": ""
-    },{
+      "query": "connectorNum=10000000101"
+    }, {
       "name": "充值",
       "path": "pages/Wallet/Cashin",
       "query": ""
@@ -326,6 +337,10 @@
     }, {
       "name": "搜索",
       "path": "pages/Mine/Search",
+      "query": ""
+    }, {
+      "name": "收藏电站",
+      "path": "pages/Site/Sitefav",
       "query": ""
     }]
   }

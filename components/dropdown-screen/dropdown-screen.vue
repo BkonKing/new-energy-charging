@@ -133,7 +133,7 @@ export default {
           [
             {
               text: '充电方式',
-              value: -1
+              value: ''
             },
             {
               text: '快充',
@@ -147,7 +147,7 @@ export default {
           [
             {
               text: '停车费',
-              value: -1
+              value: ''
             },
             {
               text: '停车收费',

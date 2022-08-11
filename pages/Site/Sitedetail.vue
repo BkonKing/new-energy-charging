@@ -9,9 +9,9 @@
         </view>
         <view class="favBtn" @click="favClick">
           <image
-            src="../../static/image/ico_08a.png"
+            v-show="siteData.storeState"
+            src="/static/image/ico_08a.png"
             mode="widthFix"
-            v-show="favshow"
           ></image>
         </view>
         <view class="fcname ellipsis">{{ siteData.siteName }}</view>
@@ -21,9 +21,11 @@
           <text>{{ siteData.operateType }}</text>
         </view>
         <view class="fpd20">
-          <view class="fctime">营业时间：{{ siteData.businessTime }}</view>
+          <view class="fctime">营业时间：{{ businessTime }}</view>
         </view>
-        <view class="fpd20"><view class="fclw">最大功率120KW</view></view>
+        <view class="fpd20">
+          <view class="fclw">最大功率{{ siteData.powerUpperLimits }}KW</view>
+        </view>
         <view class="fcsta">
           <view class="dadr">{{ siteData.address }}</view>
           <view class="dwei">{{ siteData.targetDistance }}m</view>
@@ -33,11 +35,15 @@
       <view class="siteB" @click="terminal">
         <view>
           <text class="Bico">快</text>
-          <text>空闲{{ siteData.freeFastNum }} | 共{{ siteData.fastNum }}</text>
+          <text>
+            空闲{{ siteData.freeFastNum || 0 }} | 共{{ siteData.fastNum || 0 }}
+          </text>
         </view>
         <view>
           <text class="Bico">慢</text>
-          <text>空闲{{ siteData.freeSlowNum }} | 共{{ siteData.slowNum }}</text>
+          <text>
+            空闲{{ siteData.freeSlowNum || 0 }} | 共{{ siteData.slowNum || 0 }}
+          </text>
         </view>
       </view>
       <!-- 价格信息 -->
@@ -126,7 +132,7 @@
         <view class="Dtitle">营业信息</view>
         <view class="Eul">
           <text class="Dli-a">开放时间</text>
-          <text class="Dli-b">{{ siteData.businessTime }}</text>
+          <text class="Dli-b">{{ businessTime }}</text>
         </view>
         <view class="Eul">
           <text class="Dli-a">服务提供</text>
@@ -138,7 +144,9 @@
         </view>
         <view class="Eul">
           <text class="Dli-a">客服电话</text>
-          <text class="Dli-b"><text class="callser">4000000000</text></text>
+          <text class="Dli-b" @click="callPhone">
+            <text class="callser">{{ phoneNumber }}</text>
+          </text>
         </view>
       </view>
       <view class="clearh"></view>
@@ -160,15 +168,19 @@
         <image src="../../static/image/ico_01.png" mode="widthFix"></image>
         <text>编码充电</text>
       </view>
-      <button class="sfbt">扫码充电</button>
+      <button class="sfbt" @click="handleScan">扫码充电</button>
     </view>
   </view>
 </template>
 
 <script>
 import { findSiteById, findPostageBySiteId } from '@/api/site.js';
+import { addMemberFavorite, removeMemberFavorite } from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
+import scanCode from '@/mixins/scanCode.js';
+
 export default {
+  mixins: [scanCode],
   components: { pop },
   data() {
     return {
@@ -176,29 +188,39 @@ export default {
       siteData: {},
       postageList: [],
       currentTime: 0,
-      favshow: false, //收藏与否
       // 轮播图
       list: [
         {
-          image: '../../static/img/01.jpg'
+          image: '/static/img/01.jpg'
         },
         {
-          image: '../../static/img/02.jpg'
+          image: '/static/img/02.jpg'
         },
         {
-          image: '../../static/img/03.jpg'
+          image: '/static/img/03.jpg'
         }
-      ]
+      ],
+      currentLocation: {
+        lon: 0,
+        lat: 0
+      },
+      phoneNumber: 4000000000
     };
   },
   computed: {
     pictureList() {
-      if (!this.siteData.pictures) {
-        return '';
+      if (this.siteData.pictures) {
+        return this.siteData.pictures.split(',').map(image => ({
+          image
+        }));
       }
-      return this.siteData.pictures.split(',').map(image => ({
-        image
-      }));
+      return '';
+    },
+    businessTime() {
+      if (this.siteData.businessTime) {
+        return this.siteData.businessTime.split(',').join(' ~ ');
+      }
+      return '';
     },
     currentPostageIndex() {
       const date = new Date(this.currentTime);
@@ -237,15 +259,27 @@ export default {
   },
   onLoad({ id }) {
     this.id = id;
-    this.findSiteById();
+    this.getLocationInfo();
     this.findPostageBySiteId();
   },
   methods: {
+    getLocationInfo() {
+      this.$store
+        .dispatch('getLocationInfo')
+        .then(({ longitude, latitude }) => {
+          this.currentLocation.lon = longitude;
+          this.currentLocation.lat = latitude;
+          this.findSiteById();
+        })
+        .catch(() => {
+          this.rejectGetLocation();
+        });
+    },
     findSiteById() {
       findSiteById({
-        id: this.id
+        id: this.id,
+        ...this.currentLocation
       }).then(({ result }) => {
-        console.log(result);
         this.siteData = result || {};
       });
     },
@@ -253,22 +287,44 @@ export default {
       findPostageBySiteId({
         siteId: this.id
       }).then(({ result, timestamp }) => {
-        console.log(result);
         this.currentTime = timestamp;
-        this.postageList = result || [];
+        this.postageList = result.connector || [];
       });
     },
     fillZero(num) {
       return num < 10 ? `0${num}` : num;
     },
     // 收藏
-    favClick(index) {
-      this.favshow = !this.favshow;
+    favClick() {
+      this.siteData.storeState
+        ? this.removeMemberFavorite()
+        : this.addMemberFavorite();
+    },
+    addMemberFavorite() {
+      addMemberFavorite({
+        siteId: this.id
+      }).then(() => {
+        this.$tip.toast('收藏成功')
+        this.siteData.storeState = 1
+      });
+    },
+    removeMemberFavorite() {
+      removeMemberFavorite({
+        siteId: this.id
+      }).then(() => {
+        this.$tip.toast('取消收藏成功')
+        this.siteData.storeState = 0
+      });
+    },
+    callPhone() {
+      uni.makePhoneCall({
+        phoneNumber: this.phoneNumber
+      });
     },
     // 前往终端列表
     terminal() {
       uni.navigateTo({
-        url: './Terminal'
+        url: `/pages/Site/Terminal?id=${this.id}&name=${this.siteData.siteName}`
       });
     },
     // 前往输入充电桩编码
@@ -592,7 +648,7 @@ export default {
   .Dul {
     width: 100%;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: flex-start;
     padding: 30rpx 0 0;
   }

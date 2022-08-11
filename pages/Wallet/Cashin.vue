@@ -130,7 +130,14 @@ export default {
           timestamp: 1597935292, // 时间戳（单位：秒）
           sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0' // 签名，这里用的 MD5/RSA 签名
         },
-        success(res) {},
+        success: (res) => {
+          this.$tip.success('充值成功')
+          setTimeout(() => {
+            uni.navigateBack({
+              delta: 1
+            })
+          }, 1500)
+        },
         fail(e) {}
       });
     }

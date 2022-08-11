@@ -6,7 +6,7 @@
         <view class="outip disflex4">
           <text>￥</text>
           <input
-            v-model="outMoney"
+            v-model="amount"
             placeholder="0.00"
             type="digit"
             @blur="handleBlur"
@@ -40,7 +40,7 @@
       <view class="tcwarp">
         <view class="taxtA">
           <view>余额提现</view>
-          <view class="taxnum">{{ outMoney }}</view>
+          <view class="taxnum">{{ amount }}</view>
         </view>
         <scroll-view scroll-y="true" class="Dview">
           <!-- 原路返回 -->
@@ -60,7 +60,7 @@
               <image :src="activeBank.logo" mode="widthFix"></image>
               <text>
                 {{ activeBank.bankName }}（{{
-                  activeBank.cardNo.substr(-4, 4)
+                  activeBank.cardNo | cardNoSubstr
                 }}）
               </text>
             </view>
@@ -85,15 +85,19 @@
       <view class="tcwarp">
         <view class="tctitle">请选择</view>
         <scroll-view scroll-y="true" class="radiowp">
-          <radio-group v-model="bankId" @change="radioChange">
+          <radio-group @change="radioChange">
             <label v-for="item in bankList" class="radioli" :key="item.id">
               <view class="radname">
                 <image :src="item.logo" mode="widthFix"></image>
                 <text>
-                  {{ item.bankName }}（{{ item.cardNo.substr(-4, 4) }}）
+                  {{ item.bankName }}（{{ item.cardNo | cardNoSubstr }}）
                 </text>
               </view>
-              <radio :value="item.id" color="#33b048" />
+              <radio
+                :value="item.id"
+                :checked="bankId === item.id"
+                color="#33b048"
+              />
             </label>
           </radio-group>
         </scroll-view>
@@ -104,7 +108,7 @@
 </template>
 
 <script>
-import { findMemberBanks } from '@/api/member.js';
+import { findMemberBanks, withdrawalMember } from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 
 export default {
@@ -115,37 +119,53 @@ export default {
     return {
       isshow: true,
       allMoney: 20.01,
-      outMoney: undefined,
+      amount: undefined,
       bankId: '',
       activeBank: {},
       bankList: []
     };
   },
-  onLoad() {
+  filters: {
+    cardNoSubstr(value) {
+      return value ? value.substr(-4, 4) : '';
+    }
+  },
+  onShow() {
     this.findMemberBanks();
   },
   methods: {
     findMemberBanks() {
       findMemberBanks().then(({ result }) => {
         this.bankList = result || [];
-        this.activeBank = result[0];
-        this.bankId = this.activeBank.id
+        // this.bankList = []
+        if (this.bankList.length > 0) {
+          this.activeBank = result[0];
+          this.bankId = this.activeBank.id;
+        }
       });
     },
     cashOutAll() {
-      this.outMoney = this.allMoney;
+      this.amount = this.allMoney;
     },
     handleBlur() {
-      if (this.outMoney > this.allMoney) {
-        this.outMoney = this.allMoney;
+      if (this.amount > this.allMoney) {
+        this.amount = this.allMoney;
+        return;
+      }
+      if (this.amount < 0) {
+        this.amount = 0;
       }
     },
     openBank() {
-      if (parseFloat(this.outMoney) > 0) {
-        this.$refs.popA.show();
-      } else {
+      if (parseFloat(this.amount) <= 0) {
         this.$tip.toast('请输入提现金额');
+        return
+      } 
+      if (this.bankList.length === 0) {
+        this.$refs.popB.show();
+        return
       }
+      this.$refs.popA.show();
     },
     watchOpen() {},
     watchClose() {},
@@ -153,12 +173,34 @@ export default {
     // 弹框支付方式单选
     radioChange(event) {
       this.bankId = event.detail.value;
-      this.activeBank = this.bankList.find(obj => obj.id === this.bankiD);
-
+      this.activeBank = this.bankList.find(obj => obj.id === this.bankId) || {};
       this.$refs.popB.close();
+      this.$refs.popA.open();
     },
     handleWithdraw() {
-      
+      if (parseFloat(this.amount) <= 0) {
+        this.$tip.toast('请输入提现金额');
+        return
+      }
+      if (!this.bankId) {
+        this.$tip.toast('请选择提现的银行卡');
+        return
+      }
+      this.withdrawalMember()
+    },
+    withdrawalMember() {
+      withdrawalMember({
+        amount: this.amount,
+        channel: 1, // 1：银行卡；
+        bankId: this.bankId,
+      }).then(() => {
+        this.$tip.success('提交成功，请耐心等待')
+        setTimeout(() => {
+          uni.navigateBack({
+            delta: 1
+          })
+        }, 1500)
+      })
     },
     // 前往银行卡
     goRenzcard() {
@@ -351,7 +393,7 @@ export default {
   }
   .radiowp {
     width: 92%;
-    min-height: 320rpx;
+    // min-height: 320rpx;
     max-height: 50vh;
     // overflow-y: scroll;
     margin: 0 auto;

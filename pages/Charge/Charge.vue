@@ -1,10 +1,18 @@
 <template>
   <view class="container">
+    <!-- 加载动画 -->
+    <view
+      class="loaditem"
+      @touchmove.stop.prevent="moveHandle"
+      v-show="loadshwo"
+    >
+      <view>请稍等，正在与充电枪断开……</view>
+    </view>
     <!-- 充电汽车切换 -->
     <view class="carul disflex5">
       <text @click="$refs.pop.show()">设备编码：1231321545</text>
       <image
-        src="../../static/image/arrow_03.png"
+        src="/static/image/arrow_03.png"
         mode="widthFix"
         class="arrimg"
       ></image>
@@ -32,7 +40,7 @@
     <best-gauge :config="gaugeOption1"></best-gauge>
     <!-- 汽车图片 -->
     <view class="carshow">
-      <image src="../../static/image/car.png" mode="widthFix"></image>
+      <image src="/static/image/car.png" mode="widthFix"></image>
     </view>
     <!-- 充电计时 -->
     <view class="Timesul">
@@ -43,7 +51,6 @@
         :minute="12"
         :second="12"
         class="cTimes"
-        style="justify-content:center"
       />
       <view class="sTimes disflex5">
         <text>正在充电中，已充电</text>
@@ -199,6 +206,8 @@ export default {
   data() {
     let _width = uni.upx2px(480); //传感器宽度350
     return {
+      // 加载动画显示
+      loadshwo: false,
       // 传感器chart数据
       gaugeOption1: {
         id: 'gaugeId1',
@@ -438,9 +447,7 @@ export default {
     stopCharge() {
       stopCharge({
         connectorNum: this.connectorNum
-      }).then(() => {
-        
-      })
+      }).then(() => {});
     },
     // 前往充值
     cashin() {
@@ -463,6 +470,10 @@ export default {
     /* 切换显示内容 */
     changeShowType(type) {
       this.showType = type;
+    },
+    // 禁止外壳页面手指上下滑动
+    moveHandle() {
+      return false;
     },
     // 数据图表
     getServerData() {
@@ -517,9 +528,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-page,
 .container {
   background: #fff;
+  height: auto;
 }
 // 充电汽车切换
 .carul {
@@ -575,6 +586,8 @@ page,
 .carshow {
   width: 80%;
   margin: -250rpx auto 0;
+  position: relative;
+  z-index: 2;
   image {
     width: 100%;
     height: auto;
@@ -582,10 +595,12 @@ page,
 }
 // 充电计时
 .Timesul {
+  display: flex;
+  flex-direction: column;
   margin: 20rpx auto 60rpx;
   .cTimes {
     margin: 20rpx auto 0;
-    text-align: center;
+    justify-content: center;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   }
   .sTimes {
@@ -789,5 +804,27 @@ page,
 .clearw {
   height: 180rpx;
   display: block;
+}
+// 加载动画
+.loaditem {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 101;
+
+  view {
+    width: 70%;
+    border-radius: 20rpx;
+    background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center
+      50rpx no-repeat;
+    background-size: 100rpx 100rpx;
+    color: #fff;
+    font-size: 28rpx;
+    padding: 200rpx 20rpx 30rpx;
+    text-align: center;
+    margin: 60% auto 0;
+  }
 }
 </style>

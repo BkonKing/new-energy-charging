@@ -1,260 +1,241 @@
 <template>
-	<view class="container">
-		<view class="fav_sch">
-			<input placeholder="输入电站关键字" />
-			<button class="favbt">搜索</button>
-		</view>
-		<!-- 搜索结果 -->
-		<view class="sch_ul">
-			<text>关键字</text>
-			<image src="../../static/image/ico_11.png" mode="widthFix"></image>
-		</view>
-		<!-- 搜索无结果 显示 -->
-		<view class="nodata">- 未搜索到您所要的 -</view>
-		<!-- 暂无收藏 -->
-		<view class="nodata" v-if="isshow">- 暂无收藏记录 -</view>
-		<!-- 收藏列表 -->
-		<view class="fav_ul" v-for="t in 3" v-else @click="sitedetail">
-			<view class="fav_ico">收藏</view>
-			<view class="fcname">
-				<image src="../../static/image/logo2.png" mode="heightFix"></image>
-				<view class="ellipsis">福州市规划设计研究院充电桩福州市规划设计研究院充电桩</view>
-			</view>
-			<view class="fctips fpd20">
-				<!-- <text class="xying">歇业中</text> -->
-				<text>00:00-24:00</text>
-				<text>对外开放</text>
-				<text>互联互通</text>
-			</view>
-			<view class="fpd20"><view class="fcpark ellipsis">停车收费：半小时内免费，4小时内5元，超过4小时后，每小时加0.1元</view></view>
-			<view class="fcprice fpd20">
-				￥
-				<text>1.0246</text>
-			</view>
-			<view class="fcsta">
-				<view>
-					<text>快</text>
-					<text class="colx">闲2</text>
-					<text class="gray">/4</text>
-					<text class="pl-30">慢</text>
-					<text class="colm">闲2</text>
-					<text class="gray">/4</text>
-				</view>
-				<view class="dwei">910m</view>
-			</view>
-		</view>
-		<view class="clearit"></view>
-	</view>
+  <view class="container">
+    <!-- 搜索列表 -->
+    <z-paging
+      v-model="siteListData"
+      ref="paging"
+      :fixed="true"
+      @query="queryList"
+    >
+      <template slot="top">
+        <view class="fav_sch">
+          <input v-model="searchText" placeholder="输入电站关键字" />
+          <button class="favbt" @click="handleSearch">搜索</button>
+        </view>
+        <!-- 搜索结果 -->
+        <view class="sch_ul">
+          <text v-for="key in keyList" @click="setSearchText(key)">
+            {{ key }}
+          </text>
+          <image
+            v-if="keyList.length"
+            src="/static/image/ico_11.png"
+            mode="widthFix"
+            @click="clearAllKey"
+          ></image>
+        </view>
+      </template>
+      <template v-if="siteListData && siteListData.length">
+        <view
+          v-for="item in siteListData"
+          :key="item.id"
+          class="fav_ul"
+          @click="sitedetail"
+        >
+          <site-card :data="item" :storeType="2"></site-card>
+        </view>
+        <view class="clearit"></view>
+      </template>
+    </z-paging>
+  </view>
 </template>
 
 <script>
+import { findSiteByFavorite } from '@/api/member.js';
+import { getLocationInfo } from '@/common/util.js';
+import SiteCard from '@/modules/SiteCard.vue';
 export default {
-	data() {
-		return {
-			isshow: false
-		};
-	},
-	onLoad() {},
-	methods: {
-		// 前往电站详情
-		sitedetail() {
-			uni.navigateTo({
-				url: '../../pages/Site/Sitedetail'
-			});
-		}
-	}
+  components: {
+    SiteCard
+  },
+  data() {
+    return {
+      searchText: '',
+      isshow: false,
+      keyList: [],
+      siteListData: [],
+      currentLocation: {
+        lat: 0,
+        lon: 0
+      },
+    };
+  },
+  onLoad() {
+    this.getLocationInfo()
+  },
+  methods: {
+    getLocationInfo() {
+      getLocationInfo({
+        title: '请求授权当前位置',
+        message: '我们需要获取地理位置信息，为您推荐附近的站点'
+      })
+        .then(({ longitude, latitude }) => {
+          this.currentLocation.lon = longitude;
+          this.currentLocation.lat = latitude;
+          this.$refs.paging.reload(true);
+        })
+        .catch(() => {
+        });
+    },
+    handleSearch() {
+      const key = this.searchText;
+      this.saveKey(key);
+      this.$refs.paging.reload(true);
+    },
+    queryList(pageNo, pageSize) {
+      if (!this.currentLocation.lon || !this.currentLocation.lat) {
+        return
+      }
+      const key = this.searchText;
+      this.$tip.loading();
+      //组件加载时会自动触发此方法，因此默认页面加载时会自动触发，无需手动调用
+      findSiteByFavorite({
+        key,
+        ...this.currentLocation,
+        pageNo,
+        pageSize
+      })
+        .then(({ result }) => {
+          const records = result?.siteInfo?.records || []
+          if (records.length > 0) {
+            this.$refs.paging.complete(records);
+          } else {
+            this.$refs.paging.complete([]);
+          }
+        })
+        .finally(() => {
+          this.$tip.loaded();
+        });
+    },
+    setSearchText(key) {
+      if (this.searchText === key) {
+        return;
+      }
+      this.searchText = key;
+      this.handleSearch();
+    },
+    getKey() {
+      const value = uni.getStorageSync('sitefav_key');
+      if (value) {
+        this.keyList = value.split(',');
+      }
+    },
+    saveKey(key) {
+      if (!key) {
+        return;
+      }
+      if (this.keyList.includes(key)) {
+        return;
+      }
+      if (this.keyList.length === 6) {
+        this.keyList.pop();
+      }
+      this.keyList.unshift(key);
+      uni.setStorage({
+        key: 'sitefav_key',
+        data: this.keyList.join(',')
+      });
+    },
+    clearAllKey() {
+      uni.removeStorage({
+        key: 'sitefav_key',
+        success: res => {
+          this.keyList = [];
+        }
+      });
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-.container {
-	padding-top: 30rpx;
-}
 // 搜索
 .fav_sch {
-	width: 94%;
-	background: #fff;
-	box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.03);
-	border-radius: 100rpx;
-	margin: 0 auto 50rpx;
-	padding: 20rpx 40rpx;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+  width: 94%;
+  background: #fff;
+  box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.03);
+  border-radius: 100rpx;
+  margin: 30rpx auto 50rpx;
+  padding: 20rpx 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-	input,
-	uni-input {
-		width: 80%;
-		color: #888;
-		font-size: 28rpx;
-		line-height: 1.6;
-		font-weight: 500;
-	}
-	button.favbt,
-	uni-button.favbt {
-		width: auto;
-		display: inline-block;
-		background: #33b048;
-		font-size: 26rpx;
-		line-height: 1.6;
-		color: #fff;
-		border: 1px solid #33b048;
-		border-radius: 10rpx;
-		padding: 10rpx 20rpx;
-	}
+  input,
+  uni-input {
+    width: 80%;
+    color: #888;
+    font-size: 28rpx;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+  button.favbt,
+  uni-button.favbt {
+    width: auto;
+    display: inline-block;
+    background: #33b048;
+    font-size: 26rpx;
+    line-height: 1.6;
+    color: #fff;
+    border: 1px solid #33b048;
+    border-radius: 10rpx;
+    padding: 10rpx 20rpx;
+  }
 }
 // 搜索结果
 .sch_ul {
-	width: 94%;
-	margin: 0 auto 40rpx;
-	padding-right: 30rpx;
-	font-size: 24rpx;
-	color: #666;
-	position: relative;
-	
-	text {
-		line-height: 1.2;
-		display: inline-block;
-		background: #ddd;
-		padding: 10rpx 20rpx;
-		border-radius: 20rpx;
-		margin: 0 20rpx 24rpx 0;
-	}
-	
-	image {
-		width: 40rpx;
-		height: 40rpx;
-		position: absolute;
-		right: 0;
-		top: 0;
-		z-index: 2;
-	}
+  width: 94%;
+  margin: 0 auto 40rpx;
+  padding-right: 30rpx;
+  font-size: 24rpx;
+  color: #666;
+  position: relative;
+
+  text {
+    line-height: 1.2;
+    display: inline-block;
+    background: #ddd;
+    padding: 10rpx 20rpx;
+    border-radius: 20rpx;
+    margin: 0 20rpx 24rpx 0;
+  }
+
+  image {
+    width: 40rpx;
+    height: 40rpx;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+  }
 }
 // 收藏列表
 .fav_ul {
-	position: relative;
-	width: 94%;
-	background: #fff;
-	box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.03);
-	border-radius: 14rpx;
-	font-size: 22rpx;
-	color: #999;
-	margin: 0rpx auto 30rpx;
+  position: relative;
+  width: 94%;
+  background: #fff;
+  box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.03);
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  color: #999;
+  margin: 0rpx auto 30rpx;
 
-	.fcname {
-		width: 80%;
-		padding: 34rpx 20rpx 24rpx;
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		font-size: 32rpx;
-		color: #333;
-		font-weight: 500;
-		image {
-			width: auto;
-			height: 40rpx;
-			margin-right: 10rpx;
-		}
-		view {
-			width: calc(100% - 80rpx);
-			height: 40rpx;
-			line-height: 40rpx;
-		}
-	}
-	.fctips {
-		margin-bottom: 10rpx;
-		font-size: 22rpx;
-		color: #999;
-		text {
-			display: inline-block;
-			padding: 6rpx 10rpx;
-			margin-right: 20rpx;
-			background: #f1f1f1;
-			border-radius: 6rpx;
-			margin-bottom: 10rpx;
-		}
-		.xying {
-			background: #999;
-			color: #fff;
-		}
-	}
-	.fcprice {
-		font-size: 30rpx;
-		font-weight: 500;
-		color: #333;
-		margin: 10rpx 0 20rpx;
-		text {
-			font-size: 40rpx;
-			font-weight: 500;
-		}
-	}
-	.fpd20 {
-		padding: 0 20rpx;
-	}
-	.fcpark {
-		width: 100%;
-		background: url(../../static/image/ico_03.png) left center no-repeat;
-		background-size: 30rpx 30rpx;
-		padding-left: 36rpx;
-		font-size: 22rpx;
-		color: #999;
-		margin: 10rpx 0rpx 10rpx;
-		height: 40rpx;
-		line-height: 40rpx;
-	}
-	.fcsta {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-		font-size: 24rpx;
-		color: #333;
-		font-weight: 500;
-		background: #f9f9f9;
-		border-radius: 0 0 14rpx 14rpx;
-		padding: 10rpx 20rpx;
-		.colx {
-			color: #f37c2c;
-			padding-left: 20rpx;
-			letter-spacing: 2px;
-		}
-		.colm {
-			color: #5581ff;
-			padding-left: 20rpx;
-			letter-spacing: 2px;
-		}
-		.gray {
-			color: #999;
-			font-weight: normal;
-		}
-		.dwei {
-			background: url(../../static/image/ico_04.png) right center no-repeat;
-			background-size: 25rpx 25rpx;
-			padding-right: 30rpx;
-		}
-	}
-	.fav_ico {
-		font-size: 22rpx;
-		color: #fff;
-		padding: 6rpx 14rpx;
-		background-image: linear-gradient(to right bottom, #ff696a, #fa4655, #f42542);
-		border-radius: 0 14rpx 0 14rpx;
-		position: absolute;
-		right: 0;
-		top: 0;
-		z-index: 2;
-	}
-}
-// 暂无数据
-.nodata {
-	display: block;
-	font-size: 28rpx;
-	color: #999;
-	line-height: 200rpx;
-	text-align: center;
+  ::v-deep .site-card {
+    .site-content {
+      padding-left: 20rpx;
+    }
+    .fcname {
+      width: 80%;
+      padding: 34rpx 20rpx 24rpx 0;
+    }
+    .fcsta {
+      border-radius: 0 0 14rpx 14rpx;
+      padding: 10rpx 20rpx;
+    }
+  }
 }
 .clearit {
-	height: 30rpx;
-	display: block;
+  height: 30rpx;
+  display: block;
 }
 </style>

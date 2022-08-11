@@ -1,94 +1,97 @@
 <template>
   <view class="container">
-    <!-- 余额 -->
-    <view class="wallA">
-      <view class="wali">
-        <view>资产总额</view>
-        <view class="wanum">{{ walletData.totalAssets }}</view>
-      </view>
-      <view class="waol disflex">
-        <view>
-          <text>可用余额</text>
-          <text class="wonum">{{ walletData.balances }}</text>
-        </view>
-        <view>
-          <text>冻结余额</text>
-          <text class="wonum">{{ walletData.frozenAmount }}</text>
-        </view>
-      </view>
-      <view class="watisw disflex3" v-show="tipshow">
-        <text>总金额-冻结金额</text>
-        <text>（待支付金额）</text>
-      </view>
-      <image
-        src="/static/image/ico_12.png"
-        class="watip"
-        mode="widthFix"
-        @click="showtip"
-      ></image>
-    </view>
-    <!-- 明细 -->
-    <view class="wallB">
-      <view class="wbchos">
-        <view class="wbdmx">
-          <text>收入{{ walletData.inSummary }}元</text>
-          <text>支出{{ walletData.expSummary }}元</text>
-        </view>
-        <view class="datawp" @click="showPicker">
-          <!-- hy:默认显示为当天 -->
-          <text style="color: #33b048;">{{ chooseDate }} ▼</text>
-          <rangeDatePick
-            start="2021-01-01"
-            end="2200-12-01"
-            themeColor="#33b048"
-            fields="day"
-            :show="dateShow"
-            :value="value"
-            @change="bindChange"
-            @cancel="bindCancel"
-            @showchange="showchange"
-          ></rangeDatePick>
-        </view>
-      </view>
-      <!-- 无记录 -->
-      <view class="nodata" v-if="!isHaveData">- 暂无相关明细 -</view>
-      <!-- 有记录 -->
-      <view v-else v-for="item in billList" :key="item.id">
-        <view
-          class="wblist"
-          :class="{ wtxbg: item.payType === '2' }"
-          @click="goTxdetail(item)"
-        >
-          <view class="w-70">
-            <view class="wbtou">
-              {{ item.payType | payTypeText }}
-              <text
-                v-if="item.payType === '2' && item.payStatus === '1'"
-                class="wbtxzt"
-              >
-                提现成功
-              </text>
-            </view>
-            <view>{{ item.payTime }}</view>
+    <z-paging v-model="billList" ref="paging" :fixed="true" @query="queryList">
+      <template slot="top">
+        <!-- 余额 -->
+        <view class="wallA">
+          <view class="wali">
+            <view>资产总额</view>
+            <view class="wanum">{{ walletData.totalAssets || 0 }}</view>
           </view>
-          <view>
-            <view class="wbmon">
-              <!-- 不懂后端是否返回 +/- -->
-              <!-- <text>+</text> -->
-              <text>{{ item.realAmount }}</text>
-              <text class="wbtsm">元</text>
+          <view class="waol disflex">
+            <view>
+              <text>可用余额</text>
+              <text class="wonum">{{ walletData.balances || 0 }}</text>
             </view>
-            <view class="wbyu">余额：{{ item.afterAmount }}</view>
+            <view>
+              <text>冻结余额</text>
+              <text class="wonum">{{ walletData.frozenAmount || 0 }}</text>
+            </view>
+          </view>
+          <view class="watisw disflex3" v-show="tipshow">
+            <text>总金额-冻结金额</text>
+            <text>（待支付金额）</text>
+          </view>
+          <image
+            src="/static/image/ico_12.png"
+            class="watip"
+            mode="widthFix"
+            @click="showtip"
+          ></image>
+        </view>
+        <view class="wbchos">
+          <view class="wbdmx">
+            <text>收入{{ walletData.inSummary }}元</text>
+            <text>支出{{ walletData.expSummary }}元</text>
+          </view>
+          <view class="datawp" @click="showPicker">
+            <!-- hy:默认显示为当天 -->
+            <text style="color: #33b048;">{{ chooseDate }} ▼</text>
+            <rangeDatePick
+              start="2021-01-01"
+              end="2200-12-01"
+              themeColor="#33b048"
+              fields="day"
+              :show="dateShow"
+              :value="value"
+              @change="bindChange"
+              @cancel="bindCancel"
+              @showchange="showchange"
+            ></rangeDatePick>
           </view>
         </view>
+      </template>
+      <template slot="bottom">
+        <!-- 底部按钮 -->
+        <view class="wfoot">
+          <button class="wtxbt" @click="cashout">提现</button>
+          <button class="wczbt" @click="cashin">充值</button>
+        </view>
+      </template>
+      <!-- 明细 -->
+      <view class="wallB">
+        <view v-for="item in billList" :key="item.id">
+          <view
+            class="wblist"
+            :class="{ wtxbg: item.payType === '2' }"
+            @click="goTxdetail(item)"
+          >
+            <view class="w-70">
+              <view class="wbtou">
+                {{ item.payType | payTypeText }}
+                <text
+                  v-if="item.payType === '2' && item.payStatus === '1'"
+                  class="wbtxzt"
+                >
+                  提现成功
+                </text>
+              </view>
+              <view>{{ item.payTime }}</view>
+            </view>
+            <view>
+              <view class="wbmon">
+                <!-- 不懂后端是否返回 +/- -->
+                <!-- <text>+</text> -->
+                <text>{{ item.realAmount }}</text>
+                <text class="wbtsm">元</text>
+              </view>
+              <view class="wbyu">余额：{{ item.afterAmount }}</view>
+            </view>
+          </view>
+        </view>
       </view>
-    </view>
-    <view class="clearw"></view>
-    <!-- 底部按钮 -->
-    <view class="wfoot">
-      <button class="wtxbt" @click="cashout">提现</button>
-      <button class="wczbt" @click="cashin">充值</button>
-    </view>
+      <!-- <view class="clearw"></view> -->
+    </z-paging>
   </view>
 </template>
 
@@ -112,24 +115,18 @@ export default {
       format: true
     });
     return {
-      walletData: {},
       tipshow: false,
+      walletData: {},
       nowDate: currentDate, //获取当前时间
       dateShow: false,
       value: [],
       chooseDate: '日期筛选',
       formData: {
         startDate: '',
-        endDate: '',
-        page: 1
+        endDate: ''
       },
       billList: []
     };
-  },
-  computed: {
-    isHaveData() {
-      return this.billList && this.billList.length;
-    }
   },
   filters: {
     payTypeText(value) {
@@ -138,7 +135,6 @@ export default {
   },
   onLoad() {
     this.findMemberByWallet();
-    this.findMemberBalance();
   },
   methods: {
     findMemberByWallet() {
@@ -146,10 +142,17 @@ export default {
         this.walletData = result || {};
       });
     },
-    findMemberBalance() {
-      findMemberBalance(this.formData).then(({ result }) => {
-        this.billList = result || [];
-      });
+    queryList(pageNo, pageSize) {
+      findMemberBalance({ ...this.formData, pageNo, pageSize }).then(
+        ({ result }) => {
+          const records = result?.balance?.records
+          if (records.length > 0) {
+            this.$refs.paging.complete(records);
+          } else {
+            this.$refs.paging.complete([]);
+          }
+        }
+      );
     },
     // 显示tip
     showtip() {
@@ -187,8 +190,7 @@ export default {
       this.chooseDate = data[0] + ' 至 ' + data[1];
       this.formData.startDate = data[0];
       this.formData.endDate = data[1];
-      this.formData.page = 1;
-      this.findMemberBalance();
+      this.$refs.paging.reload();
     },
     bindCancel(e) {
       console.log(e);
@@ -208,13 +210,13 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  padding-top: 30rpx;
+  // padding-top: 30rpx;
 }
 // 余额
 .wallA {
   position: relative;
   width: 94%;
-  margin: 0 auto 30rpx;
+  margin: 30rpx auto;
   padding: 0 30rpx;
   background: #fff;
   box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.02);
@@ -275,6 +277,37 @@ export default {
     z-index: 3;
   }
 }
+.wbchos {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 94%;
+  margin: 0 auto;
+  padding: 0 30rpx 20rpx;
+  background: #fff;
+  box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.02);
+  border-radius: 14rpx 14rpx 0 0;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.4;
+  padding: 30rpx 0;
+
+  .datawp {
+    border: 1px solid #33b048;
+    background: #e6f7e8;
+    padding: 10rpx 30rpx;
+    border-radius: 100rpx;
+    font-size: 30rpx;
+  }
+  .wbdmx {
+    color: #33b048;
+    margin: 0rpx auto 30rpx;
+    text {
+      font-size: 30rpx;
+      margin: 0 20rpx;
+    }
+  }
+}
 // 明细
 .wallB {
   width: 94%;
@@ -282,32 +315,10 @@ export default {
   padding: 0 30rpx 20rpx;
   background: #fff;
   box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.02);
-  border-radius: 14rpx;
+  border-radius: 0 0 14rpx 14rpx;
   font-size: 24rpx;
   color: #999;
   line-height: 1.4;
-  .wbchos {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    padding: 30rpx 0;
-
-    .datawp {
-      border: 1px solid #33b048;
-      background: #e6f7e8;
-      padding: 10rpx 30rpx;
-      border-radius: 100rpx;
-      font-size: 30rpx;
-    }
-    .wbdmx {
-      color: #33b048;
-      margin: 0rpx auto 30rpx;
-      text {
-        font-size: 30rpx;
-        margin: 0 20rpx;
-      }
-    }
-  }
   .wblist {
     padding: 24rpx 40rpx 24rpx 0;
     border-bottom: 1px dashed #ededed;

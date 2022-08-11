@@ -45,6 +45,7 @@ export default {
         trueName: this.trueName,
         idCardNo: this.idCardNo
       }).then(() => {
+        this.$store.dispatch('getUserInfo')
         this.$tip.success('实名认证成功').then(() => {
           uni.navigateBack({
             delta: 1

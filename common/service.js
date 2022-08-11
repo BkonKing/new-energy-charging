@@ -72,13 +72,16 @@ http.interceptors.request.use((config) => { // 可使用async await 做异步操
 
 http.interceptors.response.use((response) => {
   /* 对响应成功做点什么 可使用async await 做异步操作*/
-  //  if (response.data.code !== 200) { // 服务端返回的状态码不等于200，则reject()
-  //    return Promise.reject(response) // return Promise.reject 可使promise状态进入catch
-  // if (response.config.custom.verification) { // 演示自定义参数的作用
-  //   return response.data
-  // }
-  console.log(response)
-  return response
+  const {
+    success,
+    code,
+    message
+  } = response?.data || {}
+  if (success || code === 200) { // 服务端返回的状态码不等于200，则reject()
+    return response.data
+  }
+  tip.toast(message)
+  return Promise.reject(response)
 }, (response) => {
   /*  对响应错误做点什么 （statusCode !== 200）*/
   if (response) {
@@ -102,7 +105,7 @@ http.interceptors.response.use((response) => {
             //     success: function(res) {
             //       console.log('success');
             //     }
-  	         //   });
+            //   });
             //   uni.redirectTo({
             //     url: '/pages/login/login'
             //   });

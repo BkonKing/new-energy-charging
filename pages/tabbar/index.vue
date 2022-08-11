@@ -25,11 +25,11 @@
             </cCircle>
           </view>
           <view class="vmt">
-            <view>{{ item.plateNo }}</view>
+            <view>{{ item.plateNo || '' }}</view>
             <view class="fcsm">
               <text>
                 实时费用：
-                <text class="fcfont">{{ item.realAmount }}</text>
+                <text class="fcfont">{{ item.realAmount }}元</text>
               </text>
               <text>
                 预计剩余：
@@ -43,6 +43,12 @@
       <view class="fcul" v-if="siteshow">
         <site-card :data="siteData"></site-card>
       </view>
+    </view>
+    <view class="cover-view" @click="onControltap">
+      <image
+        class="cover-image"
+        src="/static/image/map_02.png"
+      ></image>
     </view>
     <!-- 输入电桩编码 -->
     <view class="enterbm" @click="inputcode">输入电桩编码</view>
@@ -64,27 +70,23 @@
       @regionchange="handleRegionchange"
       @tap="tap"
     >
-      <cover-view class="cover-view" @click="onControltap">
-        <cover-image
-          class="cover-image"
-          src="/static/image/map_02.png"
-        ></cover-image>
-      </cover-view>
       <cover-view slot="callout">
-        <template v-for="item in siteListData">
+        <template v-for="(item, index) in siteListData">
           <cover-view
             class="customCallout-container"
-            :marker-id="item.id"
+            :marker-id="index"
             :key="item.id"
           >
             <cover-view class="customCallout">
               <cover-view class="callout-label">
-                闲{{ item.freeNum }}
+                闲{{ item.freeNum || 0 }}
               </cover-view>
               <cover-view class="callout-content">
-                <cover-view class="callout-number">￥{{ item.fee }}</cover-view>
+                <cover-view class="callout-number">
+                  ￥{{ item.fee || 0 }}
+                </cover-view>
                 <cover-view class="callout-text">
-                  快{{ item.freeFastNum }} 慢{{ item.freeSlowNum }}
+                  快{{ item.freeFastNum || 0 }} 慢{{ item.freeSlowNum || 0 }}
                 </cover-view>
               </cover-view>
             </cover-view>
@@ -102,7 +104,6 @@ import { findOrderByMemberId } from '@/api/member.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import SiteCard from '@/modules/SiteCard.vue';
-import { getLocationInfo } from '@/common/util.js';
 
 const scaleObj = {
   3: 1000 * 1000,
@@ -141,8 +142,12 @@ export default {
       myMap: {
         latitude: 26.04243, // 纬度
         longitude: 119.216452, //经度
-        iconPath: '../../static/image/map_01.png', //图标为空白透明图片
+        iconPath: '/static/image/map_01.png', //图标为空白透明图片
         scale: 16 //缩放级别
+      },
+      currentLocation: {
+        latitude: 0,
+        longitude: 0
       },
       markers: [],
       siteListData: [],
@@ -158,25 +163,22 @@ export default {
     }
   },
   onLoad() {
+    this.getLocationInfo();
     this.findOrderByMemberId();
   },
   mounted() {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
     this.mapContext = uni.createMapContext('map', this);
   },
-  onReady() {
-    this.getLocationInfo();
-    this.findSiteByCoordinate();
-  },
   methods: {
     getLocationInfo() {
-      getLocationInfo({
-        title: '请求授权当前位置',
-        message: '我们需要获取地理位置信息，为您推荐附近的站点'
-      })
+      this.$store
+        .dispatch('getLocationInfo')
         .then(({ longitude, latitude }) => {
           this.myMap.longitude = longitude;
           this.myMap.latitude = latitude;
+          this.currentLocation.longitude = longitude;
+          this.currentLocation.latitude = latitude;
         })
         .catch(() => {
           this.rejectGetLocation();
@@ -192,43 +194,49 @@ export default {
     },
     //点击标记气泡
     callouttap(e) {
-      const { markerId } = e.detail;
-      if (markerId) {
-        const data = this.siteListData.find(obj => obj.id === markerId);
+      const { markerId: index } = e.detail;
+      if (index > -1) {
+        const data = this.siteListData[index];
         this.myMap.latitude = data.latitude;
         this.myMap.longitude = data.longitude;
         this.findSiteById({
-          id: markerId
+          id: data.id,
+          lon: this.currentLocation.longitude,
+          lat: this.currentLocation.latitude
         });
       }
     },
     findSiteById(params) {
       findSiteById(params).then(({ result }) => {
-        this.siteData = result;
+        this.siteData = result || [];
         this.siteshow = true;
       });
     },
     findOrderByMemberId() {
       findOrderByMemberId({
-        findType: 2, // 0:全部订单，1:等待充电 2:充电中
-        pageSize: 3,
+        findType: 1, // 0:全部订单，1:充电中和等待充电
+        pageSize: 2,
         pageNo: 1
       }).then(({ result }) => {
-        this.orderList = result || [];
+        this.orderList = result.orderInfo?.records || [];
       });
     },
     //视野发生变化时触发
     handleRegionchange(e) {
-      // console.log(e);
+      // console.log('handleRegionchange', e);
       const { type, detail } = e;
       if (e.type === 'end') {
         const { longitude: lon, latitude: lat } = detail.centerLocation;
         this.mapContext.getScale({
           success: ({ scale }) => {
             this.findSiteByCoordinate({
-              lon,
-              lat,
-              distance: scaleObj[Math.floor(scale)]
+              // lon,
+              // lat,
+              // distance: scaleObj[Math.floor(scale)]
+              // todo: 测试
+              lon: 119.28411,
+              lat: 26.048446,
+              distance: 10000000
             });
           },
           fail: () => {
@@ -243,18 +251,18 @@ export default {
     },
     findSiteByCoordinate(params) {
       findSiteByCoordinate(params).then(({ result }) => {
-        this.markers = result.map(data => {
-          return this.setMarker(data);
+        const siteListData = result.siteInfo || [];
+        this.markers = siteListData.map((data, index) => {
+          return this.setMarker(data, index);
         });
-        this.siteListData = result;
-        // console.log(result);
+        this.siteListData = siteListData;
       });
     },
-    setMarker({ id, longitude, latitude }) {
+    setMarker({ id, longitude, latitude }, index) {
       return {
-        id,
-        longitude,
-        latitude,
+        id: index,
+        longitude: +longitude,
+        latitude: +latitude,
         iconPath: '/static/image/map_no.png', //图标为空白透明图片
         rotate: 0, // Number - 顺时针旋转的角度，范围 0 ~ 360，默认为 0
         alpha: 1, // 默认1，无透明，范围 0 ~ 1
@@ -272,8 +280,8 @@ export default {
     onControltap() {
       this.mapContext.moveToLocation({
         //moveToLocation将地图中心移动到当前定位点，需要配合map组件的show-location使用
-        latitude: this.myMap.latitude,
-        longitude: this.myMap.longitude
+        latitude: this.currentLocation.latitude,
+        longitude: this.currentLocation.longitude
       });
     },
     // 前往搜索页面
@@ -360,6 +368,9 @@ export default {
     font-size: 34rpx;
     padding: 30rpx 0 24rpx;
     border-bottom: 1px solid #ddd;
+    .disflex4 + .disflex4 {
+      margin-top: 20rpx;
+    }
     .fcmd {
       width: 150rpx;
       height: 120rpx;
