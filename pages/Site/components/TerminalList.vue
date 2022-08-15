@@ -97,7 +97,6 @@
 
 <script>
 import { findConnectorBySiteId } from '@/api/site.js';
-import hrPullLoad from '@/components/hr-pull-load/hr-pull-load.vue'; //加载
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import zModal from '@/components/z-modal/z-modal.vue'; //modal弹框
 
@@ -134,7 +133,6 @@ const connectorStatus = {
 };
 export default {
   components: {
-    hrPullLoad,
     cCircle,
     zModal
   },

@@ -30,8 +30,8 @@
       </view>
       <view class="wbchos">
         <view class="wbdmx">
-          <text>收入{{ walletData.inSummary }}元</text>
-          <text>支出{{ walletData.expSummary }}元</text>
+          <text>收入{{ walletData.inSummary || 0 }}元</text>
+          <text>支出{{ walletData.expSummary || 0 }}元</text>
         </view>
         <view class="datawp" @click="showPicker">
           <!-- hy:默认显示为当天 -->

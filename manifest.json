@@ -53,7 +53,9 @@
         "appid" : "wxeda8047e0c35f6e6",
         "setting" : {
             "urlCheck" : false,
-            "postcss" : true
+            "postcss" : true,
+            "minified" : true,
+            "es6" : true
         },
         "usingComponents" : true,
         "permission" : {
@@ -61,10 +63,7 @@
                 "desc" : "请求具体定位"
             }
         },
-        "requiredPrivateInfos": [
-            "getLocation",
-            "chooseLocation"
-        ]
+        "requiredPrivateInfos" : [ "getLocation", "chooseLocation" ]
     },
     "mp-alipay" : {
         "usingComponents" : true
