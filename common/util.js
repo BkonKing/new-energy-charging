@@ -104,3 +104,24 @@ export function validateEmpty(value, message) {
   }
   return status
 }
+
+//百度坐标转换成腾讯坐标
+export function convert2TecentMap({lon, lat}){
+	if (lon == '' && lat == '') {
+		return {
+			lon: '',
+			lat: ''
+		}
+	}
+	var x_pi = 3.14159265358979324 * 3000.0 / 180.0
+	var x = lon - 0.0065
+	var y = lat - 0.006
+	var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_pi)
+	var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_pi)
+	var qqlon = z * Math.cos(theta)
+	var qqlat = z * Math.sin(theta)
+	return {
+    lon: qqlon,
+    lat: qqlat
+  }
+}

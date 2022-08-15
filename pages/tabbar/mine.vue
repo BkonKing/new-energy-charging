@@ -54,7 +54,7 @@
       <view @click="renzname">
         <image src="/static/image/my_04.png" mode="widthFix"></image>
         <text>实名认证</text>
-        <text v-if="userInfo.hasCertification === '1'" class="ztpos">
+        <text v-if="hasCertification === 1" class="ztpos">
           已认证
         </text>
       </view>
@@ -75,7 +75,7 @@
         <text>联系客服</text>
       </view>
     </view>
-    <view class="loginout" @click="logout">账号登出</view>
+    <view class="loginout" @click="handleLogout">账号登出</view>
     <view class="cleard"></view>
     <!-- 头部底图色 -->
     <view class="myimg"></view>
@@ -94,12 +94,11 @@ export default {
   },
   data() {
     return {
-      userInfo: {},
       balances: 0
     };
   },
   computed: {
-    ...mapGetters(['token', 'username', 'avatar'])
+    ...mapGetters(['token', 'username', 'avatar', 'hasCertification'])
   },
   onShow() {
     if (this.token) {
@@ -113,6 +112,11 @@ export default {
       uni.navigateTo({
         url: '/pages/login/login'
       });
+    },
+    handleLogout() {
+      this.$tip.confirm('是否退出当前账号').then(() => {
+        this.logout()
+      })
     },
     logout() {
       this.$store.dispatch('logout').then(() => {

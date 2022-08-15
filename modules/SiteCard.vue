@@ -5,12 +5,12 @@
         收藏
       </view>
       <view class="fcname">
-        <image
+        <!-- <image
           v-if="data.pictures"
           :src="pictures"
           mode="heightFix"
-        ></image>
-        <image v-else src="/static/image/logo2.png" mode="heightFix"></image>
+        ></image> -->
+        <image src="/static/image/logo2.png" mode="heightFix"></image>
         <view class="ellipsis">{{ data.siteName }}</view>
       </view>
       <view class="fctips">

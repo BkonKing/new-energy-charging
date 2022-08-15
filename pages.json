@@ -342,6 +342,18 @@
       "name": "收藏电站",
       "path": "pages/Site/Sitefav",
       "query": ""
+    }, {
+      "name": "选择订单",
+      "path": "pages/Bill/Billchose",
+      "query": ""
+    }, {
+      "name": "开票历史",
+      "path": "pages/Bill/Billhistory",
+      "query": ""
+    }, {
+      "name": "发票详情",
+      "path": "pages/Bill/Billdetail",
+      "query": ""
     }]
   }
 }

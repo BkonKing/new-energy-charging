@@ -24,13 +24,17 @@ export default {
       }).then(({
         result
       }) => {
-        if (result?.id) {
-          uni.navigateTo({
-            url: `/pages/Charge/Paychos?connectorNum=${connectorNum}`
-          })
-        } else {
+        const {connectorStatus, id} = result
+        if (!id) {
           this.$tip.toast('查找不到该充电桩编码')
+          return
         }
+        // if () {
+          
+        // }
+        uni.navigateTo({
+          url: `/pages/Charge/Paychos?connectorNum=${connectorNum}`
+        })
       })
     }
   }

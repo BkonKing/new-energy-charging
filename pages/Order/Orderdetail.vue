@@ -40,10 +40,10 @@
 					<view class="otmx_sm"><text>服务费6.5折</text></view>
 				</view>
 			</view>
-			<view class="otli">
+			<!-- <view class="otli">
 				<text>结算策略</text>
 				<text class="otcl">手动结算</text>
-			</view>
+			</view> -->
 			<view class="sfmon">
 				<view>
 					<text class="mr-20">实付金额</text>

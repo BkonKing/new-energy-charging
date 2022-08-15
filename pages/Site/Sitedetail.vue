@@ -228,8 +228,10 @@ export default {
         date.getMinutes()
       )}`;
       return this.postageList.findIndex(obj => {
-        const startTime = +obj.startTime.replace(':', '');
-        const endTime = +obj.endTime.replace(':', '');
+        let startTime = obj?.startTime || ''
+        let endTime = obj?.endTime || ''
+        startTime.replace(':', '');
+        endTime.replace(':', '');
         return time >= startTime && time <= endTime;
       });
     },
@@ -304,16 +306,16 @@ export default {
       addMemberFavorite({
         siteId: this.id
       }).then(() => {
-        this.$tip.toast('收藏成功')
-        this.siteData.storeState = 1
+        this.$tip.toast('收藏成功');
+        this.siteData.storeState = 1;
       });
     },
     removeMemberFavorite() {
       removeMemberFavorite({
         siteId: this.id
       }).then(() => {
-        this.$tip.toast('取消收藏成功')
-        this.siteData.storeState = 0
+        this.$tip.toast('取消收藏成功');
+        this.siteData.storeState = 0;
       });
     },
     callPhone() {

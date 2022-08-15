@@ -3,15 +3,15 @@
 		<view class="billul">
 			<view class="billitem" @click="billchose">
 				<text>开具电子发票</text>
-				<image src="../../static/image/arrow_01.png" mode="widthFix"></image>
+				<image src="/static/image/arrow_01.png" mode="widthFix"></image>
 			</view>
 			<view class="billitem" @click="billhistory">
 				<text>开票历史</text>
-				<image src="../../static/image/arrow_01.png" mode="widthFix"></image>
+				<image src="/static/image/arrow_01.png" mode="widthFix"></image>
 			</view>
 			<view class="billitem">
 				<text>发票帮助</text>
-				<image src="../../static/image/arrow_01.png" mode="widthFix"></image>
+				<image src="/static/image/arrow_01.png" mode="widthFix"></image>
 			</view>
 		</view>
 		<view class="cotts">

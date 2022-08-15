@@ -25,7 +25,7 @@
             </cCircle>
           </view>
           <view class="vmt">
-            <view>{{ item.plateNo || '' }}</view>
+            <view>{{ item.connectorNum || '' }}</view>
             <view class="fcsm">
               <text>
                 实时费用：
@@ -33,7 +33,7 @@
               </text>
               <text>
                 预计剩余：
-                <text class="fcfont">{{ item.remainChargeTime }}</text>
+                <text class="fcfont">{{ item.remainChargeTime || '--'}}</text>
               </text>
             </view>
           </view>
@@ -44,7 +44,7 @@
         <site-card :data="siteData"></site-card>
       </view>
     </view>
-    <view class="cover-view" @click="onControltap">
+    <view v-if="hasLocationPermission" class="cover-view" @click="onControltap">
       <image
         class="cover-image"
         src="/static/image/map_02.png"
@@ -104,27 +104,8 @@ import { findOrderByMemberId } from '@/api/member.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import SiteCard from '@/modules/SiteCard.vue';
-
-const scaleObj = {
-  3: 1000 * 1000,
-  4: 500 * 1000,
-  5: 200 * 1000,
-  6: 100 * 1000,
-  7: 50 * 1000,
-  8: 50 * 1000,
-  9: 20 * 1000,
-  10: 10 * 1000,
-  11: 5 * 1000,
-  12: 2 * 1000,
-  13: 1 * 1000,
-  14: 500,
-  15: 200,
-  16: 100,
-  17: 50,
-  18: 50,
-  19: 20,
-  20: 10
-};
+import { qqScaleObj } from '@/common/constants.js'
+import { convert2TecentMap } from '@/common/util.js'
 
 export default {
   components: {
@@ -154,7 +135,8 @@ export default {
       siteData: {},
       orderList: [],
       statusBarHeight: 0,
-      mapContext: null
+      mapContext: null,
+      hasLocationPermission: false
     };
   },
   computed: {
@@ -163,8 +145,10 @@ export default {
     }
   },
   onLoad() {
-    this.getLocationInfo();
     this.findOrderByMemberId();
+  },
+  onShow() {
+    !this.hasLocationPermission && this.getLocationInfo();
   },
   mounted() {
     this.statusBarHeight = uni.getSystemInfoSync().statusBarHeight;
@@ -175,12 +159,14 @@ export default {
       this.$store
         .dispatch('getLocationInfo')
         .then(({ longitude, latitude }) => {
+          this.hasLocationPermission = true
           this.myMap.longitude = longitude;
           this.myMap.latitude = latitude;
           this.currentLocation.longitude = longitude;
           this.currentLocation.latitude = latitude;
         })
         .catch(() => {
+          this.hasLocationPermission = false
           this.rejectGetLocation();
         });
     },
@@ -230,20 +216,20 @@ export default {
         this.mapContext.getScale({
           success: ({ scale }) => {
             this.findSiteByCoordinate({
-              // lon,
-              // lat,
-              // distance: scaleObj[Math.floor(scale)]
+              lon,
+              lat,
+              distance: qqScaleObj[Math.floor(scale)]
               // todo: 测试
-              lon: 119.28411,
-              lat: 26.048446,
-              distance: 10000000
+              // lon: 119.28411,
+              // lat: 26.048446,
+              // distance: 10000000
             });
           },
           fail: () => {
             this.findSiteByCoordinate({
               lon,
               lat,
-              distance: 1000
+              distance: qqScaleObj[this.myMap.scale]
             });
           }
         });
@@ -255,14 +241,18 @@ export default {
         this.markers = siteListData.map((data, index) => {
           return this.setMarker(data, index);
         });
-        this.siteListData = siteListData;
+        this.siteListData = siteListData
       });
     },
     setMarker({ id, longitude, latitude }, index) {
+      const { lon, lat} = convert2TecentMap({
+        lon: +longitude,
+        lat: +latitude
+      })
       return {
         id: index,
-        longitude: +longitude,
-        latitude: +latitude,
+        longitude: lon,
+        latitude: lat,
         iconPath: '/static/image/map_no.png', //图标为空白透明图片
         rotate: 0, // Number - 顺时针旋转的角度，范围 0 ~ 360，默认为 0
         alpha: 1, // 默认1，无透明，范围 0 ~ 1

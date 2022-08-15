@@ -14,7 +14,7 @@
         :class="type"
       >
         <view
-          v-if="item.connectorStatus === 1"
+          v-if="item.connectorStatus === 2"
           class="ter_go"
           @click="noteshow(item)"
         >
@@ -41,8 +41,12 @@
               </text>
             </span>
           </cCircle>
-          <view class="needt">还需00:30</view>
-          <!--  -->
+          <view
+            v-if="tem.connectorStatus === 3 && item.remainChargeTime"
+            class="needt"
+          >
+            还需{{ item.remainChargeTime }}
+          </view>
         </view>
         <view class="ter_in">
           <view>
@@ -60,7 +64,9 @@
           </view>
           <view>
             <text>电压</text>
-            <text>50V-{{ item.voltageUpperLimits }}V</text>
+            <text>
+              {{ item.voltageLowerLimits || 0 }}V-{{ item.voltageUpperLimits }}V
+            </text>
           </view>
           <view>
             <text>最高SOC</text>
@@ -236,7 +242,7 @@ export default {
       });
     },
     onRefresh() {
-      this.$emit('refresh')
+      this.$emit('refresh');
     },
     //确认弹框
     noteshow(data) {

@@ -1,63 +1,54 @@
 <template>
   <view class="container">
     <z-paging v-model="billList" ref="paging" :fixed="true" @query="queryList">
-      <template slot="top">
-        <!-- 余额 -->
-        <view class="wallA">
-          <view class="wali">
-            <view>资产总额</view>
-            <view class="wanum">{{ walletData.totalAssets || 0 }}</view>
-          </view>
-          <view class="waol disflex">
-            <view>
-              <text>可用余额</text>
-              <text class="wonum">{{ walletData.balances || 0 }}</text>
-            </view>
-            <view>
-              <text>冻结余额</text>
-              <text class="wonum">{{ walletData.frozenAmount || 0 }}</text>
-            </view>
-          </view>
-          <view class="watisw disflex3" v-show="tipshow">
-            <text>总金额-冻结金额</text>
-            <text>（待支付金额）</text>
-          </view>
-          <image
-            src="/static/image/ico_12.png"
-            class="watip"
-            mode="widthFix"
-            @click="showtip"
-          ></image>
+      <!-- 余额 -->
+      <view class="wallA">
+        <view class="wali">
+          <view>资产总额</view>
+          <view class="wanum">{{ walletData.totalAssets || 0 }}</view>
         </view>
-        <view class="wbchos">
-          <view class="wbdmx">
-            <text>收入{{ walletData.inSummary }}元</text>
-            <text>支出{{ walletData.expSummary }}元</text>
+        <view class="waol disflex">
+          <view>
+            <text>可用余额</text>
+            <text class="wonum">{{ walletData.balances || 0 }}</text>
           </view>
-          <view class="datawp" @click="showPicker">
-            <!-- hy:默认显示为当天 -->
-            <text style="color: #33b048;">{{ chooseDate }} ▼</text>
-            <rangeDatePick
-              start="2021-01-01"
-              end="2200-12-01"
-              themeColor="#33b048"
-              fields="day"
-              :show="dateShow"
-              :value="value"
-              @change="bindChange"
-              @cancel="bindCancel"
-              @showchange="showchange"
-            ></rangeDatePick>
+          <view>
+            <text>冻结余额</text>
+            <text class="wonum">{{ walletData.frozenAmount || 0 }}</text>
           </view>
         </view>
-      </template>
-      <template slot="bottom">
-        <!-- 底部按钮 -->
-        <view class="wfoot">
-          <button class="wtxbt" @click="cashout">提现</button>
-          <button class="wczbt" @click="cashin">充值</button>
+        <view class="watisw disflex3" v-show="tipshow">
+          <text>总金额-冻结金额</text>
+          <text>（待支付金额）</text>
         </view>
-      </template>
+        <image
+          src="/static/image/ico_12.png"
+          class="watip"
+          mode="widthFix"
+          @click="showtip"
+        ></image>
+      </view>
+      <view class="wbchos">
+        <view class="wbdmx">
+          <text>收入{{ walletData.inSummary }}元</text>
+          <text>支出{{ walletData.expSummary }}元</text>
+        </view>
+        <view class="datawp" @click="showPicker">
+          <!-- hy:默认显示为当天 -->
+          <text style="color: #33b048;">{{ chooseDate }} ▼</text>
+          <rangeDatePick
+            start="2021-01-01"
+            end="2200-12-01"
+            themeColor="#33b048"
+            fields="day"
+            :show="dateShow"
+            :value="value"
+            @change="bindChange"
+            @cancel="bindCancel"
+            @showchange="showchange"
+          ></rangeDatePick>
+        </view>
+      </view>
       <!-- 明细 -->
       <view class="wallB">
         <view v-for="item in billList" :key="item.id">
@@ -91,6 +82,13 @@
         </view>
       </view>
       <!-- <view class="clearw"></view> -->
+      <template slot="bottom">
+        <!-- 底部按钮 -->
+        <view class="wfoot">
+          <button class="wtxbt" @click="cashout">提现</button>
+          <button class="wczbt" @click="cashin">充值</button>
+        </view>
+      </template>
     </z-paging>
   </view>
 </template>
@@ -145,7 +143,7 @@ export default {
     queryList(pageNo, pageSize) {
       findMemberBalance({ ...this.formData, pageNo, pageSize }).then(
         ({ result }) => {
-          const records = result?.balance?.records
+          const records = result?.balance?.records;
           if (records.length > 0) {
             this.$refs.paging.complete(records);
           } else {
@@ -372,9 +370,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: fixed;
-  bottom: 0;
-  left: 0;
   z-index: 9;
 
   button.wtxbt,
