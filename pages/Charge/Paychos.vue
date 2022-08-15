@@ -1,5 +1,13 @@
 <template>
   <view class="container">
+    <!-- 加载动画 -->
+    <view
+      class="loaditem"
+      @touchmove.stop.prevent="moveHandle"
+      v-show="loadshwo"
+    >
+      <view>请稍等，正在通知设备给电……</view>
+    </view>
     <view class="PcoA">
       <view class="zduan">
         <view class="zdshop ellipsis" @click="goSitedetail">
@@ -187,7 +195,9 @@ export default {
       //开通信用-显示
       xyshow: true,
       amount: undefined,
-      walletData: {}
+      walletData: {},
+			// 加载动画显示
+			loadshwo: false
     };
   },
   computed: {
@@ -292,7 +302,11 @@ export default {
       uni.navigateTo({
         url: '../Car/Carlist'
       });
-    }
+    },
+		// 禁止外壳页面手指上下滑动
+		moveHandle: function() {
+			return false;
+		}
   }
 };
 </script>
@@ -556,4 +570,26 @@ export default {
   height: 180rpx;
   display: block;
 }
+// 加载动画
+.loaditem {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 101;
+
+	view {
+		width: 70%;
+		border-radius: 20rpx;
+		background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center 50rpx no-repeat;
+		background-size: 100rpx 100rpx;
+		color: #fff;
+		font-size: 28rpx;
+		padding: 200rpx 20rpx 30rpx;
+		text-align: center;
+		margin: 60% auto 0;
+	}
+}
+
 </style>
