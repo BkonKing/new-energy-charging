@@ -40,18 +40,23 @@
     <best-gauge :config="gaugeOption1"></best-gauge>
     <!-- 汽车图片 -->
     <view class="carshow">
-      <image src="/static/image/car.png" mode="widthFix"></image>
+      <image
+        src="/static/image/car3.png"
+        mode="widthFix"
+        :class="{ 'scale-car': scaleCardShow }"
+      ></image>
     </view>
     <!-- 充电计时 -->
     <view class="Timesul">
-      <uni-countdown
-        :show-day="false"
-        :font-size="40"
-        :hour="0"
-        :minute="12"
-        :second="12"
-        class="cTimes"
-      />
+      <div class="cTimes">
+        <uni-countdown
+          :show-day="false"
+          :font-size="40"
+          :hour="0"
+          :minute="12"
+          :second="12"
+        />
+      </div>
       <view class="sTimes disflex5">
         <text>正在充电中，已充电</text>
         <bing-countup :font-size="16" color="#999" />
@@ -138,6 +143,7 @@
         </view>
         <qiun-data-charts
           type="area"
+          :canvas2d="true"
           :opts="optsDY"
           :ontouch="true"
           :chartData="chartDataDY"
@@ -156,6 +162,7 @@
         </view>
         <qiun-data-charts
           type="area"
+          :canvas2d="true"
           :opts="optsGL"
           :ontouch="true"
           :chartData="chartDataGL"
@@ -174,6 +181,7 @@
         </view>
         <qiun-data-charts
           type="area"
+          :canvas2d="true"
           :opts="optsDL"
           :ontouch="true"
           :chartData="chartDataDL"
@@ -184,11 +192,11 @@
     <!-- 底部按钮 -->
     <view class="sitefoot">
       <view class="sfico" @click="fixsent">
-        <image src="../../static/image/ico_09.png" mode="widthFix"></image>
+        <image src="/static/image/ico_09.png" mode="widthFix"></image>
         <text>故障报修</text>
       </view>
       <view class="sfico" @click="contact">
-        <image src="../../static/image/ico_16.png" mode="widthFix"></image>
+        <image src="/static/image/ico_16.png" mode="widthFix"></image>
         <text>联系客服</text>
       </view>
       <button class="sfbt" @click="stopCharge()">停止充电</button>
@@ -206,6 +214,7 @@ export default {
   data() {
     let _width = uni.upx2px(480); //传感器宽度350
     return {
+      dataInfo: {},
       // 加载动画显示
       loadshwo: false,
       // 传感器chart数据
@@ -236,14 +245,14 @@ export default {
             color: '#000',
             fontSize: uni.upx2px(90),
             fontWeight: 'bold',
-            offsetCenter: [0, uni.upx2px(-60)], //距离圆心直径偏移
+            offsetCenter: [0, uni.upx2px(-55)], //距离圆心直径偏移
             textAlign: 'center'
           },
           unit: {
             color: '#000',
             fontSize: uni.upx2px(30),
             fontWeight: 'bold',
-            offsetCenter: [0, uni.upx2px(-60)], //距离圆心直径偏移
+            offsetCenter: [0, uni.upx2px(-55)], //距离圆心直径偏移
             textAlign: 'center'
           }
         },
@@ -423,15 +432,17 @@ export default {
             gradient: true
           }
         }
-      }
+      },
+      scaleCardShow: false
     };
   },
   onLoad({ connectorNum }) {
     this.connectorNum = connectorNum;
   },
   onShow() {
-    this.findConnectorByNum();
-    this.findMemberByWallet();
+    // this.findConnectorByNum();
+    // this.findMemberByWallet();
+    this.scaleCardShow = true;
   },
   onReady() {
     this.getServerData();
@@ -446,7 +457,7 @@ export default {
     },
     stopCharge() {
       stopCharge({
-        connectorNum: this.connectorNum
+        orderId: this.dataInfo.orderId
       }).then(() => {});
     },
     // 前往充值
@@ -584,13 +595,20 @@ export default {
 }
 // 汽车图片
 .carshow {
-  width: 80%;
-  margin: -250rpx auto 0;
+  // width: 80%;
+  // margin: -250rpx auto 0;
+  width: 60%;
+  margin: -250rpx auto -30rpx;
   position: relative;
   z-index: 2;
   image {
     width: 100%;
     height: auto;
+    transform: scale(0.5);
+    transition: transform 2s;
+  }
+  .scale-car {
+    transform: scale(1.3);
   }
 }
 // 充电计时
@@ -600,8 +618,6 @@ export default {
   margin: 20rpx auto 60rpx;
   .cTimes {
     margin: 20rpx auto 0;
-    justify-content: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
   }
   .sTimes {
     color: #999;
@@ -791,6 +807,7 @@ export default {
   button.sfbt,
   uni-button.sfbt {
     width: 56%;
+    height: 82rpx;
     line-height: 80rpx;
     font-size: 34rpx;
     background: #33b048;

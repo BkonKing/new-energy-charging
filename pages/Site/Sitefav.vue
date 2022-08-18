@@ -164,6 +164,7 @@ export default {
   input,
   uni-input {
     width: 80%;
+    height: 45rpx;
     color: #888;
     font-size: 28rpx;
     line-height: 1.6;
@@ -171,8 +172,9 @@ export default {
   }
   button.favbt,
   uni-button.favbt {
-    width: auto;
     display: inline-block;
+    width: auto;
+    height: 64rpx;
     background: #33b048;
     font-size: 26rpx;
     line-height: 1.6;

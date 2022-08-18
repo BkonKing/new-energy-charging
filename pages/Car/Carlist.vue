@@ -6,7 +6,7 @@
 		</view>
 		<view class="carlist" v-else v-for="t in 3">
 			<view class="caryrz">已认证</view>
-			<view class="disflex3"><image class="carimg" src="../../static/image/car2.png" mode="widthFix"></image></view>
+			<view class="disflex3"><image class="carimg" src="../../static/image/car3.png" mode="widthFix"></image></view>
 			<view>北京EU5</view>
 			<view class="carsm">闽AD59155</view>
 			<image class="cardel" src="../../static/image/ico_11.png" mode="widthFix" @click="cardel()"></image>

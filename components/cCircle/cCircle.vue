@@ -1,8 +1,7 @@
 <template>
   <view>
     <view :style="cBox">
-      <text v-if="!slot">{{ animationPercent }}%</text>
-      <view :style="slotStyle" v-if="slot"><slot name="content"></slot></view>
+      <view :style="slotStyle"><slot name="content">{{ animationPercent }}%</slot></view>
       <view :style="faStyle">
         <view :style="leftBox"><view :style="leftStyle"></view></view>
         <view :style="rithStyle"></view>
@@ -90,12 +89,6 @@ export default {
     }
   },
   computed: {
-    slot() {
-      if (this.$slots.content) {
-        return true;
-      }
-      return false;
-    },
     cBox() {
       var size = this.size;
       var circleWidth = this.circleWidth;

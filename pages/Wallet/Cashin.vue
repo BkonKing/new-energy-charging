@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <view class="cinA">
-      <view class="danyu">当前余额：￥0.00 元</view>
+      <view class="danyu">当前余额：￥{{balances}} 元</view>
       <view class="cinitem">
         <view>
           充值金额
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { rechargeMember } from '@/api/member.js';
+import { findMemberByWallet, rechargeMember } from '@/api/member.js';
 
 export default {
   data() {
@@ -73,11 +73,17 @@ export default {
       ],
       current: undefined,
       amount: undefined,
-      channel: undefined
+      channel: undefined,
+      balances: 0
     };
   },
   onLoad() {},
   methods: {
+    findMemberByWallet() {
+      findMemberByWallet().then(({result}) => {
+        this.balances = result.balances || 0
+      })
+    },
     // 选中充值金额
     cincheck(data, index) {
       this.current = index;
@@ -102,8 +108,8 @@ export default {
       channel = 3;
       // #endif
       this.rechargeMember({
-        amount: this.amount,
-        channel
+        amount: this.amount
+        // channel
       });
     },
     rechargeMember(params) {
@@ -111,7 +117,7 @@ export default {
         this.requestPayment(result);
       });
     },
-    requestPayment() {
+    requestPayment(params) {
       let provider = 'wxpay';
       // #ifdef MP-WEIXIN
       provider = 'wxpay';
@@ -121,22 +127,24 @@ export default {
       // #endif
       uni.requestPayment({
         provider,
-        orderInfo: {
-          appid: 'wx499********7c70e', // 微信开放平台 - 应用 - AppId，注意和微信小程序、公众号 AppId 可能不一致
-          noncestr: 'c5sEwbaNPiXAF3iv', // 随机字符串
-          package: 'Sign=WXPay', // 固定值
-          partnerid: '148*****52', // 微信支付商户号
-          prepayid: 'wx202254********************fbe90000', // 统一下单订单号
-          timestamp: 1597935292, // 时间戳（单位：秒）
-          sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0' // 签名，这里用的 MD5/RSA 签名
-        },
-        success: (res) => {
-          this.$tip.success('充值成功')
+        ...params,
+        // orderInfo:params,
+        // orderInfo: {
+        //   appid: 'wx499********7c70e', // 微信开放平台 - 应用 - AppId，注意和微信小程序、公众号 AppId 可能不一致
+        //   noncestr: 'c5sEwbaNPiXAF3iv', // 随机字符串
+        //   package: 'Sign=WXPay', // 固定值
+        //   partnerid: '148*****52', // 微信支付商户号
+        //   prepayid: 'wx202254********************fbe90000', // 统一下单订单号
+        //   timestamp: 1597935292, // 时间戳（单位：秒）
+        //   sign: 'A842B45937F6EFF60DEC7A2EAA52D5A0' // 签名，这里用的 MD5/RSA 签名
+        // },
+        success: res => {
+          this.$tip.success('充值成功');
           setTimeout(() => {
             uni.navigateBack({
               delta: 1
-            })
-          }, 1500)
+            });
+          }, 1500);
         },
         fail(e) {}
       });
@@ -181,6 +189,8 @@ export default {
       uni-input {
         color: #333;
         width: 80%;
+        height: 52rpx;
+        line-height: 52rpx;
         font-size: 52rpx;
         padding: 0;
       }

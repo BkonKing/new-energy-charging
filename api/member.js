@@ -48,18 +48,28 @@ export function addMemberBank(params) {
   return http.post('/member/addMemberBank', params)
 }
 
-export function removeMemberBank(params) {
-  return http.delete('/member/removeMemberBank', params)
+export function removeMemberBank(data) {
+  return http.request({
+    method: 'DELETE',
+    url: '/member/removeMemberBank',
+    data
+  })
+  // return http.delete('/member/removeMemberBank', params)
 }
 
 // 实名认证（会员）
-export function updateMemberByAuth(params) {
-  return http.put('/member/updateMemberByAuth', params)
+export function updateMemberByAuth(data) {
+  return http.request({
+    method: 'PUT',
+    url: '/member/updateMemberByAuth',
+    data
+  })
+  // return http.put('/member/updateMemberByAuth', data)
 }
 
 // 充值（会员）
 export function rechargeMember(params) {
-  return http.post('/member/rechargeMember', params)
+  return http.post('/member/wechat/rechargeMember', params)
 }
 
 // 提现（会员）
@@ -73,8 +83,13 @@ export function startCharge(params) {
 }
 
 // 断电（会员）
-export function stopCharge(params) {
-  return http.put('/member/stopCharge', params)
+export function stopCharge(data) {
+  return http.request({
+    method: 'PUT',
+    url: '/member/stopCharge',
+    data
+  })
+  // return http.put('/member/stopCharge', params)
 }
 
 // 添加收藏（会员）
@@ -83,6 +98,11 @@ export function addMemberFavorite(params) {
 }
 
 // 取消收藏（会员）
-export function removeMemberFavorite(params) {
-  return http.delete('/member/removeMemberFavorite', params)
+export function removeMemberFavorite(data) {
+  return http.request({
+    method: 'DELETE',
+    url: '/member/removeMemberFavorite',
+    data
+  })
+  // return http.delete('/member/removeMemberFavorite', params)
 }

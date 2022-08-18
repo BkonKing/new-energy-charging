@@ -104,6 +104,8 @@ export default {
 		uni-input {
 			color: #333;
 			width: 80%;
+      height: 60rpx;
+      line-height: 60rpx;
 			font-size: 60rpx;
 			margin-left: 10rpx;
 		}

@@ -34,7 +34,7 @@ export default {
         return []
       }
       const arr = ['****', '****', '****'];
-      arr.push(value.slice(12))
+      arr.push(value.slice(-3))
       return arr;
     }
   },

@@ -36,6 +36,7 @@
         v-model="remark"
         placeholder="补充更多信息,以便我们诊断问题"
         class="ycbuc"
+        auto-height="true"
         maxlength="200"
       />
     </view>
@@ -196,10 +197,12 @@ export default {
     padding: 28rpx 0;
     border-bottom: 1px solid #eee;
     .fixcb {
+      height: 60rpx;
+      padding: 10rpx 20rpx;
       color: #fff;
       font-size: 26rpx;
+      line-height: 40rpx;
       background: #33b048;
-      padding: 10rpx 20rpx;
       border-radius: 100rpx;
     }
     .fixsm {

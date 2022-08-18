@@ -2,16 +2,19 @@
   <view class="container">
     <z-paging
       v-model="siteListData"
+      class="site-list-paging"
       ref="paging"
       :fixed="true"
       @query="queryList"
     >
       <template slot="top">
+        <!-- #ifdef MP-WEIXIN -->
         <uni-nav-bar
           title="站点"
           :border="false"
           statusBar="false"
         ></uni-nav-bar>
+        <!-- #endif -->
         <!-- 顶部搜索+筛选 -->
         <view class="shead">
           <!-- 定位搜索 -->
@@ -26,8 +29,10 @@
         </view>
       </template>
       <template slot="bottom">
-        <!-- 底部自定义tabBar -->
-        <custom-tab-bar></custom-tab-bar>
+        <div class="paging-bottom">
+          <!-- 底部自定义tabBar -->
+          <custom-tab-bar class="sitelist-tabbar"></custom-tab-bar>
+        </div>
       </template>
       <Sitelist ref="Sitelist" :data="siteListData"></Sitelist>
     </z-paging>
@@ -39,6 +44,7 @@ import { findSiteByKey } from '@/api/site.js';
 import dropdownScreen from '@/components/dropdown-screen/dropdown-screen'; //筛选
 import Sitelist from '@/components/Site/Sitelist.vue'; //站点列表
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
+import hideBackHome from '@/mixins/hideBackHome.js';
 
 const paramKeys = {
   0: 'equipmentAction',
@@ -46,6 +52,7 @@ const paramKeys = {
 };
 
 export default {
+  mixins: [hideBackHome],
   components: {
     CustomTabBar,
     dropdownScreen,
@@ -61,11 +68,11 @@ export default {
       currentLocation: {
         lat: 0,
         lon: 0
-      },
+      }
     };
   },
   onLoad() {
-    this.getLocationInfo()
+    this.getLocationInfo();
   },
   methods: {
     getLocationInfo() {
@@ -74,10 +81,9 @@ export default {
         .then(({ longitude, latitude }) => {
           this.currentLocation.lon = longitude;
           this.currentLocation.lat = latitude;
-          this.$refs.paging.reload(true)
+          this.$refs.paging.reload(true);
         })
-        .catch(() => {
-        });
+        .catch(() => {});
     },
     // 前往搜索页面
     search() {
@@ -87,7 +93,7 @@ export default {
     },
     queryList(pageNo, pageSize) {
       if (!this.currentLocation.lon || !this.currentLocation.lat) {
-        return
+        return;
       }
       findSiteByKey({
         ...this.params,
@@ -95,7 +101,7 @@ export default {
         pageNo,
         pageSize
       }).then(({ result }) => {
-        const records = result?.siteInfo?.records || []
+        const records = result?.siteInfo?.records || [];
         if (records.length > 0) {
           this.$refs.paging.complete(records);
         } else {
@@ -104,7 +110,7 @@ export default {
       });
     },
     getParams({ $index, value }) {
-      const key = paramKeys[$index]
+      const key = paramKeys[$index];
       this.params[key] = value;
       this.$refs.paging.reload(true);
     }
@@ -154,5 +160,15 @@ page {
       border: none;
     }
   }
+}
+.paging-bottom {
+  height: 112rpx;
+  position: relative;
+}
+.sitelist-tabbar ::v-deep .tmenu {
+  position: absolute !important;
+}
+.site-list-paging ::v-deep .zp-l-container {
+  padding-bottom: 80rpx;
 }
 </style>

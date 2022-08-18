@@ -5,7 +5,7 @@
 			<text @click="carother">其他车型</text>
 		</view>
 		<view class="cark disflex4" v-for="t in 5" @click="carchos">
-			<view class="w-35"><image src="../../static/image/car2.png" mode="widthFix"></image></view>
+			<view class="w-35"><image src="../../static/image/car3.png" mode="widthFix"></image></view>
 			<view>
 				<view class="carbig">奥迪A8新能源（进口）</view>
 				<view>油电混合 | 纯电续航 --km</view>

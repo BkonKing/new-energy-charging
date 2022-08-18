@@ -21,6 +21,7 @@ export default {
   },
   onLoad({ id }) {
     this.id = id;
+    this.bankData = this.$store.state.bankInfo || {}
   },
   methods: {
     unbound() {
@@ -33,6 +34,7 @@ export default {
         id: this.id
       }).then(() => {
         this.$tip.success('解绑成功').then(() => {
+          this.$store.commit('SET_BANKINFO', {})
           uni.navigateBack({
             delta: 1
           });

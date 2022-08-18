@@ -1,8 +1,10 @@
 <template>
   <view class="container">
+    <!-- #ifdef MP-WEIXIN -->
     <uni-nav-bar title="首页" :border="false" statusBar="false"></uni-nav-bar>
+    <!-- #endif -->
     <!-- 浮动显示 -->
-    <view class="float" :style="{ top: `${statusBarHeight + 44}px` }">
+    <view class="float" :style="{ top: top }">
       <!-- 定位搜索 -->
       <view class="locsea" @click="search">
         <text>福州</text>
@@ -20,20 +22,20 @@
               :circleColor="circleColor"
             >
               <span slot="content" class="cmdtx">
-                <text>{{ item.soc }}%</text>
+                <text>{{ item.soc || '-' }}%</text>
               </span>
             </cCircle>
           </view>
           <view class="vmt">
-            <view>{{ item.connectorNum || '' }}</view>
+            <view>{{ item.connectorNum || '-' }}</view>
             <view class="fcsm">
               <text>
                 实时费用：
-                <text class="fcfont">{{ item.realAmount }}元</text>
+                <text class="fcfont">{{ item.realAmount || '-' }}元</text>
               </text>
               <text>
                 预计剩余：
-                <text class="fcfont">{{ item.remainChargeTime || '--'}}</text>
+                <text class="fcfont">{{ item.remainChargeTime || '--' }}</text>
               </text>
             </view>
           </view>
@@ -45,10 +47,7 @@
       </view>
     </view>
     <view v-if="hasLocationPermission" class="cover-view" @click="onControltap">
-      <image
-        class="cover-image"
-        src="/static/image/map_02.png"
-      ></image>
+      <image class="cover-image" src="/static/image/map_02.png"></image>
     </view>
     <!-- 输入电桩编码 -->
     <view class="enterbm" @click="inputcode">输入电桩编码</view>
@@ -58,7 +57,6 @@
     <map
       id="map"
       ref="map"
-      style="width: 100%; height: 100%;"
       :show-location="true"
       :enable-zoom="true"
       :latitude="myMap.latitude"
@@ -66,6 +64,7 @@
       :markers="markers"
       :scale="myMap.scale"
       :enable-rotate="false"
+      :show-scale="false"
       @callouttap="callouttap"
       @regionchange="handleRegionchange"
       @tap="tap"
@@ -90,7 +89,10 @@
                 </cover-view>
               </cover-view>
             </cover-view>
-            <cover-view class="callout-mark"></cover-view>
+            <cover-image
+              class="callout-mark"
+              src="/static/image/triangle-icon.png"
+            ></cover-image>
           </cover-view>
         </template>
       </cover-view>
@@ -104,8 +106,8 @@ import { findOrderByMemberId } from '@/api/member.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import SiteCard from '@/modules/SiteCard.vue';
-import { qqScaleObj } from '@/common/constants.js'
-import { convert2TecentMap } from '@/common/util.js'
+import { qqScaleObj } from '@/common/constants.js';
+import { convert2TecentMap } from '@/common/util.js';
 
 export default {
   components: {
@@ -142,6 +144,12 @@ export default {
   computed: {
     orderVisible() {
       return !!this.orderList.length;
+    },
+    top() {
+      // #ifdef MP-WEIXIN
+      return `${this.statusBarHeight + 44}px`;
+      // #endif
+      return 0;
     }
   },
   onLoad() {
@@ -159,14 +167,14 @@ export default {
       this.$store
         .dispatch('getLocationInfo')
         .then(({ longitude, latitude }) => {
-          this.hasLocationPermission = true
+          this.hasLocationPermission = true;
           this.myMap.longitude = longitude;
           this.myMap.latitude = latitude;
           this.currentLocation.longitude = longitude;
           this.currentLocation.latitude = latitude;
         })
         .catch(() => {
-          this.hasLocationPermission = false
+          this.hasLocationPermission = false;
           this.rejectGetLocation();
         });
     },
@@ -181,10 +189,15 @@ export default {
     //点击标记气泡
     callouttap(e) {
       const { markerId: index } = e.detail;
+      console.log('markerId', index);
       if (index > -1) {
         const data = this.siteListData[index];
-        this.myMap.latitude = data.latitude;
-        this.myMap.longitude = data.longitude;
+        const { lon, lat } = convert2TecentMap({
+          lon: +data.longitude,
+          lat: +data.latitude
+        });
+        this.myMap.latitude = lat;
+        this.myMap.longitude = lon;
         this.findSiteById({
           id: data.id,
           lon: this.currentLocation.longitude,
@@ -241,14 +254,14 @@ export default {
         this.markers = siteListData.map((data, index) => {
           return this.setMarker(data, index);
         });
-        this.siteListData = siteListData
+        this.siteListData = siteListData;
       });
     },
     setMarker({ id, longitude, latitude }, index) {
-      const { lon, lat} = convert2TecentMap({
+      const { lon, lat } = convert2TecentMap({
         lon: +longitude,
         lat: +latitude
-      })
+      });
       return {
         id: index,
         longitude: lon,
@@ -300,6 +313,10 @@ export default {
 .container {
   overflow: hidden;
 }
+#map {
+  width: 100% !important;
+  height: 95vh;
+}
 .cover-view {
   position: fixed;
   right: 3%;
@@ -317,7 +334,7 @@ export default {
   position: fixed;
   // left: 3%;
   left: 0;
-  top: 20rpx;
+  top: 0;
   z-index: 102;
   background: rgba(255, 255, 255, 0.95);
   padding: 16rpx;
@@ -428,7 +445,7 @@ export default {
   display: flex;
   align-items: center;
   min-width: 170rpx;
-  padding: 16rpx 10rpx;
+  padding: 16rpx 10rpx 16rpx 10rpx;
   background-color: #fff;
   border-radius: 10rpx;
 }
@@ -443,6 +460,7 @@ export default {
   border-radius: 50%;
 }
 .callout-content {
+  flex: 1;
   font-size: 24rpx;
   color: #999;
 }
@@ -453,11 +471,14 @@ export default {
   color: #333;
 }
 .callout-mark {
+  width: 40rpx;
+  height: 20rpx;
+  object-fit: contain;
   position: absolute;
   left: 50%;
-  transform: translateX(-20rpx);
-  bottom: -16rpx;
-  border: 20rpx solid transparent;
-  border-top: 20rpx solid #fff;
+  transform: translateX(-20rpx) translateY(-2rpx);
+  bottom: 0;
+  // border: 20rpx solid transparent;
+  // border-top: 20rpx solid #fff;
 }
 </style>

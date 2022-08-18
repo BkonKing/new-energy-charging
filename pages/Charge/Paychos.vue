@@ -22,12 +22,12 @@
           当前时段：{{ terminalData.startTime }}-{{ terminalData.endTime }}
         </view>
         <view class="zdprice">
-          <text>{{ terminalData.fee }}</text>
+          <text>{{ terminalData.fee || 0 }}</text>
           元/度
         </view>
         <view class="zdtime">
-          <text>电费：{{ terminalData.electricityFee }}元/度</text>
-          <text>服务费：{{ terminalData.serviceFee }}元/度</text>
+          <text>电费：{{ terminalData.electricityFee || 0 }}元/度</text>
+          <text>服务费：{{ terminalData.serviceFee || 0 }}元/度</text>
         </view>
         <view class="zdtips">只充电，不占位；充电结束后请及时离场，谢谢！</view>
       </view>
@@ -54,7 +54,7 @@
         <!-- <view>预付金额</view>
         <view class="py_sm">预计可充电1.09度，可行驶22.95公里</view> -->
         <view class="disflex">
-          <text class="py_num">￥{{ walletData.totalAssets }}</text>
+          <text class="py_num">￥{{ walletData.totalAssets || 0 }}</text>
           <text class="py_gcz" @click="cashin">充值</text>
         </view>
       </view>
@@ -126,16 +126,16 @@
         <view>充电策略</view>
         <view class="otcl">
           <text
-            v-for="(item, index) in planCd"
+            v-for="(item, index) in chargeStrategyOptions"
             :key="index"
-            :class="planCdcurrent == index ? 'otcl_a' : ''"
-            @click="planCdcheck(index)"
+            :class="chargeStrategyValue == item.value ? 'otcl_a' : ''"
+            @click="planCdcheck(item)"
           >
-            {{ item }}
+            {{ item.label }}
           </text>
         </view>
       </view>
-      <view class="otli" v-if="planCdcurrent == 0">
+      <view class="otli" v-if="chargeStrategyValue == 1">
         <view>
           <view>限定金额</view>
           <view class="ot_sm">可用余额：{{ walletData.balances }}元</view>
@@ -187,8 +187,14 @@ export default {
       paykind: ['余额付' /* , '预授权', '信用付' */],
       paykindcurrent: 0,
       // 充电策略
-      planCd: [/* '自动充满', */ '限定金额'],
-      planCdcurrent: 0,
+      chargeStrategyOptions: [
+        {
+          label: '限定金额',
+          value: 1
+        }
+        /* '自动充满', */
+      ],
+      chargeStrategyValue: 1,
       // 结算策略
       planAs: ['自动结算', '手动结算'],
       planAscurrent: 0,
@@ -196,8 +202,8 @@ export default {
       xyshow: true,
       amount: undefined,
       walletData: {},
-			// 加载动画显示
-			loadshwo: false
+      // 加载动画显示
+      loadshwo: false
     };
   },
   computed: {
@@ -242,8 +248,8 @@ export default {
       this.paykindcurrent = index;
     },
     // 选中充电策略
-    planCdcheck(index) {
-      this.planCdcurrent = index;
+    planCdcheck({ value }) {
+      this.chargeStrategyValue = value;
     },
     // 选中结算策略
     planAscheck(index) {
@@ -284,9 +290,19 @@ export default {
       this.startCharge();
     },
     startCharge() {
+      // 000000001：逸充新能源-APP；000000002：逸充新能源-微信；000000003：逸充新能源-支付宝；
+      let chargeChannel = '000000002';
+      // #ifdef MP-ALIPAY
+      chargeChannel = '000000003'
+      // #endif
+      // #ifdef APP
+      chargeChannel = '000000001'
+      // #endif
       startCharge({
         amount: this.amount,
-        connectorNum: this.connectorNum
+        connectorNum: this.connectorNum,
+        chargeStrategy: this.chargeStrategyValue,
+        chargeChannel
       }).then(() => {
         this.goCharge();
       });
@@ -303,10 +319,10 @@ export default {
         url: '../Car/Carlist'
       });
     },
-		// 禁止外壳页面手指上下滑动
-		moveHandle: function() {
-			return false;
-		}
+    // 禁止外壳页面手指上下滑动
+    moveHandle: function() {
+      return false;
+    }
   }
 };
 </script>
@@ -572,24 +588,24 @@ export default {
 }
 // 加载动画
 .loaditem {
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	left: 0;
-	top: 0;
-	z-index: 101;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 101;
 
-	view {
-		width: 70%;
-		border-radius: 20rpx;
-		background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center 50rpx no-repeat;
-		background-size: 100rpx 100rpx;
-		color: #fff;
-		font-size: 28rpx;
-		padding: 200rpx 20rpx 30rpx;
-		text-align: center;
-		margin: 60% auto 0;
-	}
+  view {
+    width: 70%;
+    border-radius: 20rpx;
+    background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center
+      50rpx no-repeat;
+    background-size: 100rpx 100rpx;
+    color: #fff;
+    font-size: 28rpx;
+    padding: 200rpx 20rpx 30rpx;
+    text-align: center;
+    margin: 60% auto 0;
+  }
 }
-
 </style>

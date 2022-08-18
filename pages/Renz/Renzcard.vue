@@ -41,21 +41,23 @@ export default {
       });
     },
     // 前往银行卡解绑
-    goCardDel({ id }) {
+    goCardDel(data) {
+      const { id } = data
+      this.$store.commit('SET_BANKINFO', data)
       uni.navigateTo({
         url: `/pages/Renz/RenzcardDel?id=${id}`
       });
     },
     // 前往绑定银行卡
     goCardAdd() {
-      // if (!this.hasCertification) {
-      //   this.$tip.confirm('请先完成实名认证，是否前往？').then(() => {
-      //     uni.navigateTo({
-      //       url: '/pages/Renz/Renzname'
-      //     })
-      //   })
-      //   return
-      // }
+      if (!this.hasCertification) {
+        this.$tip.confirm('请先完成实名认证，是否前往？').then(() => {
+          uni.navigateTo({
+            url: '/pages/Renz/Renzname'
+          })
+        })
+        return
+      }
       uni.navigateTo({
         url: '/pages/Renz/RenzcardAdd'
       });

@@ -67,16 +67,16 @@
                   提现成功
                 </text>
               </view>
-              <view>{{ item.payTime }}</view>
+              <view>{{ item.payTime || '--' }}</view>
             </view>
             <view>
               <view class="wbmon">
                 <!-- 不懂后端是否返回 +/- -->
                 <!-- <text>+</text> -->
-                <text>{{ item.realAmount }}</text>
+                <text>{{ item.realAmount || 0 }}</text>
                 <text class="wbtsm">元</text>
               </view>
-              <view class="wbyu">余额：{{ item.afterAmount }}</view>
+              <view class="wbyu">余额：{{ item.afterAmount || 0 }}</view>
             </view>
           </view>
         </view>
@@ -375,17 +375,19 @@ export default {
   button.wtxbt,
   uni-button.wtxbt {
     width: 45%;
+    height: 82rpx;
     line-height: 80rpx;
     font-size: 34rpx;
     background: #fff;
     color: #33b048;
     font-weight: 500;
-    border: 1px solid #33b048;
+    border: 2rpx solid #33b048;
     border-radius: 100rpx;
   }
   button.wczbt,
   uni-button.wczbt {
     width: 45%;
+    height: 82rpx;
     line-height: 80rpx;
     font-size: 34rpx;
     background: #33b048;

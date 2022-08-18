@@ -45,12 +45,14 @@
         <text class="colm">闲{{ data.freeSlowNum || 0 }}</text>
         <text class="gray">/{{ data.slowNum || 0 }}</text>
       </view>
-      <view class="dwei">{{ data.targetDistance }}m</view>
+      <view class="dwei">{{ data.targetDistance || '--' }}m</view>
     </view>
   </div>
 </template>
 
 <script>
+import { openLocation } from '@/common/util.js'
+
 export default {
   props: {
     data: {
@@ -98,58 +100,13 @@ export default {
       });
     },
     // 前往地图APP
-    gomap(e) {
-      // #ifdef H5
-      const that = this;
-      uni.showActionSheet({
-        title: '选择地图应用软件',
-        itemList: ['腾讯地图', '百度地图', '高德地图'],
-        success: e => {
-          let url = '';
-          let iosDownloadUrl = '';
-          let andriodDownloadUrl = '';
-          let longitude = 119.216452;
-          let latitude = 26.04243;
-          let name = '中青大厦'; //
-          let address = '福建省福州市闽侯县中青大厦'; //地址
-          switch (e.tapIndex) {
-            case 0:
-              url =
-                'qqmap://map/geocoder?coord=${latitude},${longitude}&referer=GOPBZ-RSWK6-Z2CSX-MKQ57-VNKQV-WZBMU'; //key
-              break;
-            case 1:
-              url =
-                'baidumap://map/marker?location=${latitude},${longitude}&title=${name}&coord_type=gcj02&src=andr.baidu.openAPIdemo';
-              break;
-            case 2:
-              if (this.platform == 'ios') {
-                url =
-                  'iosamap://viewMap?sourceApplication=applicationName&poiname=${name}&lat=${latitude}&lon=${longitude}&dev=0';
-              } else {
-                url =
-                  'androidamap://viewMap?sourceApplication=appname&poiname=${name}&lat=${latitude}&lon=${longitude}&dev=0';
-              }
-              break;
-            default:
-              break;
-          }
-          if (url != '') {
-            url = encodeURI(url);
-            Window.location.href = url;
-          }
-        },
-        fail(err) {}
-      });
-      // #endif
-      // #ifndef H5
-      uni.openLocation({
+    gomap() {
+      openLocation({
         latitude: +this.data.latitude,
         longitude: +this.data.longitude,
         name: this.data.siteName,
         address: this.data.address,
-        scale: 18 //缩放比例
-      });
-      // #endif
+      })
     }
   }
 };

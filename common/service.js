@@ -85,7 +85,12 @@ http.interceptors.response.use((response) => {
 }, (response) => {
   /*  对响应错误做点什么 （statusCode !== 200）*/
   if (response) {
+    console.log('response', response);
     let data = response.data
+    if (!data) {
+      tip.toast('访问出错');
+      return Promise.reject(response)
+    }
     const token = uni.getStorageSync(ACCESS_TOKEN)
     console.log("------token------", token)
     console.log(data)

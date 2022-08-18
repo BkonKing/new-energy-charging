@@ -117,9 +117,11 @@ export default {
 	uni-input,
 	input {
 		width: 75%;
+    height: 30rpx;
 		color: #555;
 		font-weight: 500;
 		text-align: right;
+    line-height: 30rpx;
 		font-size: 30rpx;
 	}
 	.uni-input-placeholder {

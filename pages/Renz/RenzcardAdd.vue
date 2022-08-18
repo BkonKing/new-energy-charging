@@ -140,6 +140,8 @@ export default {
   uni-input {
     color: #333;
     width: 70%;
+    height: 30rpx;
+    line-height: 30rpx;
     text-align: right;
     font-size: 30rpx;
   }
@@ -156,6 +158,8 @@ export default {
   uni-input {
     color: #333;
     width: 40%;
+    height: 30rpx;
+    line-height: 30rpx;
     text-align: right;
     font-size: 30rpx;
   }

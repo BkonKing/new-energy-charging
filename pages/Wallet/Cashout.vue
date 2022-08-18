@@ -262,14 +262,15 @@ export default {
 
       input,
       uni-input {
-        color: #333;
         width: 80%;
+        height: 52rpx;
         font-size: 52rpx;
-        padding: 0rpx 0;
-      }
-      .uni-input-placeholder {
+        line-height: 52rpx;
         color: #333;
       }
+      // .uni-input-placeholder {
+      //   color: #333;
+      // }
     }
   }
   .cotip {

@@ -26,9 +26,9 @@
         <view class="fpd20">
           <view class="fclw">最大功率{{ siteData.powerUpperLimits }}KW</view>
         </view>
-        <view class="fcsta">
+        <view class="fcsta" @click="gomap">
           <view class="dadr">{{ siteData.address }}</view>
-          <view class="dwei">{{ siteData.targetDistance }}m</view>
+          <view class="dwei">{{ siteData.targetDistance || 0 }}m</view>
         </view>
       </view>
       <!-- 终端入口 -->
@@ -154,18 +154,18 @@
     <!-- 轮播 -->
     <view class="shopimg">
       <FatFatMeng-Swiper
-        :swiperStyleClass="[{ height: '350rpx' }]"
+        :swiperHeight="350"
         :SwiperImglist="pictureList"
       ></FatFatMeng-Swiper>
     </view>
     <!-- 底部按钮 -->
     <view class="sitefoot">
       <view class="sfico" @click="fixsent">
-        <image src="../../static/image/ico_09.png" mode="widthFix"></image>
+        <image src="/static/image/ico_09.png" mode="widthFix"></image>
         <text>故障报修</text>
       </view>
       <view class="sfico" @click="inputcode">
-        <image src="../../static/image/ico_01.png" mode="widthFix"></image>
+        <image src="/static/image/ico_01.png" mode="widthFix"></image>
         <text>编码充电</text>
       </view>
       <button class="sfbt" @click="handleScan">扫码充电</button>
@@ -178,6 +178,7 @@ import { findSiteById, findPostageBySiteId } from '@/api/site.js';
 import { addMemberFavorite, removeMemberFavorite } from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 import scanCode from '@/mixins/scanCode.js';
+import { openLocation } from '@/common/util.js';
 
 export default {
   mixins: [scanCode],
@@ -223,16 +224,9 @@ export default {
       return '';
     },
     currentPostageIndex() {
-      const date = new Date(this.currentTime);
-      const time = `${this.fillZero(date.getHours())}${this.fillZero(
-        date.getMinutes()
-      )}`;
+      const { startTime, endTime } = this.siteData;
       return this.postageList.findIndex(obj => {
-        let startTime = obj?.startTime || ''
-        let endTime = obj?.endTime || ''
-        startTime.replace(':', '');
-        endTime.replace(':', '');
-        return time >= startTime && time <= endTime;
+        return startTime === obj.startTime && endTime === obj.endTime
       });
     },
     // 这样计算会有问题，中间如果缺了一个时间段(找不到当前时间段)，则下一个时间段永远是第一个，实际应该要重新遍历
@@ -321,6 +315,14 @@ export default {
     callPhone() {
       uni.makePhoneCall({
         phoneNumber: this.phoneNumber
+      });
+    },
+    gomap() {
+      openLocation({
+        latitude: +this.siteData.latitude,
+        longitude: +this.siteData.longitude,
+        name: this.siteData.siteName,
+        address: this.siteData.address
       });
     },
     // 前往终端列表

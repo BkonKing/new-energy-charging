@@ -48,6 +48,7 @@ input.icode {
   border-radius: 100rpx;
   text-align: center;
   margin: 30% auto 60rpx;
+  overflow: hidden;
 }
 button.bcode,
 uni-button.bcode {

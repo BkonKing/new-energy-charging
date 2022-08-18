@@ -21,7 +21,8 @@ export default new Vuex.Store({
   state: {
     token: uni.getStorageSync(ACCESS_TOKEN) || '',
     userInfo: uni.getStorageSync(USER_INFO) || {},
-    locationInfo: {}
+    locationInfo: {},
+    bankInfo: {}
   },
   mutations: {
     SET_TOKEN: (state, token) => {
@@ -34,6 +35,9 @@ export default new Vuex.Store({
     },
     SET_LOCATIONINFO: (state, locationInfo) => {
       state.locationInfo = locationInfo
+    },
+    SET_BANKINFO: (state, bankInfo) => {
+      state.bankInfo = bankInfo
     }
   },
   actions: {

@@ -87,8 +87,10 @@
 <script>
 import { findMemberByWallet } from '@/api/member.js';
 import { mapGetters } from 'vuex';
+import hideBackHome from '@/mixins/hideBackHome.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
 export default {
+  mixins: [hideBackHome],
   components: {
     CustomTabBar
   },
@@ -154,6 +156,9 @@ export default {
     },
     // 前往实名认证
     renzname() {
+      if (this.hasCertification) {
+        return
+      }
       uni.navigateTo({
         url: '/pages/Renz/Renzname'
       });

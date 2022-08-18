@@ -8,7 +8,7 @@
 			<!-- #ifndef MP -->
 			<view v-if="(direction!=='below'&&direction!=='center')" style="height: 100rpx;"></view>
 			<!-- #endif -->
-			<image src="../../static/image/cs_02.png" mode=""
+			<image src="/static/image/cs_02.png"
 				:class="(direction!=='below'&&direction!=='center')?'iconfont-h5':''" class="iconfont" @click="close"
 				v-if="is_close"></image>
 			<slot></slot>

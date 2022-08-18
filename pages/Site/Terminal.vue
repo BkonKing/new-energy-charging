@@ -89,6 +89,7 @@ export default {
 <style lang="scss" scoped>
 .dylist {
   width: 100%;
+  height: 100%;
   .leader {
     width: 100%;
     height: 91rpx;
@@ -132,15 +133,11 @@ export default {
     /* #ifdef H5 */
     height: calc(100vh - 100rpx - 44px);
     /* #endif */
-
-    /* #ifdef APP-PLUS */
+    
+    /* #ifndef H5 */
     height: calc(100vh - 100rpx);
     /* #endif */
-
-    /* #ifdef MP-WEIXIN */
-    height: calc(100vh - 100rpx);
-    /* #endif */
-    // background: #000;
+    
   }
   swiper-item {
     width: 100%;

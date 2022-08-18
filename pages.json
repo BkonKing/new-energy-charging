@@ -3,37 +3,36 @@
     {
       "path": "pages/tabbar/index",
       "style": {
-        "navigationStyle": "custom",
-        "mp-alipay": {
-          "transparentTitle": "always",
-          "titlePenetrate": "YES"
+        "navigationBarTitleText": "首页",
+        "mp-weixin": {
+          "navigationStyle": "custom"
         }
       }
     },
     {
       "path": "pages/tabbar/sitelist",
       "style": {
-        "navigationStyle": "custom",
-        "mp-alipay": {
-          "transparentTitle": "always",
-          "titlePenetrate": "YES"
+        "navigationBarTitleText": "站点",
+        "mp-weixin": {
+          "navigationStyle": "custom"
         }
       }
     },
     {
       "path": "pages/tabbar/wait",
       "style": {
-        "navigationStyle": "custom",
-        "mp-alipay": {
-          "transparentTitle": "always",
-          "titlePenetrate": "YES"
+        "navigationBarTitleText": "商城",
+        "mp-weixin": {
+          "navigationStyle": "custom"
         }
       }
     },
     {
       "path": "pages/tabbar/mine",
       "style": {
-        "navigationStyle": "custom",
+        "mp-weixin": {
+          "navigationStyle": "custom"
+        },
         "mp-alipay": {
           "transparentTitle": "always",
           "titlePenetrate": "YES"
@@ -278,7 +277,10 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#ffffff"
+    "backgroundColor": "#eff0f1",
+    "mp-alipay": {
+      "allowsBounceVertical": "NO"
+    }
   },
   "condition": { //模式配置，仅开发期间生效
     "current": 0, //当前激活的模式(list 的索引项)

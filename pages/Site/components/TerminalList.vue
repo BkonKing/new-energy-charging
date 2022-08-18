@@ -14,7 +14,7 @@
         :class="type"
       >
         <view
-          v-if="item.connectorStatus === 2"
+          v-if="item.connectorStatus === 1"
           class="ter_go"
           @click="noteshow(item)"
         >
@@ -32,7 +32,7 @@
               <!-- <text>空闲</text> -->
               <!-- <text>已插枪</text> -->
               <!-- <text>故障</text> -->
-              <template v-if="item.connectorStatus === 3">
+              <template v-if="item.connectorStatus === 2">
                 <text>{{ item.soc }}%</text>
                 <text>充电中</text>
               </template>
@@ -42,7 +42,7 @@
             </span>
           </cCircle>
           <view
-            v-if="tem.connectorStatus === 3 && item.remainChargeTime"
+            v-if="tem.connectorStatus === 2 && item.remainChargeTime"
             class="needt"
           >
             还需{{ item.remainChargeTime }}
@@ -125,11 +125,11 @@ const equipmentType = {
   2: '交流慢充'
 };
 const connectorStatus = {
-  1: '空闲',
-  2: '已插枪',
-  3: '充电中',
-  4: '充电结束',
-  5: '故障'
+  0: '空闲',
+  1: '已插枪',
+  2: '充电中',
+  3: '充电结束',
+  4: '故障'
 };
 export default {
   components: {
@@ -217,14 +217,14 @@ export default {
     },
     // 空闲时：percent=100；已插枪：percent=100；充电中：percent=实时；故障：percent=0；
     socPercent(data) {
-      // connectorStatus: 1：空闲；2：准备充电；3：充电中；4 ：充电结束；5： 故障
+      // connectorStatus: 0：空闲；1：准备充电；2：充电中；3 ：充电结束；4： 故障
       const { soc, connectorStatus } = data;
       const percent = {
+        0: 100,
         1: 100,
-        2: 100,
-        3: soc,
-        4: soc,
-        5: 0
+        2: soc || 0,
+        3: soc || 0,
+        4: 0
       };
       return percent[connectorStatus] || 0;
     },
