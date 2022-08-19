@@ -106,3 +106,20 @@ export function removeMemberFavorite(data) {
   })
   // return http.delete('/member/removeMemberFavorite', params)
 }
+
+// 充电订单详情（会员）
+export function findChargeOrder(params) {
+  return http.get('/member/findChargeOrder', {
+    params
+  })
+}
+
+// 手动结算（会员）
+export function closeMemberOrder(params) {
+  return http.put('/member/closeMemberOrder', params)
+}
+
+// 故障保修（会员）
+export function submitMemberRepair(params) {
+  return http.post('/member/submitMemberRepair', params)
+}

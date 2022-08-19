@@ -30,9 +30,9 @@
       <view class="stprice">
         <text>
           ￥
-          <text class="stbum">{{ data.realAmount }}</text>
+          <text class="stbum">{{ data.realAmount || '-' }}</text>
         </text>
-        <text>| {{ data.totalPower }}度</text>
+        <text>| {{ data.totalPower || '-' }}度</text>
       </view>
     </view>
   </view>
@@ -70,7 +70,7 @@ export default {
     // 前往订单详情
     goOrderDetail() {
       uni.navigateTo({
-        url: '/pages/Order/Orderdetail'
+        url: `/pages/Order/Orderdetail?orderId=${this.data.id}`
       });
     }
   }

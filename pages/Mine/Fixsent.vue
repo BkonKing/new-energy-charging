@@ -3,7 +3,7 @@
     <!-- 联系人 -->
     <view class="fixA disflex4">
       <text>联系人手机号</text>
-      <input v-model="phoneNumber" type="number" />
+      <input v-model="mobile" type="number" disabled maxlength="11" />
     </view>
     <!-- 关联终端 -->
     <view class="fixB">
@@ -18,7 +18,7 @@
       <view class="fixitem">
         <view>
           <view>选择近期订单</view>
-          <view class="fixsm">{{terminationID || '终端ID'}}</view>
+          <view class="fixsm">{{ terminationID || '订单ID' }}</view>
         </view>
         <view class="fixcb" @click="goSelectOrder">选择订单</view>
       </view>
@@ -26,18 +26,26 @@
     <!--异常原因 -->
     <view class="fixB">
       <view class="fixBtitle">选择异常原因</view>
-      <checkbox-group @change="checkboxChange" class="ycreson">
-        <label class="yclabel" v-for="item in ycitems" :key="item.value">
-          <checkbox style="transform:scale(0.7)" :checked="item.checked" />
+      <checkbox-group class="ycreson" @change="checkboxChange">
+        <label
+          v-for="item in repairReasonOptions"
+          :key="item.value"
+          class="yclabel"
+        >
+          <checkbox
+            :checked="item.checked"
+            :value="item.value"
+            style="transform:scale(0.7)"
+          />
           <text>{{ item.name }}</text>
         </label>
       </checkbox-group>
+      <!-- auto-height="true" -->
       <textarea
-        v-model="remark"
+        v-model="repairDesc"
         placeholder="补充更多信息,以便我们诊断问题"
         class="ycbuc"
-        auto-height="true"
-        maxlength="200"
+        maxlength="100"
       />
     </view>
     <view class="clearw"></view>
@@ -48,66 +56,83 @@
 </template>
 
 <script>
+import { submitMemberRepair } from '@/api/member.js';
 import { validateForm } from '@/common/util.js';
+import { mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
-      phoneNumber: '',
-      ycValues: [],
-      remark: '',
+      mobile: '',
+      repairReasons: [],
+      repairDesc: '',
       terminationID: '',
+      repairType: '',
       // 异常原因
-      ycitems: [
+      repairReasonOptions: [
         {
-          name: '位置描述不准确'
+          name: '位置描述不准确',
+          value: 1
         },
         {
-          name: '车位被占用'
+          name: '停车费信息不属实',
+          value: 2
         },
         {
-          name: '二维码无法识别'
+          name: '二维码无法识别',
+          value: 3
         },
         {
-          name: '停车费信息不属实'
+          name: '无法拔枪',
+          value: 4
         },
         {
-          name: '无法拔枪'
+          name: '电源指示灯不亮',
+          value: 5
         },
         {
-          name: '枪头损坏'
+          name: '故障灯常亮',
+          value: 6
         },
         {
-          name: '充电异常终端'
+          name: '充电异常断电',
+          value: 7
         },
         {
-          name: '充电慢'
+          name: '枪头损坏',
+          value: 8
         },
         {
-          name: '故障灯常亮'
+          name: '程序无法启动',
+          value: 9
         },
         {
-          name: '电源指示灯不亮'
+          name: '程序无法停止',
+          value: 10
         },
         {
-          name: '程序无法启动'
-        },
-        {
-          name: '程序无法停止'
+          name: '其他',
+          value: 11
         }
       ]
     };
   },
+  computed: {
+    ...mapGetters(['userInfo'])
+  },
   onLoad() {
-    uni.$on('selectOrder', this.handleSelectOrder)
+    uni.$on('selectOrder', this.handleSelectOrder);
+    console.log(this.userInfo);
+    this.mobile = this.userInfo.mobileNo
   },
   onUnload() {
-    uni.$off('selectOrder', this.handleSelectOrder)
+    uni.$off('selectOrder', this.handleSelectOrder);
   },
   methods: {
     // 异常原因多选
     checkboxChange(e) {
-      this.ycValues = e.detail.value;
+      console.log(e.detail.value);
+      this.repairReasons = e.detail.value;
     },
     // 前往我的订单 - 选择
     goSelectOrder() {
@@ -115,15 +140,16 @@ export default {
         url: '/pages/Order/Orderlist?type=select'
       });
     },
-    // 没有终端id
-    handleSelectOrder({connectorNum}) {
-      this.terminationID = connectorNum
+    handleSelectOrder({ id }) {
+      this.repairType = '2';
+      this.terminationID = id;
     },
     handleScan() {
       uni.scanCode({
         success: res => {
           console.log('条码类型：' + res.scanType);
           console.log('条码内容：' + res.result);
+          this.repairType = '1';
           this.terminationID = res.result;
         }
       });
@@ -131,7 +157,7 @@ export default {
     submit() {
       const requiredArray = [
         {
-          value: this.phoneNumber,
+          value: this.mobile,
           message: '请输入联系人手机号'
         },
         {
@@ -139,13 +165,27 @@ export default {
           message: '请关联终端'
         },
         {
-          value: this.ycValues,
+          value: this.repairReasons,
           message: '请选择异常原因'
-        },
-      ]
+        }
+      ];
       validateForm(requiredArray).then(() => {
-        
-      })
+        this.submitMemberRepair();
+      });
+    },
+    submitMemberRepair() {
+      const params = {
+        mobile: this.mobile,
+        repairReasons: this.repairReasons.join(','),
+        repairDesc: this.repairDesc,
+        repairType: this.repairType
+      };
+      submitMemberRepair(params).then(() => {
+        this.$tip.success('提交成功');
+        uni.navigateBack({
+          delta: 1
+        });
+      });
     }
   }
 };

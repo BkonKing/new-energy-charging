@@ -77,7 +77,9 @@ export default {
       balances: 0
     };
   },
-  onLoad() {},
+  onShow() {
+    this.findMemberByWallet()
+  },
   methods: {
     findMemberByWallet() {
       findMemberByWallet().then(({result}) => {

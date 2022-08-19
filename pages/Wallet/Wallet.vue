@@ -1,6 +1,12 @@
 <template>
   <view class="container">
-    <z-paging v-model="billList" ref="paging" :fixed="true" @query="queryList">
+    <z-paging
+      v-model="billList"
+      ref="paging"
+      :fixed="true"
+      :auto="false"
+      @query="queryList"
+    >
       <!-- 余额 -->
       <view class="wallA">
         <view class="wali">
@@ -54,14 +60,14 @@
         <view v-for="item in billList" :key="item.id">
           <view
             class="wblist"
-            :class="{ wtxbg: item.payType === '2' }"
+            :class="{ wtxbg: item.payType === 2 }"
             @click="goTxdetail(item)"
           >
             <view class="w-70">
               <view class="wbtou">
                 {{ item.payType | payTypeText }}
                 <text
-                  v-if="item.payType === '2' && item.payStatus === '1'"
+                  v-if="item.payType === 2 && item.payStatus === 1"
                   class="wbtxzt"
                 >
                   提现成功
@@ -71,8 +77,7 @@
             </view>
             <view>
               <view class="wbmon">
-                <!-- 不懂后端是否返回 +/- -->
-                <!-- <text>+</text> -->
+                <text>{{ [1, 4].includes(item.payType) ? '+' : '-' }}</text>
                 <text>{{ item.realAmount || 0 }}</text>
                 <text class="wbtsm">元</text>
               </view>
@@ -131,8 +136,9 @@ export default {
       return payTypeText[value];
     }
   },
-  onLoad() {
+  onShow() {
     this.findMemberByWallet();
+    this.$refs.paging.reload();
   },
   methods: {
     findMemberByWallet() {

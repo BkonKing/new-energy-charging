@@ -1,11 +1,11 @@
 <template>
-  <view>
-    <view :style="cBox">
-      <view :style="slotStyle"><slot name="content">{{ animationPercent }}%</slot></view>
-      <view :style="faStyle">
-        <view :style="leftBox"><view :style="leftStyle"></view></view>
-        <view :style="rithStyle"></view>
-      </view>
+  <view class="c-circle" :style="cBox">
+    <view class="circle-content" :style="slotStyle">
+      <slot name="content">{{ animationPercent }}%</slot>
+    </view>
+    <view class="clip-box" :style="faStyle">
+      <view class="left-box" :style="leftStyle"></view>
+      <view class="right-box" :style="rightStyle"></view>
     </view>
   </view>
 </template>
@@ -14,7 +14,8 @@
 export default {
   data() {
     return {
-      animationPercent: 0
+      animationPercent: 0,
+      timer: null
     };
   },
   mounted() {
@@ -24,21 +25,22 @@ export default {
       this.animationPercent = this.percent;
     }
   },
-
+  destroyed() {
+    this.timer && clearInterval(this.timer)
+  },
   methods: {
     //动画加载方法
     loadAnimation() {
       this.animationPercent = 0;
-      var that = this;
-      var i = setInterval(() => {
-        if (that.animationPercent >= that.percent) {
-          clearInterval(i);
-          that.$emit('onComplete');
+      this.timer = setInterval(() => {
+        if (this.animationPercent >= this.percent) {
+          clearInterval(this.timer);
+          this.$emit('onComplete');
         } else {
-          that.animationPercent += 1;
-          that.$emit('animationPercent', that.animationPercent);
+          this.animationPercent += 1;
+          this.$emit('animationPercent', this.animationPercent);
         }
-      }, that.animationSpeed);
+      }, this.animationSpeed);
     }
   },
   props: {
@@ -50,7 +52,7 @@ export default {
     //进度条颜色
     circleColor: {
       type: String,
-      default: '#32CDA5'
+      default: '#33b048'
     },
     //圆环背景色
     defaultColor: {
@@ -90,119 +92,102 @@ export default {
   },
   computed: {
     cBox() {
-      var size = this.size;
-      var circleWidth = this.circleWidth;
-      var style = `	
-						position:relative !important;
-						height:${circleWidth * 2 + size}px !important;
-						width:${circleWidth * 2 + size}px !important;
-						display:flex !important;
-						justify-content: center !important;
-						align-items: center !important;
+      return `
+						height:${this.size}px;
+						width:${this.size}px;
+            background-color: ${this.defaultColor};
 					`;
-      return style;
     },
     slotStyle() {
-      var size = this.size;
-      var circleWidth = this.circleWidth;
-      var style = `
-						border-radius:50% !important;
-						height:${size}px !important;
-						width:${size}px !important;
-						display:flex !important;
-						justify-content: center !important;
-						align-items: center !important;
+      const slotWidth = this.size - 2 * this.circleWidth;
+      return `
+						height:${slotWidth}px;
+						width:${slotWidth}px;
 					`;
-      return style;
     },
     faStyle() {
-      var size = this.size;
-      var circleWidth = this.circleWidth;
-      var defaultColor = this.defaultColor;
-      var direction = this.direction;
-      var clockwise = this.clockwise;
-      var style = `
-							 position:absolute !important;
-							 border-radius:50% !important;
-							 display:flex !important;
-							 justify-content: center !important;
-							 align-items: center !important;
-							 top:0 !important;
-							 left:0 !important;
-							 height:${size}px !important;
-							 width:${size}px !important;
-							 border:${circleWidth}px ${defaultColor} solid !important;
-							 transform:rotate(${direction}deg) rotateY(${
-        clockwise ? 0 : 180
-      }deg) !important;
-							 
-							`;
-      return style;
-    },
-    leftBox() {
-      var size = this.size;
-      var circleWidth = this.circleWidth;
-      var style = `
-					height:${circleWidth * 2 + size}px !important;
-					width:${circleWidth * 2 + size}px !important;
-					position:absolute !important;
-					top:-${circleWidth}px !important;
-					left:-${circleWidth}px !important;
-					opacity:1 !important;
-					clip:rect(0 ${(circleWidth * 2 + size) / 2}px ${circleWidth * 2 +
-        size}px 0) !important;
-				`;
-      return style;
+      const size = this.size;
+      const circleWidth = this.circleWidth;
+      const defaultColor = this.defaultColor;
+      const direction = this.direction;
+      const clockwise = this.clockwise;
+      const percent = this.animation ? this.animationPercent : this.percent;
+      const clip =
+        percent > 50 && percent <= 100
+          ? `clip: auto;`
+          : `clip: rect(0, ${size}px, ${size}px, ${size /
+              2}px);`;
+      return `width: ${size}px;
+            height: ${size}px;
+            border: ${circleWidth}px solid ${this.defaultColor};
+            ${clip}
+            transform:rotate(${direction}deg) rotateX(${
+              clockwise ? 180 : 0
+            }deg) rotateY(${
+              clockwise ? 180 : 0
+            }deg)`;
     },
     leftStyle() {
-      var top = this.top;
-      var clockwise = this.clockwise;
-      var size = this.size;
-      var circleColor = this.circleColor;
-      var circleWidth = this.circleWidth;
-      var percent = this.animation ? this.animationPercent : this.percent;
-      var style;
-      style = `
-					height:${size}px !important;
-					width:${size}px !important;
-					border:${circleWidth}px ${circleColor} solid !important;
-					border-radius:50% !important; 
-					z-index:0 !important;
-					position:absolute !important;
-					top:0px !important;
-					left:0px !important;
-					transform:rotate(${percent > 50 ? 180 : (percent / 100) * 360}deg) !important;
-					clip:rect(0 ${circleWidth * 2 + size}px ${circleWidth * 2 +
-        size}px ${(circleWidth * 2 + size) / 2}px ) !important;
-					`;
-      return style;
+      const size = this.size;
+      const circleColor = this.circleColor;
+      const circleWidth = this.circleWidth;
+      const percent = this.animation ? this.animationPercent : this.percent;
+      return `width: ${size}px;
+            height: ${size}px;
+            border: ${circleWidth}px solid ${circleColor};
+            clip: rect(0 ${size / 2}px ${size}px 0);
+            top: -${circleWidth}px;
+            left: -${circleWidth}px;
+            transform:rotate(${(percent / 100) * 360}deg);`;
     },
-    rithStyle() {
-      var direction = this.direction;
-      var size = this.size;
-      var circleColor = this.circleColor;
-      var defaultColor = this.defaultColor;
-      var circleWidth = this.circleWidth;
-      var percent = this.animation ? this.animationPercent : this.percent;
-      var style = `
-							 height:${size}px !important;
-							 width:${size}px !important;
-							 position:absolute;
-							 border:${circleWidth}px ${
-        percent > 50 ? circleColor : defaultColor
-      } solid !important;
-							 border-radius:50% !important;
-							 z-index:${percent > 50 ? 0 : 100} !important;
-							 position:absolute !important;
-							 top:-${circleWidth}px;
-							 left:-${circleWidth}px;
-							 transform:rotate(${percent > 50 ? (percent / 100) * 360 : 0}deg) !important;
-							 clip:rect(0 ${circleWidth * 2 + size}px ${circleWidth * 2 +
-        size}px ${(circleWidth * 2 + size) / 2}px ) !important; 
-							`;
-
-      return style;
+    rightStyle() {
+      const size = this.size;
+      const circleColor = this.circleColor;
+      const circleWidth = this.circleWidth;
+      const percent = this.animation ? this.animationPercent : this.percent
+      const width = percent > 100 || percent <= 50 ? 0 : size;
+      return `width: ${width}px;
+            height: ${size}px;
+            border: ${circleWidth}px solid ${circleColor};
+            clip: rect(0 ${size}px ${size}px ${size /
+        2}px);
+            top: -${circleWidth}px;
+            left: -${circleWidth}px;`;
     }
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.c-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-radius: 50%;
+}
+.circle-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  // font-size: 32px;
+}
+.clip-box {
+  position: absolute;
+  border-radius: 50%;
+}
+.left-box {
+  position: absolute;
+  border-radius: 50%;
+}
+.right-box {
+  position: absolute;
+  border-radius: 50%;
+}
+</style>

@@ -303,14 +303,14 @@ export default {
         connectorNum: this.connectorNum,
         chargeStrategy: this.chargeStrategyValue,
         chargeChannel
-      }).then(() => {
-        this.goCharge();
+      }).then(({result}) => {
+        this.goCharge(result.orderId);
       });
     },
     // 前往开始充电
-    goCharge() {
+    goCharge(orderId) {
       uni.navigateTo({
-        url: `/pages/Charge/Charge?connectorNum=${this.connectorNum}`
+        url: `/pages/Charge/Charge?connectorNum=${this.connectorNum}&orderId=${orderId}`
       });
     },
     // 前往车辆选择

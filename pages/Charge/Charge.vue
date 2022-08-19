@@ -1,222 +1,245 @@
 <template>
   <view class="container">
     <!-- 加载动画 -->
-    <view
-      class="loaditem"
-      @touchmove.stop.prevent="moveHandle"
-      v-show="loadshwo"
-    >
-      <view>请稍等，正在与充电枪断开……</view>
-    </view>
-    <!-- 充电汽车切换 -->
-    <view class="carul disflex5">
-      <text @click="$refs.pop.show()">设备编码：1231321545</text>
+    <view v-if="loadshwo" class="loaditem" @touchmove.stop.prevent="moveHandle">
       <image
-        src="/static/image/arrow_03.png"
-        mode="widthFix"
-        class="arrimg"
+        class="loading-image"
+        src="@/static/image/loading_1.gif"
+        mode=""
       ></image>
+      <view>请稍等，正在加载中……</view>
     </view>
-    <!-- 充电汽车切换 弹框 -->
-    <pop
-      ref="pop"
-      direction="up"
-      :is_close="true"
-      :is_mask="true"
-      :width="100"
-      height="fit-content"
-      :maskFun="true"
-      @watchOpen="watchOpen"
-      @watchClose="watchClose"
-    >
-      <view class="tcwarp">
-        <view class="caritem" v-for="t in 3" @click="popchose()">
-          <text>设备编码：1231321545</text>
-          <text class="carstatu">充电中</text>
-        </view>
-      </view>
-    </pop>
-    <!-- 传感器 -->
-    <best-gauge :config="gaugeOption1"></best-gauge>
-    <!-- 汽车图片 -->
-    <view class="carshow">
-      <image
-        src="/static/image/car3.png"
-        mode="widthFix"
-        :class="{ 'scale-car': scaleCardShow }"
-      ></image>
-    </view>
-    <!-- 充电计时 -->
-    <view class="Timesul">
-      <div class="cTimes">
-        <uni-countdown
-          :show-day="false"
-          :font-size="40"
-          :hour="0"
-          :minute="12"
-          :second="12"
-        />
-      </div>
-      <view class="sTimes disflex5">
-        <text>正在充电中，已充电</text>
-        <bing-countup :font-size="16" color="#999" />
-      </view>
-    </view>
-    <!-- 费用 -->
-    <view class="cFeiy disflex">
-      <view>
-        <text>实时费用</text>
-        <text class="wonum">0.00</text>
-      </view>
-      <view @click="cashin">
-        <text>账户余额</text>
-        <text class="wonum">0.00</text>
-        <text class="cmin">充值</text>
-      </view>
-    </view>
-    <!-- 数据 -->
-    <view class="cShu disflex">
-      <view>
-        <text>电压</text>
-        <text class="wonum">
-          392
-          <text class="snum">v /421v</text>
+    <template v-else>
+      <!-- 充电汽车切换 -->
+      <view class="carul disflex5">
+        <text @click="$refs.pop.show()">
+          设备编码：{{ dataInfo.connectorNum || '--' }}
         </text>
+        <image
+          src="/static/image/arrow_03.png"
+          mode="widthFix"
+          class="arrimg"
+        ></image>
       </view>
-      <view>
-        <text>功率</text>
-        <text class="wonum">
-          19
-          <text class="snum">kW /27kW</text>
+      <!-- 充电汽车切换 弹框 -->
+      <pop
+        ref="pop"
+        direction="up"
+        :is_close="true"
+        :is_mask="true"
+        :width="100"
+        height="fit-content"
+        :maskFun="true"
+        @watchOpen="watchOpen"
+        @watchClose="watchClose"
+      >
+        <view class="tcwarp">
+          <view class="caritem" v-for="item in orderList" @click="popchose(item)">
+            <text>设备编码：{{ item.connectorNum || '-' }}</text>
+            <text class="carstatu">{{item.chargeStatus | chargeStatusText}}</text>
+          </view>
+        </view>
+      </pop>
+      <!-- 传感器 -->
+      <best-gauge :config="gaugeOption1"></best-gauge>
+      <!-- 汽车图片 -->
+      <view class="carshow">
+        <image
+          src="/static/image/car3.png"
+          mode="widthFix"
+          :class="{ 'scale-car': scaleCardShow }"
+        ></image>
+      </view>
+      <!-- 充电计时 -->
+      <view class="Timesul">
+        <div class="cTimes">
+          <uni-countdown
+            :show-day="false"
+            :font-size="40"
+            :hour="0"
+            :minute="12"
+            :second="12"
+          />
+        </div>
+        <view class="sTimes disflex5">
+          <text>正在充电中，已充电</text>
+          <bing-countup :font-size="16" color="#999" />
+        </view>
+      </view>
+      <!-- 费用 -->
+      <view class="cFeiy disflex">
+        <view>
+          <text>实时费用</text>
+          <text class="wonum">{{ dataInfo.electricAmount || '--' }}</text>
+        </view>
+        <view @click="goCashin">
+          <text>账户余额</text>
+          <text class="wonum">{{ balances }}</text>
+          <text class="cmin">充值</text>
+        </view>
+      </view>
+      <!-- 数据 -->
+      <view class="cShu disflex">
+        <view>
+          <text>电压</text>
+          <text class="wonum">
+            10
+            <text class="snum">v /421v</text>
+          </text>
+        </view>
+        <view>
+          <text>功率</text>
+          <text class="wonum">
+            19
+            <text class="snum">kW /27kW</text>
+          </text>
+        </view>
+        <view>
+          <text>电流</text>
+          <text class="wonum">
+            12
+            <text class="snum">A /65A</text>
+          </text>
+        </view>
+      </view>
+      <!-- 终端信息 -->
+      <view class="cDuan disflex">
+        <text>
+          设备编号：{{ dataInfo.connectorNum || '--' }}
+          <text class="cdcopy">复制</text>
         </text>
+        <text>终端时间 16:24:36</text>
       </view>
-      <view>
-        <text>电流</text>
-        <text class="wonum">
-          50
-          <text class="snum">A /65A</text>
-        </text>
-      </view>
-    </view>
-    <!-- 终端信息 -->
-    <view class="cDuan disflex">
-      <text>
-        设备编号：12312321
-        <text class="cdcopy">复制</text>
-      </text>
-      <text>终端时间 16:24:36</text>
-    </view>
-    <!-- 数据图表 -->
-    <view class="dylist">
-      <view class="leader">
-        <view class="ltitle">
-          <view
-            @tap="changeShowType(1)"
-            :class="showType == 1 ? 'activeContentA' : ''"
-          >
-            <view>电压</view>
-          </view>
-          <view
-            @tap="changeShowType(2)"
-            :class="showType == 2 ? 'activeContentA' : ''"
-          >
-            <view>功率</view>
-          </view>
-          <view
-            @tap="changeShowType(3)"
-            :class="showType == 3 ? 'activeContentA' : ''"
-          >
-            <view>电流</view>
+      <!-- 数据图表 -->
+      <view class="dylist">
+        <view class="leader">
+          <view class="ltitle">
+            <view
+              @tap="changeShowType(1)"
+              :class="showType == 1 ? 'activeContentA' : ''"
+            >
+              <view>电压</view>
+            </view>
+            <view
+              @tap="changeShowType(2)"
+              :class="showType == 2 ? 'activeContentA' : ''"
+            >
+              <view>功率</view>
+            </view>
+            <view
+              @tap="changeShowType(3)"
+              :class="showType == 3 ? 'activeContentA' : ''"
+            >
+              <view>电流</view>
+            </view>
           </view>
         </view>
-      </view>
-      <view class="uchart" v-if="showType == 1">
-        <view class="uctitle">
-          <view>
-            <text>实际输出电压</text>
-            <text>392.90V</text>
+        <view class="uchart" v-if="showType == 1">
+          <view class="uctitle">
+            <view>
+              <text>实际输出电压</text>
+              <text>392.90V</text>
+            </view>
+            <view>
+              <text>所需电压</text>
+              <text>421V</text>
+            </view>
           </view>
-          <view>
-            <text>所需电压</text>
-            <text>421V</text>
-          </view>
+          <qiun-data-charts
+            type="area"
+            :canvas2d="true"
+            :opts="optsDY"
+            :ontouch="true"
+            :chartData="chartDataDY"
+          />
         </view>
-        <qiun-data-charts
-          type="area"
-          :canvas2d="true"
-          :opts="optsDY"
-          :ontouch="true"
-          :chartData="chartDataDY"
-        />
-      </view>
-      <view class="uchart" v-if="showType == 2">
-        <view class="uctitle">
-          <view>
-            <text>实际输出功率</text>
-            <text>0kW</text>
+        <view class="uchart" v-if="showType == 2">
+          <view class="uctitle">
+            <view>
+              <text>实际输出功率</text>
+              <text>0kW</text>
+            </view>
+            <view>
+              <text>所需功率</text>
+              <text>0kW</text>
+            </view>
           </view>
-          <view>
-            <text>所需功率</text>
-            <text>0kW</text>
-          </view>
+          <qiun-data-charts
+            type="area"
+            :canvas2d="true"
+            :opts="optsGL"
+            :ontouch="true"
+            :chartData="chartDataGL"
+          />
         </view>
-        <qiun-data-charts
-          type="area"
-          :canvas2d="true"
-          :opts="optsGL"
-          :ontouch="true"
-          :chartData="chartDataGL"
-        />
-      </view>
-      <view class="uchart" v-if="showType == 3">
-        <view class="uctitle">
-          <view>
-            <text>实际输出电流</text>
-            <text>10A</text>
+        <view class="uchart" v-if="showType == 3">
+          <view class="uctitle">
+            <view>
+              <text>实际输出电流</text>
+              <text>10A</text>
+            </view>
+            <view>
+              <text>所需电流</text>
+              <text>10A</text>
+            </view>
           </view>
-          <view>
-            <text>所需电流</text>
-            <text>10A</text>
-          </view>
+          <qiun-data-charts
+            type="area"
+            :canvas2d="true"
+            :opts="optsDL"
+            :ontouch="true"
+            :chartData="chartDataDL"
+          />
         </view>
-        <qiun-data-charts
-          type="area"
-          :canvas2d="true"
-          :opts="optsDL"
-          :ontouch="true"
-          :chartData="chartDataDL"
-        />
       </view>
-    </view>
-    <view class="clearw"></view>
-    <!-- 底部按钮 -->
-    <view class="sitefoot">
-      <view class="sfico" @click="fixsent">
-        <image src="/static/image/ico_09.png" mode="widthFix"></image>
-        <text>故障报修</text>
+      <view class="clearw"></view>
+      <!-- 底部按钮 -->
+      <view class="sitefoot">
+        <view class="sfico" @click="goFixsent">
+          <image src="/static/image/ico_09.png" mode="widthFix"></image>
+          <text>故障报修</text>
+        </view>
+        <view class="sfico" @click="goContact">
+          <image src="/static/image/ico_16.png" mode="widthFix"></image>
+          <text>联系客服</text>
+        </view>
+        <button class="sfbt" @click="stopCharge()">停止充电</button>
       </view>
-      <view class="sfico" @click="contact">
-        <image src="/static/image/ico_16.png" mode="widthFix"></image>
-        <text>联系客服</text>
-      </view>
-      <button class="sfbt" @click="stopCharge()">停止充电</button>
-    </view>
+    </template>
   </view>
 </template>
 
 <script>
-import { findConnectorByNum } from '@/api/site.js';
-import { findMemberByWallet, stopCharge } from '@/api/member.js';
+import {
+  findMemberByWallet,
+  stopCharge,
+  findChargeOrder,
+  findOrderByMemberId
+} from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 import bestGauge from '../../components/best-gauge/best-gauge.vue'; //环形传感器
+
+const chargeStatusDict = {
+  '-1': '充电失败',
+  0: '充电中',
+  1: '充电结束',
+  2: '等待充电',
+}
+
 export default {
   components: { pop, bestGauge },
   data() {
     let _width = uni.upx2px(480); //传感器宽度350
     return {
+      connectorNum: '',
+      orderId: '',
+      balances: 0,
+      pollNum: 1,
+      pollTimer: null,
       dataInfo: {},
+      orderList: [],
       // 加载动画显示
-      loadshwo: false,
+      loadshwo: true,
       // 传感器chart数据
       gaugeOption1: {
         id: 'gaugeId1',
@@ -436,55 +459,85 @@ export default {
       scaleCardShow: false
     };
   },
-  onLoad({ connectorNum }) {
+  filters: {
+    chargeStatusText(value) {
+      return chargeStatusDict || '--'
+    }
+  },
+  onLoad({ connectorNum, orderId }) {
     this.connectorNum = connectorNum;
+    this.orderId = '1560197580267483138' || orderId;
   },
   onShow() {
-    // this.findConnectorByNum();
-    // this.findMemberByWallet();
-    this.scaleCardShow = true;
+    this.findMemberByWallet();
+    this.pollOrder();
   },
-  onReady() {
-    this.getServerData();
+  onUnload() {
+    this.pollTimer && clearTimeout(this.pollTimer);
   },
-  onLoad() {},
   methods: {
-    // 充电汽车切换-弹框
-    watchOpen() {},
-    watchClose() {},
-    popchose() {
-      this.$refs.pop.close();
+    pollOrder() {
+      this.findChargeOrder()
+        .then(() => {
+          this.pollNum = 1;
+          this.complatePoll();
+        })
+        .catch(() => {
+          if (this.pollNum === 4) {
+            this.$tip.toast('正在生成订单，请稍后再试...');
+            return;
+          }
+          this.pollTimer = setTimeout(() => {
+            this.pollNum++;
+            this.pollOrder();
+          }, 3000);
+        });
+    },
+    complatePoll() {
+      this.loadshwo = false;
+      this.$nextTick(() => {
+        this.scaleCardShow = true;
+        this.findOrderByMemberId();
+        this.getServerData();
+      });
+    },
+    findMemberByWallet() {
+      findMemberByWallet().then(({ result }) => {
+        this.balances = result.balances || 0;
+      });
+    },
+    findChargeOrder() {
+      return findChargeOrder({
+        orderId: this.orderId
+      }).then(({ result }) => {
+        this.dataInfo = result || {};
+      });
+    },
+    findOrderByMemberId() {
+      findOrderByMemberId({
+        findType: 1, // 0:全部订单，1:充电中和等待充电
+        pageSize: 10,
+        pageNo: 1
+      }).then(({ result }) => {
+        this.orderList = result.orderInfo?.records || [];
+      });
     },
     stopCharge() {
       stopCharge({
-        orderId: this.dataInfo.orderId
-      }).then(() => {});
-    },
-    // 前往充值
-    cashin() {
-      uni.navigateTo({
-        url: '../Wallet/Cashin'
+        orderId: this.orderId
+      }).then(() => {
+        this.tip.success('充电已停止');
       });
     },
-    // 前往故障报修
-    fixsent() {
-      uni.navigateTo({
-        url: '../Mine/Fixsent'
-      });
+    popchose(data) {
+      this.orderId = data.id
+      this.findChargeOrder();
+      this.getServerData();
+      this.$refs.pop.close();
     },
-    // 前往联系客服
-    contact() {
-      uni.navigateTo({
-        url: '../Mine/Contact'
-      });
-    },
-    /* 切换显示内容 */
+    // 切换显示内容
     changeShowType(type) {
       this.showType = type;
-    },
-    // 禁止外壳页面手指上下滑动
-    moveHandle() {
-      return false;
     },
     // 数据图表
     getServerData() {
@@ -533,6 +586,31 @@ export default {
         this.chartDataGL = JSON.parse(JSON.stringify(resGL));
         this.chartDataDL = JSON.parse(JSON.stringify(resDL));
       }, 500);
+    },
+    // 充电汽车切换-弹框
+    watchOpen() {},
+    watchClose() {},
+    // 前往充值
+    goCashin() {
+      uni.navigateTo({
+        url: '/pages/Wallet/Cashin'
+      });
+    },
+    // 前往故障报修
+    goFixsent() {
+      uni.navigateTo({
+        url: '/pages/Mine/Fixsent'
+      });
+    },
+    // 前往联系客服
+    goContact() {
+      uni.navigateTo({
+        url: '/pages/Mine/Contact'
+      });
+    },
+    // 禁止外壳页面手指上下滑动
+    moveHandle() {
+      return false;
     }
   }
 };
@@ -824,24 +902,25 @@ export default {
 }
 // 加载动画
 .loaditem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   height: 100%;
   position: fixed;
   left: 0;
-  top: 0;
+  top: 40%;
   z-index: 101;
 
   view {
-    width: 70%;
-    border-radius: 20rpx;
-    background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center
-      50rpx no-repeat;
-    background-size: 100rpx 100rpx;
-    color: #fff;
+    color: #222;
     font-size: 28rpx;
-    padding: 200rpx 20rpx 30rpx;
     text-align: center;
-    margin: 60% auto 0;
+    margin-top: 40rpx;
+  }
+  .loading-image {
+    width: 100rpx;
+    height: 100rpx;
   }
 }
 </style>

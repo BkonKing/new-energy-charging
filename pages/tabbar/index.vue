@@ -11,16 +11,19 @@
         <text>搜索你想要去的充电桩站点/目的地</text>
       </view>
       <!-- 充电中的设备-浮框 -->
-      <view class="fing" v-show="orderVisible" @click="charge">
-        <view v-for="item in orderList" :key="item.id" class="disflex4">
+      <view
+        v-show="orderVisible"
+        class="fing"
+        :class="{ 'fing-expand': isExpand }"
+      >
+        <view
+          v-for="item in orderList"
+          :key="item.id"
+          class="disflex4"
+          @click="goCharge(item)"
+        >
           <view class="fcmd">
-            <cCircle
-              :size="60"
-              :percent="item.soc"
-              :animation="true"
-              :animationSpeed="5"
-              :circleColor="circleColor"
-            >
+            <cCircle :percent="item.soc" :animation="true">
               <span slot="content" class="cmdtx">
                 <text>{{ item.soc || '-' }}%</text>
               </span>
@@ -39,6 +42,9 @@
               </text>
             </view>
           </view>
+        </view>
+        <view class="expand-icon" @click="changeExpand">
+          <uni-icons type="bottom" size="20"></uni-icons>
         </view>
       </view>
       <!-- 站点浮窗信息 -->
@@ -73,7 +79,7 @@
         <template v-for="(item, index) in siteListData">
           <cover-view
             class="customCallout-container"
-            :marker-id="index"
+            :marker-id="item.markerId"
             :key="item.id"
           >
             <cover-view class="customCallout">
@@ -119,8 +125,6 @@ export default {
     return {
       siteshow: false, //站点浮窗是否显示
       fcshow: false, //浮窗信息是否显示
-      percent: 80, //进度圈
-      circleColor: '#33b048', //进度圈颜色
       // 地图数据
       myMap: {
         latitude: 26.04243, // 纬度
@@ -138,7 +142,8 @@ export default {
       orderList: [],
       statusBarHeight: 0,
       mapContext: null,
-      hasLocationPermission: false
+      hasLocationPermission: false,
+      isExpand: false
     };
   },
   computed: {
@@ -188,22 +193,22 @@ export default {
     },
     //点击标记气泡
     callouttap(e) {
-      const { markerId: index } = e.detail;
-      console.log('markerId', index);
-      if (index > -1) {
-        const data = this.siteListData[index];
-        const { lon, lat } = convert2TecentMap({
-          lon: +data.longitude,
-          lat: +data.latitude
-        });
-        this.myMap.latitude = lat;
-        this.myMap.longitude = lon;
-        this.findSiteById({
-          id: data.id,
-          lon: this.currentLocation.longitude,
-          lat: this.currentLocation.latitude
-        });
+      const { markerId } = e.detail;
+      const data = this.siteListData.find(obj => obj.markerId === markerId);
+      if (!data) {
+        return;
       }
+      const { lon, lat } = convert2TecentMap({
+        lon: +data.longitude,
+        lat: +data.latitude
+      });
+      this.myMap.latitude = lat;
+      this.myMap.longitude = lon;
+      this.findSiteById({
+        id: data.id,
+        lon: this.currentLocation.longitude,
+        lat: this.currentLocation.latitude
+      });
     },
     findSiteById(params) {
       findSiteById(params).then(({ result }) => {
@@ -214,7 +219,7 @@ export default {
     findOrderByMemberId() {
       findOrderByMemberId({
         findType: 1, // 0:全部订单，1:充电中和等待充电
-        pageSize: 2,
+        pageSize: 3,
         pageNo: 1
       }).then(({ result }) => {
         this.orderList = result.orderInfo?.records || [];
@@ -251,10 +256,16 @@ export default {
     findSiteByCoordinate(params) {
       findSiteByCoordinate(params).then(({ result }) => {
         const siteListData = result.siteInfo || [];
-        this.markers = siteListData.map((data, index) => {
-          return this.setMarker(data, index);
+        const markers = [];
+        this.siteListData = siteListData.map((data, index) => {
+          const randomNumber = Math.ceil(Math.random() * 1000000000000);
+          markers.push(this.setMarker(data, randomNumber));
+          return {
+            ...data,
+            markerId: randomNumber
+          };
         });
-        this.siteListData = siteListData;
+        this.markers = markers;
       });
     },
     setMarker({ id, longitude, latitude }, index) {
@@ -277,15 +288,18 @@ export default {
         }
       };
     },
-    tap() {
-      this.siteshow = false;
-    },
     onControltap() {
       this.mapContext.moveToLocation({
         //moveToLocation将地图中心移动到当前定位点，需要配合map组件的show-location使用
         latitude: this.currentLocation.latitude,
         longitude: this.currentLocation.longitude
       });
+    },
+    tap() {
+      this.siteshow = false;
+    },
+    changeExpand() {
+      this.isExpand = !this.isExpand;
     },
     // 前往搜索页面
     search() {
@@ -300,9 +314,9 @@ export default {
       });
     },
     // 前往充电中
-    charge() {
+    goCharge({ connectorNum, id }) {
       uni.navigateTo({
-        url: '/pages/Charge/Charge'
+        url: `/pages/Charge/Charge?connectorNum=${connectorNum}&orderId=${id}`
       });
     }
   }
@@ -370,11 +384,29 @@ export default {
   }
   // 充电中的设备-浮框
   .fing {
+    height: 170rpx;
+    padding: 30rpx 0 24rpx;
+    position: relative;
+    overflow: hidden;
     color: #333;
     font-weight: 500;
     font-size: 34rpx;
-    padding: 30rpx 0 24rpx;
     border-bottom: 1px solid #ddd;
+    &.fing-expand {
+      height: 460rpx;
+      .expand-icon {
+        transform: rotate(180deg);
+      }
+    }
+    .expand-icon {
+      position: absolute;
+      top: 34rpx;
+      right: 0;
+      transition: transform 100ms linear;
+    }
+    .disflex4 {
+      height: 120rpx;
+    }
     .disflex4 + .disflex4 {
       margin-top: 20rpx;
     }
@@ -389,10 +421,10 @@ export default {
 
       .cmdtx {
         position: absolute;
-        width: 120rpx;
-        margin-top: -20rpx;
+        width: 90rpx;
+        // margin-top: -20rpx;
         // height: 160rpx;
-        left: -6rpx;
+        left: 0;
         // top: 0;
         z-index: 2;
         display: flex;

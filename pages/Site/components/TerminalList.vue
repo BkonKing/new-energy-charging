@@ -33,7 +33,7 @@
               <!-- <text>已插枪</text> -->
               <!-- <text>故障</text> -->
               <template v-if="item.connectorStatus === 2">
-                <text>{{ item.soc }}%</text>
+                <text>{{ item.soc || '-' }}%</text>
                 <text>充电中</text>
               </template>
               <text v-else>
@@ -42,7 +42,7 @@
             </span>
           </cCircle>
           <view
-            v-if="tem.connectorStatus === 2 && item.remainChargeTime"
+            v-if="item.connectorStatus === 2 && item.remainChargeTime"
             class="needt"
           >
             还需{{ item.remainChargeTime }}
@@ -60,12 +60,12 @@
           </view>
           <view>
             <text>电流</text>
-            <text>最大{{ item.currentUpperLimits }}A</text>
+            <text>最大{{ item.currentUpperLimits || '--' }}A</text>
           </view>
           <view>
             <text>电压</text>
             <text>
-              {{ item.voltageLowerLimits || 0 }}V-{{ item.voltageUpperLimits }}V
+              {{ item.voltageLowerLimits || 0 }}V-{{ item.voltageUpperLimits || '--' }}V
             </text>
           </view>
           <view>
@@ -74,7 +74,7 @@
           </view>
           <view class="ter_nr">
             <text>{{ item.equipmentType | electricityType }}</text>
-            <text>| 最大功率{{ item.powerUpperLimits }}KW</text>
+            <text>| 最大功率{{ item.powerUpperLimits || '--'  }}KW</text>
             <text v-if="item.nationalStandard">
               | {{ item.nationalStandard }}
             </text>
