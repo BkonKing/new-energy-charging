@@ -33,7 +33,7 @@
               <!-- <text>已插枪</text> -->
               <!-- <text>故障</text> -->
               <template v-if="item.connectorStatus === 2">
-                <text>{{ item.soc || '-' }}%</text>
+                <text>{{ item.soc || '--' }}%</text>
                 <text>充电中</text>
               </template>
               <text v-else>
@@ -249,6 +249,7 @@ export default {
       this.modalShow = !this.modalShow;
     },
     sure(e) {
+      this.modalShow = false
       uni.navigateTo({
         url: `/pages/Charge/Paychos?connectorNum=${
           this.activeTerminal.connectorNum
@@ -305,7 +306,7 @@ $slowColor: #5b84ed;
   .cmdtx {
     position: absolute;
     width: 140rpx;
-    margin-top: -15rpx;
+    // margin-top: -15rpx;
     // height: 160rpx;
     left: -10rpx;
     // top: 0;

@@ -11,14 +11,14 @@
       <view class="fixitem">
         <view>
           <view>扫描终端二维码</view>
-          <view class="fixsm">{{ terminationID || '终端ID' }}</view>
+          <view class="fixsm">{{ (repairType === '1' && repairValue) || '终端ID' }}</view>
         </view>
         <view class="fixcb" @click="handleScan">扫码关联</view>
       </view>
       <view class="fixitem">
         <view>
           <view>选择近期订单</view>
-          <view class="fixsm">{{ terminationID || '订单ID' }}</view>
+          <view class="fixsm">{{ repairType === '2' && repairValue || '订单ID' }}</view>
         </view>
         <view class="fixcb" @click="goSelectOrder">选择订单</view>
       </view>
@@ -44,6 +44,7 @@
       <textarea
         v-model="repairDesc"
         placeholder="补充更多信息,以便我们诊断问题"
+        auto-height="true"
         class="ycbuc"
         maxlength="100"
       />
@@ -66,7 +67,7 @@ export default {
       mobile: '',
       repairReasons: [],
       repairDesc: '',
-      terminationID: '',
+      repairValue: '',
       repairType: '',
       // 异常原因
       repairReasonOptions: [
@@ -142,7 +143,7 @@ export default {
     },
     handleSelectOrder({ id }) {
       this.repairType = '2';
-      this.terminationID = id;
+      this.repairValue = id;
     },
     handleScan() {
       uni.scanCode({
@@ -150,7 +151,7 @@ export default {
           console.log('条码类型：' + res.scanType);
           console.log('条码内容：' + res.result);
           this.repairType = '1';
-          this.terminationID = res.result;
+          this.repairValue = res.result;
         }
       });
     },
@@ -161,7 +162,7 @@ export default {
           message: '请输入联系人手机号'
         },
         {
-          value: this.terminationID,
+          value: this.repairValue,
           message: '请关联终端'
         },
         {
@@ -178,7 +179,8 @@ export default {
         mobile: this.mobile,
         repairReasons: this.repairReasons.join(','),
         repairDesc: this.repairDesc,
-        repairType: this.repairType
+        repairType: this.repairType,
+        repairValue: this.repairValue
       };
       submitMemberRepair(params).then(() => {
         this.$tip.success('提交成功');

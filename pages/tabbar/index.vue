@@ -25,16 +25,16 @@
           <view class="fcmd">
             <cCircle :percent="item.soc" :animation="true">
               <span slot="content" class="cmdtx">
-                <text>{{ item.soc || '-' }}%</text>
+                <text>{{ item.soc || '--' }}%</text>
               </span>
             </cCircle>
           </view>
           <view class="vmt">
-            <view>{{ item.connectorNum || '-' }}</view>
+            <view>{{ item.connectorNum || '--' }}</view>
             <view class="fcsm">
               <text>
                 实时费用：
-                <text class="fcfont">{{ item.realAmount || '-' }}元</text>
+                <text class="fcfont">{{ item.realAmount || '--' }}元</text>
               </text>
               <text>
                 预计剩余：
@@ -43,7 +43,7 @@
             </view>
           </view>
         </view>
-        <view class="expand-icon" @click="changeExpand">
+        <view v-if="orderList && orderList.length > 1" class="expand-icon" @click="changeExpand">
           <uni-icons type="bottom" size="20"></uni-icons>
         </view>
       </view>
@@ -334,7 +334,8 @@ export default {
 .cover-view {
   position: fixed;
   right: 3%;
-  bottom: 240rpx;
+  bottom: calc(230rpx + constant(safe-area-inset-bottom) / 2);
+  bottom: calc(230rpx + env(safe-area-inset-bottom) / 2);
   z-index: 101;
 }
 .cover-image {
@@ -393,7 +394,7 @@ export default {
     font-size: 34rpx;
     border-bottom: 1px solid #ddd;
     &.fing-expand {
-      height: 460rpx;
+      height: auto;
       .expand-icon {
         transform: rotate(180deg);
       }
@@ -462,7 +463,8 @@ export default {
   padding: 20rpx 20rpx 20rpx 70rpx;
   position: fixed;
   right: 3%;
-  bottom: 150rpx;
+  bottom: calc(150rpx + constant(safe-area-inset-bottom) / 2);
+  bottom: calc(150rpx + env(safe-area-inset-bottom) / 2);
   z-index: 101;
   box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
 }
@@ -482,6 +484,7 @@ export default {
   border-radius: 10rpx;
 }
 .callout-label {
+  min-width: 40rpx;
   height: 30rpx;
   padding: 10rpx;
   margin-right: 10rpx;
@@ -489,7 +492,7 @@ export default {
   color: #fff;
   text-align: center;
   font-size: 24rpx;
-  border-radius: 50%;
+  border-radius: 15rpx;
 }
 .callout-content {
   flex: 1;

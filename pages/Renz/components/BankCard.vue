@@ -1,5 +1,5 @@
 <template>
-  <view class="cardlist b_qingdao" @click="handleClick">
+  <view class="cardlist" :class="data.bankAbbr" @click="handleClick">
     <view class="cardA">
       <image :src="data.logo" mode="widthFix"></image>
       <view>
@@ -14,6 +14,22 @@
 </template>
 
 <script>
+/* 
+  中国银行 BOC
+  中国建设银行 CCB
+  中国工商银行 ICBC
+  中国农业银行 ABC
+  招商银行 CMB
+  中国邮政储蓄银行 PSBC
+  广发银行 CGB
+  交通银行 BCM
+  中国平安银行 SPABANK
+  中信银行 CNCB
+  浦发银行 SPDB
+  中国民生银行 CMBC
+  中国光大银行 CEB
+  兴业银行 CIB
+*/
 export default {
   name: 'BankCard',
   props: {
@@ -29,12 +45,12 @@ export default {
   },
   computed: {
     cardNoArray() {
-      const value = this.data.cardNo
+      const value = this.data.cardNo;
       if (!value) {
-        return []
+        return [];
       }
       const arr = ['****', '****', '****'];
-      arr.push(value.slice(-3))
+      arr.push(value.slice(-3));
       return arr;
     }
   },
@@ -60,7 +76,7 @@ export default {
   background: #fff;
   box-shadow: 0px 0px 20px 2px rgba(0, 0, 0, 0.04);
   border-radius: 20rpx;
-  color: #fff;
+  color: #222;
   margin: 0rpx auto 34rpx;
   padding: 30rpx 30rpx;
 
@@ -107,130 +123,144 @@ export default {
 }
 /* ------------------------银行卡对应背景------------------------------ */
 /* 中国银行 */
-.b_zhongguo {
+.BOC {
   background-image: linear-gradient(
     to right bottom,
     #df4243,
     #c32f3c,
     #9e1f31
   ) !important;
+  color: #fff;
 }
 /* 中国工商银行 */
-.b_gongshang {
+.ICBC {
   background-image: linear-gradient(
     to right bottom,
     #c91d27,
     #c41d27,
     #c6000b
   ) !important;
+  color: #fff;
 }
 /* 建设银行 */
-.b_jianshe {
+.CCB {
   background-image: linear-gradient(
     to right bottom,
     #055fb7,
     #0e6ac3,
     #004f9c
   ) !important;
+  color: #fff;
 }
 /* 农业银行 */
-.b_nongye {
+.ABC {
   background-image: linear-gradient(
     to right bottom,
     #16c59c,
     #05a983,
     #008566
   ) !important;
+  color: #fff;
 }
 /* 邮政储蓄 */
-.b_youzheng {
+.PSBC {
   background-image: linear-gradient(
     to right bottom,
     #10af4b,
     #0bab47,
     #108c3e
   ) !important;
+  color: #fff;
 }
 /* 兴业银行 */
-.b_xingye {
+.CIB {
   background-image: linear-gradient(
     to right bottom,
     #0577f1,
     #0665cc,
     #025ab8
   ) !important;
+  color: #fff;
 }
 /* 广发银行 */
-.b_guangfa {
+.CGB {
   background-image: linear-gradient(
     to right bottom,
     #e5001f,
     #bd0016,
     #7c0606
   ) !important;
+  color: #fff;
 }
 /* 中信银行 */
-.b_zhongxin {
+.CNCB {
   background-image: linear-gradient(
     to right bottom,
     #e5001f,
     #de051e,
     #d7000f
   ) !important;
+  color: #fff;
 }
 /* 招商银行 */
-.b_zhaoshang {
+.CMB {
   background-image: linear-gradient(
     to right bottom,
     #df1826,
     #b30a0f,
     #a61f23
   ) !important;
+  color: #fff;
 }
 /* 交通银行 */
-.b_jiaotong {
+.BCM {
   background-image: linear-gradient(
     to right bottom,
     #0256c1,
     #054699,
     #00367a
   ) !important;
+  color: #fff;
 }
 /* 平安银行 */
-.b_pingan {
+.SPABANK {
   background-image: linear-gradient(
     to right bottom,
     #fc6208,
     #eb5e0c,
     #ec681b
   ) !important;
+  color: #fff;
 }
 /* 浦发银行 */
-.b_pufa {
+.SPDB {
   background-image: linear-gradient(
     to right bottom,
     #0546ca,
     #0c42b0,
     #14377e
   ) !important;
+  color: #fff;
 }
 /* 民生银行 */
-.b_minsheng {
+.CMBC {
   background-image: linear-gradient(
     to right bottom,
     #3a3ed2,
     #3b30cd,
     #2428bb
   ) !important;
+  color: #fff;
 }
 /* 光大银行 */
-.b_guangda {
+.CEB {
   background-image: linear-gradient(
     to right bottom,
     #900db7,
     #8d09b5,
     #6d1687
   ) !important;
+  color: #fff;
 }
 /* 北京银行 */
 .b_beijing {
@@ -240,6 +270,7 @@ export default {
     #e21b20,
     #e8252a
   ) !important;
+  color: #fff;
 }
 /* 上海银行 */
 .b_shanghai {
@@ -249,6 +280,7 @@ export default {
     #3350b9,
     #314693
   ) !important;
+  color: #fff;
 }
 /* 青岛银行 */
 .b_qingdao {
@@ -258,5 +290,6 @@ export default {
     #e6333a,
     #d8353b
   ) !important;
+  color: #fff;
 }
 </style>

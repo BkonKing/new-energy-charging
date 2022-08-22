@@ -12,6 +12,7 @@
       <text class="addit">添加银行卡</text>
       <text>添加银行卡·安全 便捷 优惠</text>
     </view>
+    <view class="bottom-placeholder"></view>
   </view>
 </template>
 
@@ -90,5 +91,8 @@ export default {
     color: #333;
     margin-bottom: 20rpx;
   }
+}
+.bottom-placeholder {
+  height: 1rpx;
 }
 </style>

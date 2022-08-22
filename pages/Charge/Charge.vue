@@ -1,15 +1,17 @@
 <template>
   <view class="container">
     <!-- 加载动画 -->
-    <view v-if="loadshwo" class="loaditem" @touchmove.stop.prevent="moveHandle">
-      <image
-        class="loading-image"
-        src="@/static/image/loading_1.gif"
-        mode=""
-      ></image>
-      <view>请稍等，正在加载中……</view>
+    <view v-if="loadshwo">
+      <view class="loaditem" @touchmove.stop.prevent="moveHandle">
+        <image
+          class="loading-image"
+          src="@/static/image/loading_1.gif"
+          mode=""
+        ></image>
+        <view>请稍等，正在加载中……</view>
+      </view>
     </view>
-    <template v-else>
+    <template>
       <!-- 充电汽车切换 -->
       <view class="carul disflex5">
         <text @click="$refs.pop.show()">
@@ -35,7 +37,7 @@
       >
         <view class="tcwarp">
           <view class="caritem" v-for="item in orderList" @click="popchose(item)">
-            <text>设备编码：{{ item.connectorNum || '-' }}</text>
+            <text>设备编码：{{ item.connectorNum || '--' }}</text>
             <text class="carstatu">{{item.chargeStatus | chargeStatusText}}</text>
           </view>
         </view>
@@ -234,7 +236,6 @@ export default {
       connectorNum: '',
       orderId: '',
       balances: 0,
-      pollNum: 1,
       pollTimer: null,
       dataInfo: {},
       orderList: [],
@@ -461,12 +462,12 @@ export default {
   },
   filters: {
     chargeStatusText(value) {
-      return chargeStatusDict || '--'
+      return chargeStatusDict[value] || '--'
     }
   },
   onLoad({ connectorNum, orderId }) {
     this.connectorNum = connectorNum;
-    this.orderId = '1560197580267483138' || orderId;
+    this.orderId = orderId;
   },
   onShow() {
     this.findMemberByWallet();
@@ -477,29 +478,13 @@ export default {
   },
   methods: {
     pollOrder() {
-      this.findChargeOrder()
-        .then(() => {
-          this.pollNum = 1;
-          this.complatePoll();
-        })
-        .catch(() => {
-          if (this.pollNum === 4) {
-            this.$tip.toast('正在生成订单，请稍后再试...');
-            return;
-          }
-          this.pollTimer = setTimeout(() => {
-            this.pollNum++;
+      this.pollTimer = setTimeout(() => {
+        this.findChargeOrder()
+          .then(() => {
             this.pollOrder();
-          }, 3000);
-        });
-    },
-    complatePoll() {
-      this.loadshwo = false;
-      this.$nextTick(() => {
-        this.scaleCardShow = true;
-        this.findOrderByMemberId();
+          })
         this.getServerData();
-      });
+      }, 10000);
     },
     findMemberByWallet() {
       findMemberByWallet().then(({ result }) => {
@@ -511,6 +496,11 @@ export default {
         orderId: this.orderId
       }).then(({ result }) => {
         this.dataInfo = result || {};
+        if (!this.scaleCardShow) {
+          this.scaleCardShow = true
+          this.findOrderByMemberId();
+        }
+        this.loadshwo = false;
       });
     },
     findOrderByMemberId() {
@@ -526,7 +516,7 @@ export default {
       stopCharge({
         orderId: this.orderId
       }).then(() => {
-        this.tip.success('充电已停止');
+        this.$tip.success('充电已停止');
       });
     },
     popchose(data) {
@@ -854,20 +844,23 @@ export default {
     }
   }
 }
-
 // 底部按钮
 .sitefoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  background: #fff;
+  height: calc(112rpx + constant(safe-area-inset-bottom) / 2);
+  height: calc(112rpx + env(safe-area-inset-bottom) / 2);
+  padding: 20rpx;
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom) / 2);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom) / 2);
   position: fixed;
   bottom: 0;
   left: 0;
   z-index: 5;
+  background: #fff;
   box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.05);
-  padding: 20rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   font-size: 26rpx;
   color: #333;
 
@@ -911,7 +904,6 @@ export default {
   left: 0;
   top: 40%;
   z-index: 101;
-
   view {
     color: #222;
     font-size: 28rpx;

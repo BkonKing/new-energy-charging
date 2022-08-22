@@ -4,16 +4,16 @@ import {
 
 export default {
   methods: {
-    handleScan() {
+    handleScan(isRedirect) {
       uni.scanCode({
         success: res => {
           console.log('条码类型：' + res.scanType);
           console.log('条码内容：' + res.result);
-          this.findConnectorByNum(res.result)
+          this.findConnectorByNum(res.result, isRedirect)
         }
       });
     },
-    findConnectorByNum(connectorNum) {
+    findConnectorByNum(connectorNum, isRedirect) {
       console.log('connectorNum', connectorNum);
       if (!connectorNum) {
         this.$tip.toast('充电桩编码不能为空')
@@ -34,6 +34,12 @@ export default {
           return
         }
         if (connectorStatus === 1) {
+          if (isRedirect) {
+            uni.redirectTo({
+              url: `/pages/Charge/Paychos?connectorNum=${connectorNum}`
+            })
+            return
+          }
           uni.navigateTo({
             url: `/pages/Charge/Paychos?connectorNum=${connectorNum}`
           })

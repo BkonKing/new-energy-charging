@@ -5,9 +5,9 @@
       <view class="myliA disflex3">
         <image
           v-if="avatar"
-          :src="avatar"
           mode="widthFix"
           class="myico"
+          :src="avatar"
         ></image>
         <image
           v-else
@@ -75,7 +75,7 @@
         <text>联系客服</text>
       </view>
     </view>
-    <view class="loginout" @click="handleLogout">账号登出</view>
+    <view v-if="token" class="loginout" @click="handleLogout">账号登出</view>
     <view class="cleard"></view>
     <!-- 头部底图色 -->
     <view class="myimg"></view>

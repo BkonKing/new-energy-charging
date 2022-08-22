@@ -10,10 +10,10 @@
     </view>
     <view @click="handleClick">
       <view class="stname">
-        <view class="ellipsis">
-          {{data.siteName}}
-        </view>
-        <text v-if="data.payStatus">已完成</text>
+        <view class="ellipsis">{{ data.siteName }}</view>
+        <text v-if="data.payStatus" :class="statusClassName">
+          {{ data.payStatus | payStatusText }}
+        </text>
       </view>
       <view class="stkind disflex4">
         <image src="/static/image/logo2.png" mode="heightFix"></image>
@@ -30,15 +30,21 @@
       <view class="stprice">
         <text>
           ￥
-          <text class="stbum">{{ data.realAmount || '-' }}</text>
+          <text class="stbum">{{ data.realAmount || '--' }}</text>
         </text>
-        <text>| {{ data.totalPower || '-' }}度</text>
+        <text>| {{ data.totalPower || '--' }}度</text>
       </view>
     </view>
   </view>
 </template>
 
 <script>
+const payStatusDict = {
+  0: '已关闭',
+  1: '已完成',
+  2: '待支付',
+  3: '执行中'
+};
 export default {
   name: 'OrderItem',
   props: {
@@ -49,6 +55,16 @@ export default {
     type: {
       type: String,
       default: 'list'
+    }
+  },
+  computed: {
+    statusClassName() {
+      return `pay-status-${this.data.payStatus}`
+    }
+  },
+  filters: {
+    payStatusText(value) {
+      return payStatusDict[value] || '';
     }
   },
   methods: {
@@ -118,6 +134,12 @@ export default {
       background: url(/static/image/arrow_01.png) right -5rpx center no-repeat;
       background-size: 30rpx 30rpx;
       padding-right: 25rpx;
+    }
+    .pay-status-0 {
+        color: #999;
+    }
+    .pay-status-2, .pay-status-3 {
+        color: #dd524d;
     }
   }
   .stkind {

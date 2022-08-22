@@ -9,8 +9,8 @@
           自动结算订单
         </text>
       </view>
-      <view class="disflex4">
-        <text>订单编号：{{ dataInfo.platformOrderNo || '--' }}</text>
+      <view class="disflex4 order-number-box">
+        <text class="order-label">订单编号：{{ dataInfo.platformOrderNo || '--' }}</text>
         <text class="tcope" @click="setClipboardData(dataInfo.platformOrderNo)">
           复制
         </text>
@@ -94,14 +94,14 @@
     <!-- 终端信息 -->
     <view class="odtitem">
       <view class="otbig">终端信息</view>
-      <view class="zduan">
-        <view class="zdshop ellipsis" @click="sitedetail">
+      <view class="zduan" @click="sitedetail">
+        <view class="zdshop ellipsis">
           <text class="zdkind">自营</text>
           <text>{{ dataInfo.siteName }}</text>
         </view>
         <view class="zdcode">
           <text>终端编号：{{ dataInfo.connectorNum || '--' }}</text>
-          <text class="zdcope" @click="setClipboardData(dataInfo.connectorNum)">
+          <text class="zdcope" @click.stop="setClipboardData(dataInfo.connectorNum)">
             复制
           </text>
         </view>
@@ -172,7 +172,7 @@ export default {
     // 前往终端详情
     sitedetail() {
       uni.navigateTo({
-        url: `/pages/Site/Sitedetail?connectorNum=${this.dataInfo.connectorNum}`
+        url: `/pages/Site/Sitedetail?id=${this.dataInfo.siteId}`
       });
     }
   }
@@ -207,9 +207,16 @@ export default {
       padding: 0 6rpx;
     }
   }
+  .order-label {
+    max-width: 610rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .tcope {
-    color: #33b048;
+    width: 58rpx;
     margin-left: 20rpx;
+    color: #33b048;
   }
 }
 .odtitem {
@@ -380,5 +387,8 @@ export default {
     border-radius: 100rpx;
     margin: 0rpx auto;
   }
+}
+.order-number-box {
+  
 }
 </style>

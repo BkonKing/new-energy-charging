@@ -91,20 +91,22 @@ export default {
 <style lang="scss" scoped>
 // 底部tabbar
 .tmenu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
+  height: calc(126rpx + constant(safe-area-inset-bottom) / 2);
+  height: calc(126rpx + env(safe-area-inset-bottom) / 2);
+  padding: 0;
+  padding-bottom: constant(safe-area-inset-bottom) / 2;
+  padding-bottom: env(safe-area-inset-bottom) / 2;
   background: #fff;
-  padding: 0rpx 0;
   line-height: 30rpx;
   position: fixed;
   bottom: 0;
   left: 0;
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.1);
-  padding-bottom: $iosAreaBottomConstant;
-  padding-bottom: $iosAreaBottomEnv;
   .tm40 {
     width: 38%;
     display: flex;

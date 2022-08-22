@@ -19,7 +19,7 @@
           <text class="zdcope" @click="setClipboardData">复制</text>
         </view>
         <view class="zdtime">
-          当前时段：{{ terminalData.startTime }}-{{ terminalData.endTime }}
+          当前时段：{{ terminalData.startTime || '00:00' }}-{{ terminalData.endTime || '00:00'  }}
         </view>
         <view class="zdprice">
           <text>{{ terminalData.fee || 0 }}</text>
@@ -309,7 +309,7 @@ export default {
     },
     // 前往开始充电
     goCharge(orderId) {
-      uni.navigateTo({
+      uni.redirectTo({
         url: `/pages/Charge/Charge?connectorNum=${this.connectorNum}&orderId=${orderId}`
       });
     },
@@ -320,7 +320,7 @@ export default {
       });
     },
     // 禁止外壳页面手指上下滑动
-    moveHandle: function() {
+    moveHandle() {
       return false;
     }
   }
@@ -370,6 +370,9 @@ export default {
   .zdtime {
     font-size: 24rpx;
     color: #999;
+    text + text {
+      margin-left: 14rpx;
+    }
   }
   .zdprice {
     font-size: 24rpx;
@@ -444,6 +447,7 @@ export default {
     }
     // 限定金额充电
     .otxip {
+      width: 400rpx;
       font-weight: 500;
       color: #333;
       line-height: 50rpx;

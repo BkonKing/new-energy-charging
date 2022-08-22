@@ -28,7 +28,7 @@
         </view>
         <view class="fcsta" @click="gomap">
           <view class="dadr">{{ siteData.address }}</view>
-          <view class="dwei">{{ siteData.targetDistance || 0 }}m</view>
+          <view class="dwei">{{ siteData.targetDistance || 0 }}km</view>
         </view>
       </view>
       <!-- 终端入口 -->
@@ -686,6 +686,8 @@ export default {
 // 底部按钮
 .sitefoot {
   width: 100%;
+  height: calc(136rpx + constant(safe-area-inset-bottom) / 2);
+  height: calc(136rpx + env(safe-area-inset-bottom) / 2);
   background: #fff;
   position: fixed;
   bottom: 0;
@@ -693,6 +695,8 @@ export default {
   z-index: 5;
   box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.05);
   padding: 20rpx;
+  padding-bottom: calc(20rpx + constant(safe-area-inset-bottom) / 2);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom) / 2);
   display: flex;
   align-items: center;
   justify-content: space-between;

@@ -14,10 +14,10 @@
         </view>
       </view>
       <view class="cotip">
-        <text>可提现金额：￥{{ allMoney }}</text>
+        <text>可提现金额：￥{{ balances }}</text>
         <text class="alltx" @click="cashOutAll">全部提现</text>
       </view>
-      <button class="suretx" @click="openBank">2小时内到账，确定提现</button>
+      <button class="suretx" @click="submit">2小时内到账，确定提现</button>
     </view>
     <view class="cotts">
       <view>温馨提示</view>
@@ -104,11 +104,16 @@
         <view class="glcard" @click="goRenzcard">管理银行卡</view>
       </view>
     </pop>
+    <view v-if="showToast" class="toast">{{toastText}}</view>
   </view>
 </template>
 
 <script>
-import { findMemberBanks, withdrawalMember } from '@/api/member.js';
+import {
+  findMemberBanks,
+  withdrawalMember,
+  findMemberByWallet
+} from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 
 export default {
@@ -118,12 +123,23 @@ export default {
   data() {
     return {
       isshow: true,
-      allMoney: 20.01,
+      balances: 0.0,
       amount: undefined,
       bankId: '',
       activeBank: {},
-      bankList: []
+      bankList: [],
+      showToast: false,
+      toastText: ''
     };
+  },
+  watch: {
+    showToast(newValue) {
+      if (newValue) {
+        setTimeout(() => {
+          this.showToast = false
+        }, 2000)
+      }
+    }
   },
   filters: {
     cardNoSubstr(value) {
@@ -131,9 +147,15 @@ export default {
     }
   },
   onShow() {
+    this.findMemberByWallet();
     this.findMemberBanks();
   },
   methods: {
+    findMemberByWallet() {
+      findMemberByWallet().then(({ result }) => {
+        this.balances = result?.balances || 0.0;
+      });
+    },
     findMemberBanks() {
       findMemberBanks().then(({ result }) => {
         this.bankList = result || [];
@@ -145,31 +167,47 @@ export default {
       });
     },
     cashOutAll() {
-      this.amount = this.allMoney;
+      this.amount = this.balances;
     },
     handleBlur() {
-      if (this.amount > this.allMoney) {
-        this.amount = this.allMoney;
+      if (this.amount > this.balances) {
+        this.amount = this.balances;
         return;
       }
       if (this.amount < 0) {
         this.amount = 0;
       }
     },
+    submit() {
+      if (!this.validateAmount()) {
+        return;
+      }
+      this.withdrawalMember({
+        amount: this.amount
+      });
+    },
+    validateAmount() {
+      if (!this.amount || parseFloat(this.amount) <= 0) {
+        this.$tip.toast('请输入提现金额');
+        return false;
+      }
+      if (parseFloat(this.amount) > this.balances) {
+        this.$tip.toast('提现金额不能大于可提现金额');
+        return false;
+      }
+      return true;
+    },
     openBank() {
       if (parseFloat(this.amount) <= 0) {
         this.$tip.toast('请输入提现金额');
-        return
-      } 
+        return;
+      }
       if (this.bankList.length === 0) {
         this.$refs.popB.show();
-        return
+        return;
       }
       this.$refs.popA.show();
     },
-    watchOpen() {},
-    watchClose() {},
-
     // 弹框支付方式单选
     radioChange(event) {
       this.bankId = event.detail.value;
@@ -178,30 +216,43 @@ export default {
       this.$refs.popA.open();
     },
     handleWithdraw() {
-      if (parseFloat(this.amount) <= 0) {
-        this.$tip.toast('请输入提现金额');
-        return
+      if (!this.validateAmount()) {
+        return;
       }
       if (!this.bankId) {
         this.$tip.toast('请选择提现的银行卡');
-        return
+        return;
       }
-      this.withdrawalMember()
-    },
-    withdrawalMember() {
-      withdrawalMember({
+      this.withdrawalMember({
         amount: this.amount,
         channel: 1, // 1：银行卡；
-        bankId: this.bankId,
-      }).then(() => {
-        this.$tip.success('提交成功，请耐心等待')
+        bankId: this.bankId
+      });
+    },
+    withdrawalMember(params) {
+      withdrawalMember(params).then(({ result }) => {
+        if (+result.status === 1) {
+          this.toastText = '您的充值订单全部超过六个月，无法原路退还，请提现到银行卡'
+          this.showToast = true
+          this.openBank()
+          return
+        }
+        if (+result.status === 2) {
+          this.toastText = `您有${result.amount}元可原路退还，剩余充值金额超过六个月无法原路返回，请提现到银行卡`
+          this.showToast = true
+          this.openBank()
+          return
+        }
+        this.$tip.success('提交成功，请耐心等待');
         setTimeout(() => {
           uni.navigateBack({
             delta: 1
-          })
-        }, 1500)
-      })
+          });
+        }, 1500);
+      });
     },
+    watchOpen() {},
+    watchClose() {},
     // 前往银行卡
     goRenzcard() {
       uni.navigateTo({
@@ -450,5 +501,18 @@ export default {
     border-radius: 100rpx;
     margin: 0rpx auto;
   }
+}
+
+.toast {
+  max-width: 300rpx;
+  padding: 20rpx;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  font-size: 28rpx;
+  transform: translate(-50%, -50%);
+  border-radius: 10rpx;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
 }
 </style>

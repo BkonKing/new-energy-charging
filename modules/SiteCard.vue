@@ -28,12 +28,12 @@
           {{ data.operateType }}
         </text>
       </view>
+      <view v-if="data.parkDesc" class="fcpark ellipsis">
+        停车收费：{{ data.parkDesc }}
+      </view>
       <view class="fcprice">
         ￥
         <text>{{ data.fee || 0 }}</text>
-      </view>
-      <view v-if="data.parkDesc" class="fcpark ellipsis">
-        停车收费：{{ data.parkDesc }}
       </view>
     </view>
     <view class="fcsta" @click="gomap()">
@@ -45,7 +45,7 @@
         <text class="colm">闲{{ data.freeSlowNum || 0 }}</text>
         <text class="gray">/{{ data.slowNum || 0 }}</text>
       </view>
-      <view class="dwei">{{ data.targetDistance || '--' }}m</view>
+      <view class="dwei">{{ data.targetDistance || '--' }}km</view>
     </view>
   </div>
 </template>
@@ -181,6 +181,7 @@ export default {
     }
   }
   .fcprice {
+    margin-bottom: 10rpx;
     font-size: 30rpx;
     font-weight: 500;
     color: #333;
@@ -197,7 +198,7 @@ export default {
     padding-left: 36rpx;
     font-size: 22rpx;
     color: #999;
-    margin: 10rpx 0 20rpx;
+    margin: 10rpx 0;
     height: 40rpx;
     line-height: 40rpx;
   }

@@ -78,7 +78,7 @@
             <view>
               <view class="wbmon">
                 <text>{{ [1, 4].includes(item.payType) ? '+' : '-' }}</text>
-                <text>{{ item.realAmount || 0 }}</text>
+                <text>{{ item.amount || 0 }}</text>
                 <text class="wbtsm">元</text>
               </view>
               <view class="wbyu">余额：{{ item.afterAmount || 0 }}</view>

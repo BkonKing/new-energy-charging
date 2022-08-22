@@ -6,12 +6,12 @@
       type="number"
       placeholder="请输入充电桩编码"
     />
-    <button class="bcode" @click="findConnectorByNum(connectorNum)">确定</button>
+    <button class="bcode" @click="findConnectorByNum(connectorNum, true)">确定</button>
     <view class="scan disflex5">
       <image
         src="/static/image/scan.png"
         mode="widthFix"
-        @click="handleScan"
+        @click="handleScan(true)"
       ></image>
     </view>
   </view>
