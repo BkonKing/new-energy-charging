@@ -110,6 +110,7 @@
 import { findSiteByCoordinate, findSiteById } from '@/api/site.js';
 import { findOrderByMemberId } from '@/api/member.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
+import { mapGetters } from 'vuex'
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import SiteCard from '@/modules/SiteCard.vue';
 import { qqScaleObj } from '@/common/constants.js';
@@ -127,8 +128,8 @@ export default {
       fcshow: false, //浮窗信息是否显示
       // 地图数据
       myMap: {
-        latitude: 26.04243, // 纬度
-        longitude: 119.216452, //经度
+        latitude: 39.90960456049752, // 纬度
+        longitude: 116.3972282409668, //经度
         iconPath: '/static/image/map_01.png', //图标为空白透明图片
         scale: 16 //缩放级别
       },
@@ -147,6 +148,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['token']),
     orderVisible() {
       return !!this.orderList.length;
     },
@@ -157,10 +159,8 @@ export default {
       return 0;
     }
   },
-  onLoad() {
-    this.findOrderByMemberId();
-  },
   onShow() {
+    this.token && this.findOrderByMemberId();
     !this.hasLocationPermission && this.getLocationInfo();
   },
   mounted() {

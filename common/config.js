@@ -1,4 +1,5 @@
 const BASE_URL = 'http://119.3.241.168:9103/api/v1' // 开发环境
+// const BASE_URL = 'http://192.168.2.4:9103/api/v1' // 开发环境
 // /nenergy/api/v1
 
 // const BASE_URL = 'https://wushui.cloudoptek.com' // 生产环境

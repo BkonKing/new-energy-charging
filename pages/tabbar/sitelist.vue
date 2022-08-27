@@ -4,6 +4,7 @@
       v-model="siteListData"
       class="site-list-paging"
       ref="paging"
+      :auto="false"
       :fixed="true"
       @query="queryList"
     >
@@ -66,8 +67,8 @@ export default {
       },
       siteListData: [],
       currentLocation: {
-        lat: 0,
-        lon: 0
+        lat: undefined,
+        lon: undefined
       }
     };
   },
@@ -83,7 +84,18 @@ export default {
           this.currentLocation.lat = latitude;
           this.$refs.paging.reload(true);
         })
-        .catch(() => {});
+        .catch(() => {
+          this.rejectGetLocation();
+          this.$refs.paging.complete([]);
+        });
+    },
+    // 彻底拒绝位置获取
+    rejectGetLocation() {
+      uni.showToast({
+        title: '你拒绝了授权，无法获得周边站点信息',
+        icon: 'none',
+        duration: 2000
+      });
     },
     // 前往搜索页面
     search() {
@@ -93,6 +105,7 @@ export default {
     },
     queryList(pageNo, pageSize) {
       if (!this.currentLocation.lon || !this.currentLocation.lat) {
+        this.$refs.paging.complete([]);
         return;
       }
       findSiteByKey({

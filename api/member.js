@@ -52,7 +52,7 @@ export function removeMemberBank(data) {
   return http.request({
     method: 'DELETE',
     url: '/member/removeMemberBank',
-    data
+    params: data
   })
   // return http.delete('/member/removeMemberBank', params)
 }
@@ -102,7 +102,7 @@ export function removeMemberFavorite(data) {
   return http.request({
     method: 'DELETE',
     url: '/member/removeMemberFavorite',
-    data
+    params: data
   })
   // return http.delete('/member/removeMemberFavorite', params)
 }

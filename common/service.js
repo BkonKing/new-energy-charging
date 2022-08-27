@@ -4,8 +4,8 @@ import {
 } from '@/common/constants.js'
 import config from './config.js'
 import tip from '@/common/tip.js';
+import store from '@/store/index.js';
 // import api from '@/api/api.js';
-// import store from '@/store/index.js';
 
 let apiUrl = config.apiUrl;
 
@@ -77,8 +77,16 @@ http.interceptors.response.use((response) => {
     code,
     message
   } = response?.data || {}
-  if (success || code === 200) { // 服务端返回的状态码不等于200，则reject()
+  if (success || +code === 200) { // 服务端返回的状态码不等于200，则reject()
     return response.data
+  }
+  if (+code === 401) {
+    store.commit('SET_TOKEN', '')
+    store.commit('SET_USERINFO', '')
+    uni.navigateTo({
+      url: '/pages/login/login'
+    })
+    return Promise.reject(response)
   }
   tip.toast(message)
   return Promise.reject(response)
@@ -128,13 +136,8 @@ http.interceptors.response.use((response) => {
       case 504:
         break
       case 401:
-        if (token) {
-          /* store.dispatch('Logout').then(() => {
-             setTimeout(() => {
-               window.location.reload()
-             }, 1500)
-           }) */
-        }
+        store.commit('SET_TOKEN', '')
+        store.commit('SET_USERINFO', '')
         break
       default:
         tip.error({
@@ -145,7 +148,6 @@ http.interceptors.response.use((response) => {
         break
     }
   }
-  console.log(response)
   return Promise.reject(response)
 })
 

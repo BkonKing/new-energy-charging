@@ -44,7 +44,6 @@
       <textarea
         v-model="repairDesc"
         placeholder="补充更多信息,以便我们诊断问题"
-        auto-height="true"
         class="ycbuc"
         maxlength="100"
       />
@@ -132,7 +131,6 @@ export default {
   methods: {
     // 异常原因多选
     checkboxChange(e) {
-      console.log(e.detail.value);
       this.repairReasons = e.detail.value;
     },
     // 前往我的订单 - 选择
@@ -270,11 +268,12 @@ export default {
   }
   .ycbuc {
     width: 100%;
+    height: 200rpx;
+    padding: 30rpx;
+    margin: 0rpx 0;
     font-size: 28rpx;
     border-radius: 14rpx;
     background: #f1f1f1;
-    padding: 30rpx;
-    margin: 0rpx 0;
   }
 }
 // 底部按钮
@@ -283,6 +282,8 @@ export default {
   box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.05);
   background: #fff;
   padding: 30rpx 3%;
+  padding-bottom: calc(30rpx + constant(safe-area-inset-bottom) / 2);
+  padding-bottom: calc(30rpx + env(safe-area-inset-bottom) / 2);
   position: fixed;
   bottom: 0;
   left: 0;

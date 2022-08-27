@@ -1,7 +1,7 @@
 <template>
   <view class="cardlist" :class="data.bankAbbr" @click="handleClick">
     <view class="cardA">
-      <image :src="data.logo" mode="widthFix"></image>
+      <image :src="`../../static/bank/${data.logo}`" mode="widthFix"></image>
       <view>
         <view>{{ data.bankName }}</view>
         <view class="ctag">储蓄卡</view>

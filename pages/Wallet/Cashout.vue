@@ -239,7 +239,9 @@ export default {
         }
         if (+result.status === 2) {
           this.toastText = `您有${result.amount}元可原路退还，剩余充值金额超过六个月无法原路返回，请提现到银行卡`
+          this.amount = result.noAmount
           this.showToast = true
+          this.findMemberByWallet()
           this.openBank()
           return
         }
