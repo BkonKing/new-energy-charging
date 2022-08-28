@@ -31,30 +31,29 @@
     <view class="agrcd disflex4">
       <checkbox-group @change="changeCheck">
         <label>
-          <checkbox
-            :checked="isCheck"
-            class="checkbox"
-            style="transform:scale(0.7)"
-          />
+          <checkbox :checked="isCheck" class="checkbox" style="transform:scale(0.7)" />
           <text>我已阅读并同意签署</text>
           <text>《逸充新能源支付协议》</text>
         </label>
       </checkbox-group>
     </view>
-    <button class="surerz" @click="submit">立即绑定</button>
+    <button class="surerz" :disabled="disabled" :loading="disabled" @click="handleSubmit">立即绑定</button>
   </view>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import { addMemberBank } from '@/api/member.js';
-import { validateForm } from '@/common/util.js';
+import { validateForm, throttle } from '@/common/util.js';
+
 export default {
   data() {
     return {
       bankName: '',
       cardNo: '',
-      isCheck: true
+      isCheck: true,
+      disabled: false,
+      handleSubmit: throttle(this.submit)
     };
   },
   computed: {
@@ -65,7 +64,7 @@ export default {
   },
   methods: {
     changeCheck({ detail }) {
-      this.isCheck = !!detail.value.length
+      this.isCheck = !!detail.value.length;
     },
     submit() {
       if (!this.isCheck) {
@@ -87,17 +86,22 @@ export default {
       });
     },
     addMemberBank() {
+      this.disabled = true;
       addMemberBank({
         bankHolder: this.userInfo.trueName,
         bankName: this.bankName,
         cardNo: this.cardNo
-      }).then(() => {
-        this.$tip.success('添加成功').then(() => {
-          uni.navigateBack({
-            delta: 1
+      })
+        .then(() => {
+          this.$tip.success('添加成功').then(() => {
+            uni.navigateBack({
+              delta: 1
+            });
           });
+        })
+        .finally(() => {
+          this.disabled = false;
         });
-      });
     }
   }
 };
@@ -205,5 +209,8 @@ uni-button.surerz {
   box-shadow: 0 0 20rpx 5rpx rgba(45, 255, 80, 0.2);
   border-radius: 100rpx;
   margin: 0 auto;
+  &[disabled] {
+    opacity: 0.6;
+  }
 }
 </style>

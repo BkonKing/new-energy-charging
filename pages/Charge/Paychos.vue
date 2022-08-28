@@ -162,7 +162,7 @@
 		</view> -->
     <view class="clearw"></view>
     <view class="wfoot">
-      <button class="combutton" @click="submitCharge">启动充电</button>
+      <button class="combutton" :disabled="disabled" :loading="disabled" @click="handleSubmit">启动充电</button>
     </view>
   </view>
 </template>
@@ -170,6 +170,7 @@
 <script>
 import { findConnectorByNum } from '@/api/site.js';
 import { findMemberByWallet, startCharge } from '@/api/member.js';
+import { throttle } from '@/common/util.js'
 
 const operateTypeDict = {
   1: '直营',
@@ -203,7 +204,9 @@ export default {
       amount: undefined,
       walletData: {},
       // 加载动画显示
-      loadshwo: false
+      loadshwo: false,
+      disabled: false,
+      handleSubmit: throttle(this.submitCharge)
     };
   },
   computed: {
@@ -290,6 +293,7 @@ export default {
       this.startCharge();
     },
     startCharge() {
+      this.disabled = true
       // 000000001：逸充新能源-APP；000000002：逸充新能源-微信；000000003：逸充新能源-支付宝；
       let chargeChannel = '000000002';
       // #ifdef MP-ALIPAY
@@ -305,6 +309,8 @@ export default {
         chargeChannel
       }).then(({result}) => {
         this.goCharge(result.orderId);
+      }).finally(() => {
+        this.disabled = false
       });
     },
     // 前往开始充电
@@ -611,5 +617,8 @@ export default {
     text-align: center;
     margin: 60% auto 0;
   }
+}
+.combutton[disabled] {
+  opacity: 0.6;
 }
 </style>

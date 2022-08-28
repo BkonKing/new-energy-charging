@@ -108,7 +108,7 @@
       </view>
     </view>
     <view v-if="dataInfo.payStatus === 2" class="paywarp">
-      <button class="surepay" @click="closeMemberOrder">立即支付</button>
+      <button class="surepay" :disabled="disabled" :loading="disabled" @click="handleClose">立即支付</button>
     </view>
     <view class="clearit"></view>
   </view>
@@ -116,6 +116,7 @@
 
 <script>
 import { findChargeOrder, closeMemberOrder } from '@/api/member.js';
+import { throttle } from '@/common/util.js'
 const payStatusDict = {
   0: '已关闭',
   1: '已支付',
@@ -126,7 +127,9 @@ export default {
   data() {
     return {
       orderId: '',
-      dataInfo: {}
+      dataInfo: {},
+      disabled: false,
+      handleClose: throttle(this.closeMemberOrder)
     };
   },
   computed: {
@@ -148,11 +151,14 @@ export default {
       });
     },
     closeMemberOrder() {
+      this.disabled = true
       closeMemberOrder({
         orderId: this.orderId
       }).then(({ result }) => {
         this.$tip.success('支付成功');
         this.findChargeOrder();
+      }).finally(() => {
+        this.disabled = false
       });
     },
     setClipboardData(data) {
@@ -386,6 +392,9 @@ export default {
     box-shadow: 0 0 20rpx 5rpx rgba(45, 255, 80, 0.2);
     border-radius: 100rpx;
     margin: 0rpx auto;
+    &[disabled] {
+      opacity: 0.6;
+    }
   }
 }
 .order-number-box {

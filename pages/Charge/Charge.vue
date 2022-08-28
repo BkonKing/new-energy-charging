@@ -205,7 +205,7 @@
           <image src="/static/image/ico_16.png" mode="widthFix"></image>
           <text>联系客服</text>
         </view>
-        <button class="sfbt" @click="stopCharge()">停止充电</button>
+        <button class="sfbt" :disabled="disabled" :loading="disabled" @click="handleStop()">停止充电</button>
       </view>
     </template>
   </view>
@@ -218,6 +218,7 @@ import {
   findChargeOrder,
   findOrderByMemberId
 } from '@/api/member.js';
+import { throttle } from '@/common/util.js'
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 import bestGauge from '../../components/best-gauge/best-gauge.vue'; //环形传感器
 
@@ -457,7 +458,9 @@ export default {
           }
         }
       },
-      scaleCardShow: false
+      scaleCardShow: false,
+      disabled: false,
+      handleStop: throttle(this.stopCharge)
     };
   },
   filters: {
@@ -513,10 +516,15 @@ export default {
       });
     },
     stopCharge() {
-      stopCharge({
-        orderId: this.orderId
-      }).then(() => {
-        this.$tip.success('充电已停止');
+      this.$tip.confirm('是否停止当前充电？').then(() => {
+        this.disabled = true
+        stopCharge({
+          orderId: this.orderId
+        }).then(() => {
+          this.$tip.success('充电已停止');
+        }).finally(() => {
+          this.disabled = false
+        });
       });
     },
     popchose(data) {
@@ -886,6 +894,9 @@ export default {
     font-weight: 500;
     border: 1px solid #33b048;
     border-radius: 100rpx;
+    &[disabled] {
+      opacity: 0.6;
+    }
   }
 }
 //clear

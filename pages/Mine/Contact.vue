@@ -2,8 +2,8 @@
   <view class="container contact">
     <uni-collapse v-for="(item, index) in qalist" :key="index">
       <uni-collapse-item
+        thumb="/static/image/ico_14.png"
         :title="item.qtitle"
-        thumb="../../static/image/ico_14.png"
       >
         <view class="content">{{ item.qanswer }}</view>
       </uni-collapse-item>

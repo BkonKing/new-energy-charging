@@ -50,13 +50,14 @@
     </view>
     <!-- #endif -->
     <view class="paywarp">
-      <button class="surepay" @click="submit">充值</button>
+      <button class="surepay" :disabled="disabled" :loading="disabled" @click="handleSubmit">充值</button>
     </view>
   </view>
 </template>
 
 <script>
 import { findMemberByWallet, rechargeMember } from '@/api/member.js';
+import { throttle } from '@/common/util.js'
 
 export default {
   data() {
@@ -74,7 +75,9 @@ export default {
       current: undefined,
       amount: undefined,
       channel: undefined,
-      balances: 0
+      balances: 0,
+      disabled: false,
+      handleSubmit: throttle(this.submit)
     };
   },
   onShow() {
@@ -115,8 +118,11 @@ export default {
       });
     },
     rechargeMember(params) {
+      this.disabled = true
       rechargeMember(params).then(({ result }) => {
         this.requestPayment(result);
+      }).finally(() => {
+        this.disabled = false
       });
     },
     requestPayment(params) {
@@ -299,6 +305,9 @@ export default {
     box-shadow: 0 0 20rpx 5rpx rgba(45, 255, 80, 0.2);
     border-radius: 100rpx;
     margin: 0rpx auto;
+    &[disabled] {
+      opacity: 0.6;
+    }
   }
 }
 </style>

@@ -15,18 +15,20 @@
         />
       </view>
     </view>
-    <button class="surerz" @click="submit">确认无误</button>
+    <button class="surerz" :disabled="disabled" :loading="disabled" @click="handleSubmit">确认无误</button>
   </view>
 </template>
 
 <script>
 import { updateMemberByAuth } from '@/api/member.js';
-import { validateForm } from '@/common/util.js';
+import { validateForm, throttle } from '@/common/util.js';
 export default {
   data() {
     return {
       trueName: '',
-      idCardNo: ''
+      idCardNo: '',
+      disabled: false,
+      handleSubmit: throttle(this.submit)
     };
   },
   onLoad() {},
@@ -41,6 +43,7 @@ export default {
       });
     },
     updateMemberByAuth() {
+      this.disabled = true
       updateMemberByAuth({
         trueName: this.trueName,
         idCardNo: this.idCardNo
@@ -51,6 +54,8 @@ export default {
             delta: 1
           });
         });
+      }).finally(() => {
+        this.disabled = false
       });
     }
   }
@@ -110,5 +115,8 @@ uni-button.surerz {
   box-shadow: 0 0 20rpx 10rpx rgba(45, 255, 80, 0.2);
   border-radius: 100rpx;
   margin: 0 auto;
+  &[disabled] {
+    opacity: 0.6;
+  }
 }
 </style>

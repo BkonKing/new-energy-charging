@@ -50,14 +50,14 @@
     </view>
     <view class="clearw"></view>
     <view class="wfoot">
-      <button class="combutton" @click="submit">提交</button>
+      <button class="combutton" :disabled="disabled" :loading="disabled" @click="handleSubmit">提交</button>
     </view>
   </view>
 </template>
 
 <script>
 import { submitMemberRepair } from '@/api/member.js';
-import { validateForm } from '@/common/util.js';
+import { validateForm, throttle } from '@/common/util.js';
 import { mapGetters } from 'vuex'
 
 export default {
@@ -114,7 +114,9 @@ export default {
           name: '其他',
           value: 11
         }
-      ]
+      ],
+      disabled: false,
+      handleSubmit: throttle(this.submit)
     };
   },
   computed: {
@@ -173,6 +175,7 @@ export default {
       });
     },
     submitMemberRepair() {
+      this.disabled = true
       const params = {
         mobile: this.mobile,
         repairReasons: this.repairReasons.join(','),
@@ -185,6 +188,8 @@ export default {
         uni.navigateBack({
           delta: 1
         });
+      }).finally(() => {
+        this.disabled = false
       });
     }
   }
@@ -275,6 +280,10 @@ export default {
     border-radius: 14rpx;
     background: #f1f1f1;
   }
+}
+
+.combutton[disabled] {
+  opacity: 0.6;
 }
 // 底部按钮
 .wfoot {

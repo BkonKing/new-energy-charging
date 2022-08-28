@@ -1,10 +1,17 @@
 import {
   findConnectorByNum
 } from '@/api/site.js'
+import { throttle } from '@/common/util.js'
 
 export default {
+  data() {
+    return {
+      handleScan: throttle(this.scanCode),
+      disabled: false
+    }
+  },
   methods: {
-    handleScan(isRedirect) {
+    scanCode(isRedirect) {
       uni.scanCode({
         success: res => {
           console.log('条码类型：' + res.scanType);
@@ -19,6 +26,7 @@ export default {
         this.$tip.toast('充电桩编码不能为空')
         return
       }
+      this.disabled = true
       findConnectorByNum({
         connectorNum
       }).then(({
@@ -46,6 +54,8 @@ export default {
           return
         }
         this.toast(connectorStatus)
+      }).finally(() => {
+        this.disabled = false
       })
     },
     toast(connectorStatus) {
