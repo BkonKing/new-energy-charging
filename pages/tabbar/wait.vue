@@ -8,7 +8,7 @@
     ></uni-nav-bar>
     <!-- #endif -->
     <view class="waitimg">
-      <image src="../../static/image/wait.gif" mode="widthFix"></image>
+      <image src="https://yckj-battery-pile.oss-cn-shanghai.aliyuncs.com/nenergy/images/wait.gif" mode="widthFix"></image>
       <view>商城开发中，敬请期待!</view>
     </view>
     <!-- 底部自定义tabBar -->

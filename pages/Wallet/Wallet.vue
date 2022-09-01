@@ -6,6 +6,7 @@
       :fixed="true"
       :auto="false"
       @query="queryList"
+      @onRefresh="findMemberByWallet"
     >
       <!-- 余额 -->
       <view class="wallA">
@@ -42,17 +43,6 @@
         <view class="datawp" @click="showPicker">
           <!-- hy:默认显示为当天 -->
           <text style="color: #33b048;">{{ chooseDate }} ▼</text>
-          <rangeDatePick
-            start="2021-01-01"
-            end="2200-12-01"
-            themeColor="#33b048"
-            fields="day"
-            :show="dateShow"
-            :value="value"
-            @change="bindChange"
-            @cancel="bindCancel"
-            @showchange="showchange"
-          ></rangeDatePick>
         </view>
       </view>
       <!-- 明细 -->
@@ -95,6 +85,17 @@
         </view>
       </template>
     </z-paging>
+    <rangeDatePick
+      start="2021-01-01"
+      end="2200-12-01"
+      themeColor="#33b048"
+      fields="day"
+      :show="dateShow"
+      :value="value"
+      @change="bindChange"
+      @cancel="bindCancel"
+      @showchange="showchange"
+    ></rangeDatePick>
   </view>
 </template>
 

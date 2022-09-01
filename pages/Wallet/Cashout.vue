@@ -118,7 +118,7 @@ export default {
   methods: {
     findMemberByWallet() {
       findMemberByWallet().then(({ result }) => {
-        this.balances = result?.balances || 0.0;
+        this.balances = result?.balances || 0.00;
       });
     },
     findMemberBanks() {
@@ -211,7 +211,7 @@ export default {
           this.openBank();
           return;
         }
-        this.$tip.success('提交成功，请耐心等待');
+        this.$tip.success('提交成功');
         setTimeout(() => {
           uni.navigateBack({
             delta: 1

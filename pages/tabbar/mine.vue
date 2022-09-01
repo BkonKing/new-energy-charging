@@ -70,6 +70,10 @@
         <image src="/static/image/my_07.png" mode="widthFix"></image>
         <text>故障报修</text>
       </view>
+      <view v-if="token" @click="changephone">
+      	<image src="/static/image/my_10.png" mode="widthFix"></image>
+      	<text>更改手机号</text>
+      </view>
       <view @click="contact">
         <image src="/static/image/my_09.png" mode="widthFix"></image>
         <text>联系客服</text>
@@ -204,7 +208,13 @@ export default {
       uni.navigateTo({
         url: '/pages/Bill/Billitem'
       });
-    }
+    },
+		//前往更改手机号
+		changephone() {
+			uni.navigateTo({
+				url: '/pages/Mine/ChangePhone'
+			});
+		}
   }
 };
 </script>

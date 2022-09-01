@@ -1,152 +1,159 @@
 <template>
   <view class="container">
     <!-- 加载动画 -->
-    <view v-if="loadshwo">
-      <view class="loaditem" @touchmove.stop.prevent="moveHandle">
-        <image
-          class="loading-image"
-          src="@/static/image/loading_1.gif"
-          mode=""
-        ></image>
-        <view>请稍等，正在加载中……</view>
+    <view
+      v-if="loadingShow"
+      class="loaditem"
+      @touchmove.stop.prevent="moveHandle"
+    >
+      <view class="loading-box">
+        <image class="loading-image" :src="loadingUrl" mode=""></image>
+        <view class="loading-text">正在断开与充电枪的连接…</view>
       </view>
     </view>
-    <template>
-      <!-- 充电汽车切换 -->
-      <view class="carul disflex5">
-        <text @click="$refs.pop.show()">
-          设备编码：{{ dataInfo.connectorNum || '--' }}
+    <!-- 充电汽车切换 -->
+    <view class="carul disflex5">
+      <text @click="$refs.pop.show()">
+        设备编码：{{ orderInfo.connectorNum || '--' }}
+      </text>
+      <image
+        src="/static/image/arrow_03.png"
+        mode="widthFix"
+        class="arrimg"
+      ></image>
+    </view>
+    <!-- 充电汽车切换 弹框 -->
+    <pop
+      ref="pop"
+      direction="up"
+      :is_close="true"
+      :is_mask="true"
+      :width="100"
+      height="fit-content"
+      :maskFun="true"
+      @watchOpen="watchOpen"
+      @watchClose="watchClose"
+    >
+      <view class="tcwarp">
+        <view class="caritem" v-for="item in orderList" @click="popchose(item)">
+          <text>设备编码：{{ item.connectorNum || '--' }}</text>
+          <text class="carstatu">
+            {{ item.chargeStatus | chargeStatusText }}
+          </text>
+        </view>
+      </view>
+    </pop>
+    <!-- 传感器 -->
+    <best-gauge :config="gaugeOption"></best-gauge>
+    <!-- 汽车图片 -->
+    <view class="carshow">
+      <image
+        :src="cardImageUrl"
+        mode="widthFix"
+        :class="{ 'scale-car': scaleCardShow }"
+      ></image>
+    </view>
+    <!-- 充电计时 -->
+    <view class="Timesul">
+      <div class="cTimes">
+        <uni-countdown
+          :show-day="false"
+          :font-size="40"
+          :hour="countDownHour"
+          :minute="countDownMinute"
+          :second="countDownSecond"
+        />
+      </div>
+      <view class="sTimes disflex5">
+        <text>正在充电中，已充电</text>
+        <bing-countup
+          ref="countup"
+          :auto-start="false"
+          :font-size="16"
+          color="#999"
+        />
+      </view>
+    </view>
+    <!-- 费用 -->
+    <view class="cFeiy disflex">
+      <view>
+        <text>实时费用</text>
+        <text class="wonum">{{ chargeInfo.electricAmount || '--' }}</text>
+      </view>
+      <view @click="goCashin">
+        <text>账户余额</text>
+        <text class="wonum">{{ balances }}</text>
+        <text class="cmin">充值</text>
+      </view>
+    </view>
+    <!-- 数据 -->
+    <view class="cShu disflex">
+      <view>
+        <text>电压</text>
+        <text class="wonum">
+          {{ chargeInfo.outputVoltage || 0 }}
+          <text class="snum">v /--v</text>
         </text>
-        <image
-          src="/static/image/arrow_03.png"
-          mode="widthFix"
-          class="arrimg"
-        ></image>
       </view>
-      <!-- 充电汽车切换 弹框 -->
-      <pop
-        ref="pop"
-        direction="up"
-        :is_close="true"
-        :is_mask="true"
-        :width="100"
-        height="fit-content"
-        :maskFun="true"
-        @watchOpen="watchOpen"
-        @watchClose="watchClose"
-      >
-        <view class="tcwarp">
-          <view class="caritem" v-for="item in orderList" @click="popchose(item)">
-            <text>设备编码：{{ item.connectorNum || '--' }}</text>
-            <text class="carstatu">{{item.chargeStatus | chargeStatusText}}</text>
-          </view>
-        </view>
-      </pop>
-      <!-- 传感器 -->
-      <best-gauge :config="gaugeOption1"></best-gauge>
-      <!-- 汽车图片 -->
-      <view class="carshow">
-        <image
-          src="/static/image/car3.png"
-          mode="widthFix"
-          :class="{ 'scale-car': scaleCardShow }"
-        ></image>
-      </view>
-      <!-- 充电计时 -->
-      <view class="Timesul">
-        <div class="cTimes">
-          <uni-countdown
-            :show-day="false"
-            :font-size="40"
-            :hour="0"
-            :minute="12"
-            :second="12"
-          />
-        </div>
-        <view class="sTimes disflex5">
-          <text>正在充电中，已充电</text>
-          <bing-countup :font-size="16" color="#999" />
-        </view>
-      </view>
-      <!-- 费用 -->
-      <view class="cFeiy disflex">
-        <view>
-          <text>实时费用</text>
-          <text class="wonum">{{ dataInfo.electricAmount || '--' }}</text>
-        </view>
-        <view @click="goCashin">
-          <text>账户余额</text>
-          <text class="wonum">{{ balances }}</text>
-          <text class="cmin">充值</text>
-        </view>
-      </view>
-      <!-- 数据 -->
-      <view class="cShu disflex">
-        <view>
-          <text>电压</text>
-          <text class="wonum">
-            10
-            <text class="snum">v /421v</text>
-          </text>
-        </view>
-        <view>
-          <text>功率</text>
-          <text class="wonum">
-            19
-            <text class="snum">kW /27kW</text>
-          </text>
-        </view>
-        <view>
-          <text>电流</text>
-          <text class="wonum">
-            12
-            <text class="snum">A /65A</text>
-          </text>
-        </view>
-      </view>
-      <!-- 终端信息 -->
-      <view class="cDuan disflex">
-        <text>
-          设备编号：{{ dataInfo.connectorNum || '--' }}
-          <text class="cdcopy">复制</text>
+      <view>
+        <text>功率</text>
+        <text class="wonum">
+          {{ chargeInfo.outputPower || 0 }}
+          <text class="snum">kW /--kW</text>
         </text>
-        <text>终端时间 16:24:36</text>
       </view>
-      <!-- 数据图表 -->
-      <view class="dylist">
-        <view class="leader">
-          <view class="ltitle">
-            <view
-              @tap="changeShowType(1)"
-              :class="showType == 1 ? 'activeContentA' : ''"
-            >
-              <view>电压</view>
-            </view>
-            <view
-              @tap="changeShowType(2)"
-              :class="showType == 2 ? 'activeContentA' : ''"
-            >
-              <view>功率</view>
-            </view>
-            <view
-              @tap="changeShowType(3)"
-              :class="showType == 3 ? 'activeContentA' : ''"
-            >
-              <view>电流</view>
-            </view>
+      <view>
+        <text>电流</text>
+        <text class="wonum">
+          {{ chargeInfo.outputElectricity || 0 }}
+          <text class="snum">A /--A</text>
+        </text>
+      </view>
+    </view>
+    <!-- 终端信息 -->
+    <view class="cDuan disflex">
+      <text>
+        设备编号：{{ orderInfo.connectorNum || '--' }}
+        <text class="cdcopy" @click="setClipboardData">复制</text>
+      </text>
+      <!-- <text>终端时间 16:24:36</text> -->
+    </view>
+    <!-- 数据图表 -->
+    <view class="dylist">
+      <view class="leader">
+        <view class="ltitle">
+          <view
+            @tap="changeShowType(1)"
+            :class="showType == 1 ? 'activeContentA' : ''"
+          >
+            <view>电压</view>
+          </view>
+          <view
+            @tap="changeShowType(2)"
+            :class="showType == 2 ? 'activeContentA' : ''"
+          >
+            <view>功率</view>
+          </view>
+          <view
+            @tap="changeShowType(3)"
+            :class="showType == 3 ? 'activeContentA' : ''"
+          >
+            <view>电流</view>
           </view>
         </view>
-        <view class="uchart" v-if="showType == 1">
-          <view class="uctitle">
-            <view>
-              <text>实际输出电压</text>
-              <text>392.90V</text>
-            </view>
-            <view>
-              <text>所需电压</text>
-              <text>421V</text>
-            </view>
+      </view>
+      <view class="uchart" v-if="showType == 1">
+        <view class="uctitle">
+          <view>
+            <text>实际输出电压</text>
+            <text>392.90V</text>
           </view>
+          <view>
+            <text>所需电压</text>
+            <text>421V</text>
+          </view>
+        </view>
+        <view style="height: 250px;">
           <qiun-data-charts
             type="area"
             :canvas2d="true"
@@ -155,17 +162,19 @@
             :chartData="chartDataDY"
           />
         </view>
-        <view class="uchart" v-if="showType == 2">
-          <view class="uctitle">
-            <view>
-              <text>实际输出功率</text>
-              <text>0kW</text>
-            </view>
-            <view>
-              <text>所需功率</text>
-              <text>0kW</text>
-            </view>
+      </view>
+      <view class="uchart" v-if="showType == 2">
+        <view class="uctitle">
+          <view>
+            <text>实际输出功率</text>
+            <text>0kW</text>
           </view>
+          <view>
+            <text>所需功率</text>
+            <text>0kW</text>
+          </view>
+        </view>
+        <view style="height: 250px;">
           <qiun-data-charts
             type="area"
             :canvas2d="true"
@@ -174,17 +183,19 @@
             :chartData="chartDataGL"
           />
         </view>
-        <view class="uchart" v-if="showType == 3">
-          <view class="uctitle">
-            <view>
-              <text>实际输出电流</text>
-              <text>10A</text>
-            </view>
-            <view>
-              <text>所需电流</text>
-              <text>10A</text>
-            </view>
+      </view>
+      <view class="uchart" v-if="showType == 3">
+        <view class="uctitle">
+          <view>
+            <text>实际输出电流</text>
+            <text>10A</text>
           </view>
+          <view>
+            <text>所需电流</text>
+            <text>10A</text>
+          </view>
+        </view>
+        <view style="height: 250px;">
           <qiun-data-charts
             type="area"
             :canvas2d="true"
@@ -194,20 +205,27 @@
           />
         </view>
       </view>
-      <view class="clearw"></view>
-      <!-- 底部按钮 -->
-      <view class="sitefoot">
-        <view class="sfico" @click="goFixsent">
-          <image src="/static/image/ico_09.png" mode="widthFix"></image>
-          <text>故障报修</text>
-        </view>
-        <view class="sfico" @click="goContact">
-          <image src="/static/image/ico_16.png" mode="widthFix"></image>
-          <text>联系客服</text>
-        </view>
-        <button class="sfbt" :disabled="disabled" :loading="disabled" @click="handleStop()">停止充电</button>
+    </view>
+    <view class="clearw"></view>
+    <!-- 底部按钮 -->
+    <view class="sitefoot">
+      <view class="sfico" @click="goFixsent">
+        <image src="/static/image/ico_09.png" mode="widthFix"></image>
+        <text>故障报修</text>
       </view>
-    </template>
+      <view class="sfico" @click="goContact">
+        <image src="/static/image/ico_16.png" mode="widthFix"></image>
+        <text>联系客服</text>
+      </view>
+      <button
+        class="sfbt"
+        :disabled="disabled"
+        :loading="disabled"
+        @click="handleStop()"
+      >
+        停止充电
+      </button>
+    </view>
   </view>
 </template>
 
@@ -218,91 +236,38 @@ import {
   findChargeOrder,
   findOrderByMemberId
 } from '@/api/member.js';
-import { throttle } from '@/common/util.js'
+import { throttle } from '@/common/util.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
-import bestGauge from '../../components/best-gauge/best-gauge.vue'; //环形传感器
+import bestGauge from '@/components/best-gauge/best-gauge.vue'; //环形传感器
 
 const chargeStatusDict = {
   '-1': '充电失败',
   0: '充电中',
   1: '充电结束',
-  2: '等待充电',
-}
+  2: '等待充电'
+};
 
 export default {
   components: { pop, bestGauge },
   data() {
-    let _width = uni.upx2px(480); //传感器宽度350
     return {
+      loadingUrl:
+        'https://yckj-battery-pile.oss-cn-shanghai.aliyuncs.com/nenergy/images/loading_1.gif',
+      cardImageUrl:
+        'https://yckj-battery-pile.oss-cn-shanghai.aliyuncs.com/nenergy/images/car3.png',
       connectorNum: '',
+      gaugeWidth: uni.upx2px(480),
       orderId: '',
       balances: 0,
       pollTimer: null,
-      dataInfo: {},
+      countDownHour: 0,
+      countDownMinute: 0,
+      countDownSecond: 0,
+      orderInfo: {},
+      chargeInfo: {},
       orderList: [],
       // 加载动画显示
-      loadshwo: true,
-      // 传感器chart数据
-      gaugeOption1: {
-        id: 'gaugeId1',
-        bgColor: 'rgba(255,255,255,1)',
-        startAngle: 0.75,
-        endAngle: 0.25,
-        width: _width,
-        // status: 1, //设备是否在线 0 离线 1在线
-        padding: 10,
-        min: 0,
-        max: 100,
-        value: 75.8,
-        unit: '%',
-        name: '已充0.00度',
-        detail: {
-          //数值单位设置
-          title: {
-            //name字体位置设置
-            color: '#333',
-            fontSize: uni.upx2px(30),
-            fontWeight: '500',
-            offsetCenter: [0, uni.upx2px(10)],
-            textAlign: 'center'
-          },
-          value: {
-            color: '#000',
-            fontSize: uni.upx2px(90),
-            fontWeight: 'bold',
-            offsetCenter: [0, uni.upx2px(-55)], //距离圆心直径偏移
-            textAlign: 'center'
-          },
-          unit: {
-            color: '#000',
-            fontSize: uni.upx2px(30),
-            fontWeight: 'bold',
-            offsetCenter: [0, uni.upx2px(-55)], //距离圆心直径偏移
-            textAlign: 'center'
-          }
-        },
-        axisTick: [
-          //轴刻度线
-          {
-            width: uni.upx2px(30), //轴长
-            number: 10, //轴数量（相当于几等分）
-            color: '#33b048,#dddddd', //轴颜色(第一个值--指针之前的颜色，之后的颜色)
-            subNumber: 10, //一个大刻度分成几个小刻度
-            subHeight: 1.8,
-            subWidth: uni.upx2px(30),
-            padding: uni.upx2px(10) //刻度距离边距
-          },
-          {
-            width: uni.upx2px(20), //轴长
-            number: 10, //轴数量（相当于几等分）
-            color: '#d5d5d5', //轴颜色(第一个值--指针之前的颜色，之后的颜色)
-            subNumber: 10, //一个大刻度分成几个小刻度
-            subHeight: 1,
-            subWidth: uni.upx2px(10),
-            padding: uni.upx2px(25) //刻度距离边距
-          }
-        ]
-      },
+      loadingShow: false,
       // 数据图标tab页面
       showType: 1,
       chartDataDY: {}, //电压
@@ -331,7 +296,8 @@ export default {
           scrollShow: true, //新增是否显示滚动条，默认false
           scrollAlign: 'left', //滚动条初始位置
           scrollBackgroundColor: '#F7F7FF', //默认为 #EFEBEF
-          scrollColor: '#DEE7F7' //默认为 #A6A6A6}
+          scrollColor: '#DEE7F7', //默认为 #A6A6A6}
+          format: 'xAxisTime'
         },
         // y轴显示的内容
         yAxis: {
@@ -382,7 +348,8 @@ export default {
           scrollShow: true, //新增是否显示滚动条，默认false
           scrollAlign: 'left', //滚动条初始位置
           scrollBackgroundColor: '#F7F7FF', //默认为 #EFEBEF
-          scrollColor: '#DEE7F7' //默认为 #A6A6A6}
+          scrollColor: '#DEE7F7', //默认为 #A6A6A6}
+          format: 'xAxisTime'
         },
         // y轴显示的内容
         yAxis: {
@@ -433,7 +400,8 @@ export default {
           scrollShow: true, //新增是否显示滚动条，默认false
           scrollAlign: 'left', //滚动条初始位置
           scrollBackgroundColor: '#F7F7FF', //默认为 #EFEBEF
-          scrollColor: '#DEE7F7' //默认为 #A6A6A6}
+          scrollColor: '#DEE7F7', //默认为 #A6A6A6}
+          format: 'xAxisTime'
         },
         // y轴显示的内容
         yAxis: {
@@ -463,9 +431,75 @@ export default {
       handleStop: throttle(this.stopCharge)
     };
   },
+  computed: {
+    // 传感器chart数据
+    gaugeOption() {
+      const soc = this.chargeInfo.soc || 0;
+      return {
+        id: 'gaugeId1',
+        bgColor: 'rgba(255,255,255,1)',
+        startAngle: 0.75,
+        endAngle: 0.25,
+        width: this.gaugeWidth,
+        // status: 1, //设备是否在线 0 离线 1在线
+        padding: 10,
+        min: 0,
+        max: 100,
+        value: soc,
+        unit: '%',
+        name: `已充${soc}度`,
+        detail: {
+          //数值单位设置
+          title: {
+            //name字体位置设置
+            color: '#333',
+            fontSize: uni.upx2px(30),
+            fontWeight: '500',
+            offsetCenter: [0, uni.upx2px(10)],
+            textAlign: 'center'
+          },
+          value: {
+            color: '#000',
+            fontSize: uni.upx2px(90),
+            fontWeight: 'bold',
+            offsetCenter: [0, uni.upx2px(-55)], //距离圆心直径偏移
+            textAlign: 'center'
+          },
+          unit: {
+            color: '#000',
+            fontSize: uni.upx2px(30),
+            fontWeight: 'bold',
+            offsetCenter: [0, uni.upx2px(-55)], //距离圆心直径偏移
+            textAlign: 'center'
+          }
+        },
+        axisTick: [
+          //轴刻度线
+          {
+            width: uni.upx2px(30), //轴长
+            number: 10, //轴数量（相当于几等分）
+            color: '#33b048,#dddddd', //轴颜色(第一个值--指针之前的颜色，之后的颜色)
+            subNumber: 10, //一个大刻度分成几个小刻度
+            subHeight: 1.8,
+            subWidth: uni.upx2px(30),
+            padding: uni.upx2px(10) //刻度距离边距
+          },
+          {
+            width: uni.upx2px(20), //轴长
+            number: 10, //轴数量（相当于几等分）
+            color: '#d5d5d5', //轴颜色(第一个值--指针之前的颜色，之后的颜色)
+            subNumber: 10, //一个大刻度分成几个小刻度
+            subHeight: 1,
+            subWidth: uni.upx2px(10),
+            padding: uni.upx2px(25) //刻度距离边距
+          }
+        ]
+      };
+    }
+  },
   filters: {
     chargeStatusText(value) {
-      return chargeStatusDict[value] || '--'
+      return chargeStatusDict[value] || '--';
     }
   },
   onLoad({ connectorNum, orderId }) {
@@ -473,38 +507,63 @@ export default {
     this.orderId = orderId;
   },
   onShow() {
+    this.findChargeOrder();
     this.findMemberByWallet();
     this.pollOrder();
   },
+  onHide() {
+    this.clearPoll();
+  },
   onUnload() {
-    this.pollTimer && clearTimeout(this.pollTimer);
+    this.clearPoll();
   },
   methods: {
-    pollOrder() {
-      this.pollTimer = setTimeout(() => {
-        this.findChargeOrder()
-          .then(() => {
-            this.pollOrder();
-          })
-        this.getServerData();
-      }, 10000);
-    },
     findMemberByWallet() {
       findMemberByWallet().then(({ result }) => {
         this.balances = result.balances || 0;
       });
     },
+    pollOrder(ts = 15000) {
+      this.clearPoll();
+      this.pollTimer = setTimeout(() => {
+        this.findChargeOrder().then(() => {
+          this.pollOrder(ts);
+        });
+      }, ts);
+    },
+    clearPoll() {
+      this.pollTimer && clearTimeout(this.pollTimer);
+    },
     findChargeOrder() {
       return findChargeOrder({
         orderId: this.orderId
       }).then(({ result }) => {
-        this.dataInfo = result || {};
+        const { order, chargeInfo, electricEnergyTrend } = result;
+        if (+order.payStatus === 2) {
+          uni.redirectTo({
+            url: `/pages/Order/Orderdetail?orderId=${this.orderId}`
+          });
+          this.loadingShow = false;
+          return;
+        }
         if (!this.scaleCardShow) {
-          this.scaleCardShow = true
+          this.scaleCardShow = true;
           this.findOrderByMemberId();
         }
-        this.loadshwo = false;
+        this.orderInfo = order || {};
+        this.chargeInfo = chargeInfo || {};
+        this.$refs.countup.start(chargeInfo.totalTime * 60 || 0);
+        this.setCountDown(chargeInfo.remainTime);
+        if (electricEnergyTrend && electricEnergyTrend.length) {
+          this.setChartsData(electricEnergyTrend);
+        }
+        // this.loadingShow = false;
       });
+    },
+    setCountDown(remainTime) {
+      this.countDownHour = Math.ceil(remainTime / 60);
+      this.countDownMinute = Math.ceil(remainTime % 60);
+      this.countDownSecond = 0;
     },
     findOrderByMemberId() {
       findOrderByMemberId({
@@ -512,25 +571,29 @@ export default {
         pageSize: 10,
         pageNo: 1
       }).then(({ result }) => {
-        this.orderList = result.orderInfo?.records || [];
+        this.orderList = result.orderInfo?.records || '';
       });
     },
     stopCharge() {
       this.$tip.confirm('是否停止当前充电？').then(() => {
-        this.disabled = true
+        this.disabled = true;
+        this.loadingShow = true;
         stopCharge({
           orderId: this.orderId
-        }).then(() => {
-          this.$tip.success('充电已停止');
-        }).finally(() => {
-          this.disabled = false
-        });
+        })
+          .then(() => {
+            // 轮询订单接口 结算已提交
+            // this.$tip.success('充电已停止');
+            this.pollOrder(2000);
+          })
+          .finally(() => {
+            this.disabled = false;
+          });
       });
     },
     popchose(data) {
-      this.orderId = data.id
+      this.orderId = data.id;
       this.findChargeOrder();
-      this.getServerData();
       this.$refs.pop.close();
     },
     // 切换显示内容
@@ -538,56 +601,57 @@ export default {
       this.showType = type;
     },
     // 数据图表
-    getServerData() {
-      //模拟从服务器获取数据时的延时
-      setTimeout(() => {
-        let resDY = {
-          categories: ['16:50', '16:51', '16:52', '16:53', '16:54', '16:55'],
-          series: [
-            {
-              name: '输出电压',
-              data: [100, 233, 436, 312, 423, 221]
-            },
-            {
-              name: '需求电压',
-              data: [102, 314, 217, 311, 378, 424]
-            }
-          ]
-        };
-        let resGL = {
-          categories: ['16:50', '16:51', '16:52', '16:53', '16:54', '16:55'],
-          series: [
-            {
-              name: '输出功率',
-              data: [1, 3, 6, 12, 23, 21]
-            },
-            {
-              name: '需求功率',
-              data: [2, 4, 7, 11, 8, 24]
-            }
-          ]
-        };
-        let resDL = {
-          categories: ['16:50', '16:51', '16:52', '16:53', '16:54', '16:55'],
-          series: [
-            {
-              name: '输出电流',
-              data: [31, 63, 86, 42, 63, 41]
-            },
-            {
-              name: '需求电流',
-              data: [42, 64, 57, 61, 58, 44]
-            }
-          ]
-        };
-        this.chartDataDY = JSON.parse(JSON.stringify(resDY));
-        this.chartDataGL = JSON.parse(JSON.stringify(resGL));
-        this.chartDataDL = JSON.parse(JSON.stringify(resDL));
-      }, 500);
+    setChartsData(data) {
+      const categories = [];
+      const outputVoltageArray = [];
+      const outputElectricityArray = [];
+      const outputPowerArray = [];
+      data.forEach(item => {
+        const { outputVoltage, outputElectricity, outputPower, ts } = item;
+        outputVoltageArray.push(outputVoltage || 0);
+        outputElectricityArray.push(outputElectricity || 0);
+        outputPowerArray.push(outputPower || 0);
+        categories.push(ts.substring(11, 16));
+      });
+      let resDY = {
+        categories,
+        series: [
+          {
+            name: '输出电压',
+            data: outputVoltageArray
+          }
+        ]
+      };
+      let resGL = {
+        categories,
+        series: [
+          {
+            name: '输出功率',
+            data: outputPowerArray
+          }
+        ]
+      };
+      let resDL = {
+        categories,
+        series: [
+          {
+            name: '输出电流',
+            data: outputElectricityArray
+          }
+        ]
+      };
+      this.chartDataDY = JSON.parse(JSON.stringify(resDY));
+      this.chartDataGL = JSON.parse(JSON.stringify(resGL));
+      this.chartDataDL = JSON.parse(JSON.stringify(resDL));
     },
     // 充电汽车切换-弹框
     watchOpen() {},
     watchClose() {},
+    setClipboardData() {
+      uni.setClipboardData({
+        data: `${this.orderInfo.connectorNum || '--'}`
+      });
+    },
     // 前往充值
     goCashin() {
       uni.navigateTo({
@@ -763,7 +827,7 @@ export default {
     flex-direction: column;
     .wonum {
       color: #333;
-      font-size: 50rpx;
+      font-size: 36rpx;
       font-weight: 500;
     }
   }
@@ -824,13 +888,13 @@ export default {
 }
 .uchart {
   width: 100%;
-  padding: 100rpx 0 30rpx;
+  padding: 30rpx 0;
   height: auto;
-  position: relative;
+  // position: relative;
   .uctitle {
-    position: absolute;
-    left: 0;
-    top: 30rpx;
+    // position: absolute;
+    // left: 0;
+    // top: 30rpx;
     z-index: 1;
     font-size: 24rpx;
     text-align: center;
@@ -908,18 +972,29 @@ export default {
 .loaditem {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
   position: fixed;
   left: 0;
-  top: 40%;
+  top: 0;
   z-index: 101;
-  view {
-    color: #222;
+  background-color: rgba(0, 0, 0, 0.5);
+  .loading-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30rpx 20rpx;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10rpx;
+  }
+  .loading-text {
+    margin-top: 40rpx;
+    color: #fff;
     font-size: 28rpx;
     text-align: center;
-    margin-top: 40rpx;
   }
   .loading-image {
     width: 100rpx;

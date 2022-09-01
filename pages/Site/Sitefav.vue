@@ -30,7 +30,6 @@
           v-for="item in siteListData"
           :key="item.id"
           class="fav_ul"
-          @click="sitedetail"
         >
           <site-card :data="item" :storeType="2"></site-card>
         </view>
@@ -61,6 +60,7 @@ export default {
     };
   },
   onLoad() {
+    this.getKey()
     this.getLocationInfo()
   },
   methods: {

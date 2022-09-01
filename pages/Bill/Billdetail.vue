@@ -45,7 +45,9 @@
         <text>123@123.com</text>
       </view>
     </view>
-    <view class="pd24 bord"><view>1张发票，含4个订单</view></view>
+    <view class="pd24 bord" @click="billinclure">
+      <view>1张发票，含4个订单</view>
+    </view>
     <view class="clearw"></view>
     <view class="wfoot">
       <button class="combutton" @click="repeatSent()">重发发票</button>
@@ -84,6 +86,12 @@ export default {
     // 点击弹框取消按钮
     Sentcancel() {
       this.mshow = false;
+    },
+    //前往所含订单
+    billinclure() {
+      uni.navigateTo({
+        url: './Billinclure'
+      });
     }
   }
 };

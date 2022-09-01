@@ -85,14 +85,14 @@ export default {
       this.checkData = this.bcosInfo
       this.checked = this.bcosInfo.map(obj => obj.id)
     },
-    // 下一步，前往开具发票
+    // 下一步，前往下一步选择 / 开具发票
     billopen() {
       if (!this.checked.length) {
         this.$tip.toast('请先选择订单');
         return;
       }
       uni.navigateTo({
-        url: './Billopen'
+        url: './BillchoseB'
       });
     },
     queryList(pageNo, pageSize) {

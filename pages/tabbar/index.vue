@@ -413,7 +413,7 @@ export default {
     }
     .fcmd {
       width: 150rpx;
-      height: 120rpx;
+      height: 60px;
       display: flex;
       align-items: center;
       flex-direction: column;

@@ -19,7 +19,9 @@
           <text class="zdcope" @click="setClipboardData">复制</text>
         </view>
         <view class="zdtime">
-          当前时段：{{ terminalData.startTime || '00:00' }}-{{ terminalData.endTime || '00:00'  }}
+          当前时段：{{ terminalData.startTime || '00:00' }}-{{
+            terminalData.endTime || '00:00'
+          }}
         </view>
         <view class="zdprice">
           <text>{{ terminalData.fee || 0 }}</text>
@@ -39,10 +41,10 @@
         <text
           v-for="(item, index) in paykind"
           :key="index"
-          :class="paykindcurrent == index ? 'otkindck' : ''"
-          @click="paykindcheck(index)"
+          :class="payChannel == item.value ? 'otkindck' : ''"
+          @click="paykindcheck(item)"
         >
-          {{ item }}
+          {{ item.label }}
         </text>
       </view>
       <!-- <view class="otli">
@@ -50,7 +52,7 @@
         <view class="fufei">服务费6.5折</view>
       </view> -->
       <!-- 余额付 -->
-      <view class="payYue" v-if="paykindcurrent == 0">
+      <view class="payYue" v-if="payChannel == 1">
         <!-- <view>预付金额</view>
         <view class="py_sm">预计可充电1.09度，可行驶22.95公里</view> -->
         <view class="disflex">
@@ -59,12 +61,12 @@
         </view>
       </view>
       <!-- 预授权 -->
-      <view class="otli" v-if="paykindcurrent == 1" @click="payYsq">
+      <view class="otli" v-if="payChannel == 2" @click="payYsq">
         <text>预付金额</text>
         <text class="otfor">请选择预付金额</text>
       </view>
       <!-- 信用付 -->
-      <view class="payXy" v-if="paykindcurrent == 2">
+      <view class="payXy" v-if="payChannel == 3">
         <view class="disflex">
           <text>授信额度</text>
           <text>￥100</text>
@@ -162,7 +164,14 @@
 		</view> -->
     <view class="clearw"></view>
     <view class="wfoot">
-      <button class="combutton" :disabled="disabled" :loading="disabled" @click="handleSubmit">启动充电</button>
+      <button
+        class="combutton"
+        :disabled="disabled"
+        :loading="disabled"
+        @click="handleSubmit"
+      >
+        启动充电
+      </button>
     </view>
   </view>
 </template>
@@ -170,7 +179,7 @@
 <script>
 import { findConnectorByNum } from '@/api/site.js';
 import { findMemberByWallet, startCharge } from '@/api/member.js';
-import { throttle } from '@/common/util.js'
+import { throttle } from '@/common/util.js';
 
 const operateTypeDict = {
   1: '直营',
@@ -185,8 +194,13 @@ export default {
       connectorNum: '',
       terminalData: {},
       // 支付方式
-      paykind: ['余额付' /* , '预授权', '信用付' */],
-      paykindcurrent: 0,
+      paykind: [
+        {
+          label: '余额付',
+          value: 1
+        }
+      ] /* , '预授权', '信用付' */,
+      payChannel: 1,
       // 充电策略
       chargeStrategyOptions: [
         {
@@ -247,8 +261,8 @@ export default {
       });
     },
     // 选中支付方式
-    paykindcheck(index) {
-      this.paykindcurrent = index;
+    paykindcheck({value}) {
+      this.payChannel = value;
     },
     // 选中充电策略
     planCdcheck({ value }) {
@@ -293,30 +307,35 @@ export default {
       this.startCharge();
     },
     startCharge() {
-      this.disabled = true
+      this.disabled = true;
       // 000000001：逸充新能源-APP；000000002：逸充新能源-微信；000000003：逸充新能源-支付宝；
       let chargeChannel = '000000002';
       // #ifdef MP-ALIPAY
-      chargeChannel = '000000003'
+      chargeChannel = '000000003';
       // #endif
       // #ifdef APP
-      chargeChannel = '000000001'
+      chargeChannel = '000000001';
       // #endif
       startCharge({
         amount: this.amount,
         connectorNum: this.connectorNum,
         chargeStrategy: this.chargeStrategyValue,
-        chargeChannel
-      }).then(({result}) => {
-        this.goCharge(result.orderId);
-      }).finally(() => {
-        this.disabled = false
-      });
+        chargeChannel,
+        payChannel: this.payChannel
+      })
+        .then(({ result }) => {
+          this.goCharge(result.orderId);
+        })
+        .finally(() => {
+          this.disabled = false;
+        });
     },
     // 前往开始充电
     goCharge(orderId) {
       uni.redirectTo({
-        url: `/pages/Charge/Charge?connectorNum=${this.connectorNum}&orderId=${orderId}`
+        url: `/pages/Charge/Charge?connectorNum=${
+          this.connectorNum
+        }&orderId=${orderId}`
       });
     },
     // 前往车辆选择

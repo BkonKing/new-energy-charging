@@ -233,6 +233,12 @@
         }
       },
       {
+      	"path": "BillchoseB",
+      	"style": {
+      		"navigationBarTitleText": "选择订单"
+      	}
+      },
+      {
         "path": "Billopen",
         "style": {
           "navigationBarTitleText": "开具发票"
@@ -243,6 +249,12 @@
         "style": {
           "navigationBarTitleText": "开票历史"
         }
+      },
+      {
+      	"path": "Billinclure",
+      	"style": {
+      		"navigationBarTitleText": "所含订单"
+      	}
       },
       {
         "path": "Billdetail",
@@ -270,7 +282,13 @@
         "style": {
           "navigationBarTitleText": "联系客服"
         }
-      }
+      },
+	  {
+	  	"path": "ChangePhone",
+	  	"style": {
+	  		"navigationBarTitleText": "更改手机号"
+	  	}
+	  }
     ]
   }],
   "globalStyle": {
@@ -287,11 +305,11 @@
     "list": [{
       "name": "站点详情",
       "path": "pages/Site/Sitedetail",
-      "query": "id=a496c6a945e45c30fd99eef92cf2d620"
+      "query": ""
     }, {
       "name": "终端列表",
       "path": "pages/Site/Terminal",
-      "query": "id=a496c6a945e45c30fd99eef92cf2d620"
+      "query": ""
     }, {
       "name": "充电桩查询",
       "path": "pages/Charge/Inputcode",
@@ -299,7 +317,11 @@
     }, {
       "name": "充电桩",
       "path": "pages/Charge/Paychos",
-      "query": "connectorNum=10000000101"
+      "query": ""
+    }, {
+      "name": "充电中",
+      "path": "pages/Charge/Charge",
+      "query": ""
     }, {
       "name": "充值",
       "path": "pages/Wallet/Cashin",

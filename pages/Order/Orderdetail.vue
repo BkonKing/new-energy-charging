@@ -3,15 +3,30 @@
     <view class="odtitle">
       <view class="disflex4">
         <text>{{ payStatusText }}</text>
-        <text v-if="dataInfo.payStatus === 2" class="weip">
+        <text v-if="orderInfo.payStatus === 2" class="weip">
           剩
-          <text class="weit">23小时59分</text>
+          <uni-countdown
+            class="weit"
+            color="#333"
+            :show-day="false"
+            :font-size="26"
+            :showColon="false"
+            :showDay="false"
+            :hour="countDownHour"
+            :minute="countDownMinute"
+            :second="countDownSecond"
+          />
           自动结算订单
         </text>
       </view>
       <view class="disflex4 order-number-box">
-        <text class="order-label">订单编号：{{ dataInfo.platformOrderNo || '--' }}</text>
-        <text class="tcope" @click="setClipboardData(dataInfo.platformOrderNo)">
+        <text class="order-label">
+          订单编号：{{ orderInfo.platformOrderNo || '--' }}
+        </text>
+        <text
+          class="tcope"
+          @click="setClipboardData(orderInfo.platformOrderNo)"
+        >
           复制
         </text>
       </view>
@@ -24,13 +39,13 @@
         <view class="otmx">
           <view>
             ￥
-            <text class="otmx_num">{{ dataInfo.totalAmount || 0 }}</text>
+            <text class="otmx_num">{{ orderInfo.totalAmount || 0 }}</text>
           </view>
           <view class="otmx_sm">
             <text class="mr-20">
-              电费:￥{{ dataInfo.totalElectricAmount || 0 }}
+              电费:￥{{ orderInfo.totalElectricAmount || 0 }}
             </text>
-            <text>服务费:￥{{ dataInfo.totalServiceAmount || 0 }}</text>
+            <text>服务费:￥{{ orderInfo.totalServiceAmount || 0 }}</text>
           </view>
         </view>
       </view>
@@ -48,11 +63,11 @@
 				<text>结算策略</text>
 				<text class="otcl">手动结算</text>
 			</view> -->
-      <view v-if="dataInfo.payStatus === 1" class="sfmon">
+      <view v-if="orderInfo.payStatus === 1" class="sfmon">
         <view>
           <text class="mr-20">实付金额</text>
           <text>￥</text>
-          <text class="sfnum">{{ dataInfo.totalAmount || 0 }}</text>
+          <text class="sfnum">{{ orderInfo.totalAmount || 0 }}</text>
         </view>
         <view>个人账户</view>
       </view>
@@ -62,32 +77,32 @@
       <view class="otbig">充电信息</view>
       <view class="stbst disflex4">
         <text class="ststar">起</text>
-        <text>{{ dataInfo.startTime }}</text>
+        <text>{{ orderInfo.startTime }}</text>
       </view>
       <view class="stbst disflex4">
         <text class="stend">讫</text>
-        <text>{{ dataInfo.endTime }}</text>
+        <text>{{ orderInfo.endTime }}</text>
       </view>
       <view class="reson">
-        <text>停止原因：{{ dataInfo.stopReason || '--' }}</text>
+        <text>停止原因：{{ orderInfo.stopReason || '--' }}</text>
         <text>
-          SOC:{{ dataInfo.startSoc || 0 }}%-{{ dataInfo.endSoc || 0 }}%
+          SOC:{{ orderInfo.startSoc || 0 }}%-{{ orderInfo.endSoc || 0 }}%
         </text>
       </view>
       <view class="otli">
         <text>充电车辆</text>
         <view class="otmx">
-          <view>{{ dataInfo.plateNo || '--' }}</view>
+          <view>{{ orderInfo.plateNo || '--' }}</view>
           <!-- <view class="otmx_sm">北京EU5</view> -->
         </view>
       </view>
       <view class="otli">
         <text>充电时长</text>
-        <view class="otmx">{{ dataInfo.totalChargeTime || '--' }}</view>
+        <view class="otmx">{{chargeTime }}</view>
       </view>
       <view class="otli">
         <text>充电电量</text>
-        <view class="otmx">{{ dataInfo.chargePower || '--' }}度</view>
+        <view class="otmx">{{ orderInfo.totalPower || '--' }}度</view>
       </view>
       <view class="sechart" @click="orderchart">查看充电曲线</view>
     </view>
@@ -97,18 +112,28 @@
       <view class="zduan" @click="sitedetail">
         <view class="zdshop ellipsis">
           <text class="zdkind">自营</text>
-          <text>{{ dataInfo.siteName }}</text>
+          <text>{{ orderInfo.siteName }}</text>
         </view>
         <view class="zdcode">
-          <text>终端编号：{{ dataInfo.connectorNum || '--' }}</text>
-          <text class="zdcope" @click.stop="setClipboardData(dataInfo.connectorNum)">
+          <text>终端编号：{{ orderInfo.connectorNum || '--' }}</text>
+          <text
+            class="zdcope"
+            @click.stop="setClipboardData(orderInfo.connectorNum)"
+          >
             复制
           </text>
         </view>
       </view>
     </view>
-    <view v-if="dataInfo.payStatus === 2" class="paywarp">
-      <button class="surepay" :disabled="disabled" :loading="disabled" @click="handleClose">立即支付</button>
+    <view v-if="orderInfo.payStatus === 2" class="paywarp">
+      <button
+        class="surepay"
+        :disabled="disabled"
+        :loading="disabled"
+        @click="handleClose"
+      >
+        立即支付
+      </button>
     </view>
     <view class="clearit"></view>
   </view>
@@ -116,7 +141,7 @@
 
 <script>
 import { findChargeOrder, closeMemberOrder } from '@/api/member.js';
-import { throttle } from '@/common/util.js'
+import { throttle } from '@/common/util.js';
 const payStatusDict = {
   0: '已关闭',
   1: '已支付',
@@ -127,19 +152,29 @@ export default {
   data() {
     return {
       orderId: '',
-      dataInfo: {},
+      orderInfo: {},
       disabled: false,
+      countDownHour: 0,
+      countDownMinute: 0,
+      countDownSecond: 0,
       handleClose: throttle(this.closeMemberOrder)
     };
   },
   computed: {
     payStatusText() {
-      const key = this.dataInfo.payStatus;
+      const key = this.orderInfo.payStatus;
       return payStatusDict[key] || '--';
+    },
+    chargeTime() {
+      const value = this.orderInfo.chargeTime
+      if (value) {
+        return this.formatTime(value)
+      }
+      return '--'
     }
   },
   onLoad({ orderId }) {
-    this.orderId = /* '1560197580267483138' || */orderId;
+    this.orderId = orderId;
     this.findChargeOrder();
   },
   methods: {
@@ -147,19 +182,22 @@ export default {
       findChargeOrder({
         orderId: this.orderId
       }).then(({ result }) => {
-        this.dataInfo = result || {};
+        const { order, chargeInfo, electricEnergyTrend } = result;
+        this.orderInfo = order || {};
       });
     },
     closeMemberOrder() {
-      this.disabled = true
+      this.disabled = true;
       closeMemberOrder({
         orderId: this.orderId
-      }).then(({ result }) => {
-        this.$tip.success('支付成功');
-        this.findChargeOrder();
-      }).finally(() => {
-        this.disabled = false
-      });
+      })
+        .then(({ result }) => {
+          this.$tip.success('支付成功');
+          this.findChargeOrder();
+        })
+        .finally(() => {
+          this.disabled = false;
+        });
     },
     setClipboardData(data) {
       uni.setClipboardData({
@@ -169,16 +207,25 @@ export default {
         }
       });
     },
+    formatTime(time) {
+      let h = parseInt((time / 60 / 60) % 24);
+      h = h < 10 ? '0' + h : h;
+      let m = parseInt((time / 60) % 60);
+      m = m < 10 ? '0' + m : m;
+      let s = parseInt(time % 60);
+      s = s < 10 ? '0' + s : s;
+      return `${h}时${m}分${s}秒`
+    },
     // 前往充电曲线
     orderchart() {
       uni.navigateTo({
-        url: '/pages/Order/Orderchart'
+        url: `/pages/Order/Orderchart?orderId=${this.orderId}`
       });
     },
     // 前往终端详情
     sitedetail() {
       uni.navigateTo({
-        url: `/pages/Site/Sitedetail?id=${this.dataInfo.siteId}`
+        url: `/pages/Site/Sitedetail?id=${this.orderInfo.siteId}`
       });
     }
   }
@@ -398,6 +445,5 @@ export default {
   }
 }
 .order-number-box {
-  
 }
 </style>
