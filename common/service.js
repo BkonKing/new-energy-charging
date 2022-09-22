@@ -88,7 +88,9 @@ http.interceptors.response.use((response) => {
     })
     return Promise.reject(response)
   }
-  tip.toast(message)
+  if (!response.config?.header?.noToast) {
+    tip.toast(message)
+  }
   return Promise.reject(response)
 }, (response) => {
   /*  对响应错误做点什么 （statusCode !== 200）*/

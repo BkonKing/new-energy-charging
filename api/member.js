@@ -74,7 +74,11 @@ export function rechargeMember(params) {
 
 // 提现（会员）
 export function withdrawalMember(params) {
-  return http.post('/member/withdrawalMember', params)
+  return http.post('/member/withdrawalMember', params, {
+    header: {
+      noToast: 1
+    }
+  })
 }
 
 // 充电（会员）

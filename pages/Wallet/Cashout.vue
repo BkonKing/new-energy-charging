@@ -5,26 +5,14 @@
         <view>提现金额</view>
         <view class="outip disflex4">
           <text>￥</text>
-          <input
-            v-model="amount"
-            placeholder="0.00"
-            type="digit"
-            @blur="handleBlur"
-          />
+          <input v-model="amount" placeholder="0.00" type="digit" @blur="handleBlur" />
         </view>
       </view>
       <view class="cotip">
         <text>可提现金额：￥{{ balances }}</text>
         <text class="alltx" @click="cashOutAll">全部提现</text>
       </view>
-      <button
-        class="suretx"
-        :disabled="disabled"
-        :loading="disabled"
-        @click="handleSubmit"
-      >
-        2小时内到账，确定提现
-      </button>
+      <button class="suretx" :disabled="disabled" :loading="disabled" @click="handleSubmit">2小时内到账，确定提现</button>
     </view>
     <view class="cotts">
       <view>温馨提示</view>
@@ -33,21 +21,12 @@
       <view>3、6个月订单原路退回。</view>
     </view>
     <!-- 弹框 -->
-    <pop
-      ref="popA"
-      direction="below"
-      :is_close="true"
-      :is_mask="true"
-      :width="100"
-      height="fit-content"
-      :maskFun="true"
-      @watchOpen="watchOpen"
-      @watchClose="watchClose"
-    >
+    <pop ref="popA" direction="below" :is_close="true" :is_mask="true" :width="100" height="fit-content" :maskFun="true" @watchOpen="watchOpen" @watchClose="watchClose">
       <view class="tcwarp">
         <view class="taxtA">
           <view>余额提现</view>
           <view class="taxnum">{{ amount }}</view>
+          <view v-if="noAmount" class="alert-text">{{ `${canAmount}元按原路退还，${noAmount}元提现到银行卡` }}</view>
         </view>
         <scroll-view scroll-y="true" class="Dview">
           <!-- 原路返回 -->
@@ -64,38 +43,17 @@
           <view class="taxfor" @click="$refs.popB.show()" v-else>
             <text>提现至</text>
             <view class="txfid">
-              <image :src="activeBank.logo" mode="widthFix"></image>
-              <text>
-                {{ activeBank.bankName }}（{{
-                  activeBank.cardNo | cardNoSubstr
-                }}）
-              </text>
+              <image v-if="activeBank.logo" :src="activeBank.logo" mode="widthFix"></image>
+              <text>{{ activeBank.bankName || '请选择银行卡' }}{{ activeBank.cardNo | cardNoSubstr }}</text>
             </view>
           </view>
         </scroll-view>
-        <button
-          class="sureco"
-          :disabled="disabled"
-          :loading="disabled"
-          @click="handleWithdraw"
-        >
-          确认提现
-        </button>
+        <button class="sureco" :disabled="disabled" :loading="disabled" @click="handleWithdraw">确认提现</button>
       </view>
     </pop>
 
     <!-- 弹框 提现至-->
-    <pop
-      ref="popB"
-      direction="below"
-      :is_close="true"
-      :is_mask="true"
-      :width="100"
-      height="fit-content"
-      :maskFun="true"
-      @watchOpen="watchOpen"
-      @watchClose="watchClose"
-    >
+    <pop ref="popB" direction="below" :is_close="true" :is_mask="true" :width="100" height="fit-content" :maskFun="true" @watchOpen="watchOpen" @watchClose="watchClose">
       <view class="tcwarp">
         <view class="tctitle">请选择</view>
         <scroll-view scroll-y="true" class="radiowp">
@@ -103,15 +61,9 @@
             <label v-for="item in bankList" class="radioli" :key="item.id">
               <view class="radname">
                 <image :src="item.logo" mode="widthFix"></image>
-                <text>
-                  {{ item.bankName }}（{{ item.cardNo | cardNoSubstr }}）
-                </text>
+                <text>{{ item.bankName }}{{ item.cardNo | cardNoSubstr }}</text>
               </view>
-              <radio
-                :value="item.id"
-                :checked="bankId === item.id"
-                color="#33b048"
-              />
+              <radio :value="item.id" :checked="bankId === item.id" color="#33b048" />
             </label>
           </radio-group>
         </scroll-view>
@@ -124,11 +76,7 @@
 
 <script>
 import { throttle } from '@/common/util.js';
-import {
-  findMemberBanks,
-  withdrawalMember,
-  findMemberByWallet
-} from '@/api/member.js';
+import { findMemberBanks, withdrawalMember, findMemberByWallet } from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 
 export default {
@@ -148,6 +96,7 @@ export default {
       disabled: false,
       handleSubmit: throttle(this.submit),
       handleWithdraw: throttle(this.withdrawToBank),
+      canAmount: 0,
       noAmount: 0
     };
   },
@@ -162,7 +111,7 @@ export default {
   },
   filters: {
     cardNoSubstr(value) {
-      return value ? value.substr(-4, 4) : '';
+      return value ? `（${value.substr(-4, 4)}）` : '';
     }
   },
   onShow() {
@@ -221,11 +170,10 @@ export default {
         this.$tip.toast('请输入提现金额');
         return;
       }
-      if (this.bankList.length === 0) {
-        this.$refs.popB.show();
-        return;
-      }
       this.$refs.popA.show();
+      // if (this.bankList.length === 0) {
+      //   this.$refs.popB.show();
+      // }
     },
     // 弹框支付方式单选
     radioChange(event) {
@@ -252,30 +200,36 @@ export default {
       this.disabled = true;
       withdrawalMember(params)
         .then(({ result }) => {
-          if (+result.status === 1) {
-            this.toastText =
-              '您的充值订单全部超过六个月，无法原路退还，请提现到银行卡';
-            this.showToast = true;
-            this.openBank();
-            return;
-          }
-          if (+result.status === 2) {
-            this.toastText = `您有${
-              result.amount
-            }元可原路退还，剩余充值金额超过六个月无法原路返回，请提现到银行卡`;
-            // this.amount = result.noAmount;
-            this.noAmount = result.noAmount;
-            this.showToast = true;
-            this.findMemberByWallet();
-            this.openBank();
-            return;
-          }
           this.$tip.success('提交成功');
           setTimeout(() => {
             uni.navigateBack({
               delta: 1
             });
           }, 1500);
+        })
+        .catch(({ data }) => {
+          const { result, message } = data;
+          if (+result.status === 1) {
+            // this.toastText = '您的充值订单全部超过六个月，无法原路退还，请提现到银行卡';
+            // this.showToast = true;
+            // setTimeout(() => {
+            //   this.openBank();
+            // }, 1000)
+            this.openBank();
+            return;
+          }
+          if (+result.status === 2) {
+            // this.toastText = `您有${result.amount}元可原路退还，剩余充值金额超过六个月无法原路返回，请提现到银行卡`;
+            this.canAmount = result.amount;
+            this.noAmount = result.noAmount;
+            // this.showToast = true;
+            this.findMemberByWallet();
+            setTimeout(() => {
+              this.openBank();
+            }, 1000);
+            return;
+          }
+          this.$tip.toast(message)
         })
         .finally(() => {
           this.disabled = false;
@@ -284,7 +238,7 @@ export default {
     watchOpen() {},
     watchClose() {
       if (this.noAmount) {
-        this.amount = this.noAmount;
+        this.canAmount = 0;
         this.noAmount = 0;
       }
     },
@@ -552,5 +506,10 @@ export default {
   border-radius: 10rpx;
   background-color: rgba(0, 0, 0, 0.7);
   color: #fff;
+}
+
+.alert-text {
+  font-size: 28rpx;
+  color: #dd524d;
 }
 </style>
