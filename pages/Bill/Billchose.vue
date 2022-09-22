@@ -2,7 +2,6 @@
   <view class="container">
     <z-paging v-model="bcosInfo" ref="paging" :fixed="true" @query="queryList">
       <view class="bcosul">
-        <!-- 插入自己的数据-->
         <checkbox-group @change="checkboxChange">
           <label v-for="(item, index) in bcosInfo" :key="index" class="bcosli">
             <checkbox
@@ -28,13 +27,13 @@
       <view class="bcofoot" slot="bottom">
         <view>
           <view v-if="checked.length" class="bcoftnr">
-            <text>{{checked.length}}</text>
+            <text>{{ checked.length }}</text>
             个订单，共
-            <text>{{allMoney}}</text>
+            <text>{{ allMoney }}</text>
             元
           </view>
           <checkbox-group @change="checkAll">
-            <label>
+            <label class="align-items-center">
               <checkbox class="checkbox" style="transform:scale(0.8)" />
               本页全选
             </label>
@@ -47,7 +46,7 @@
 </template>
 
 <script>
-import { findOrderByMemberId } from '@/api/member.js';
+import { findMemberOrderByInvoice } from '@/api/member.js';
 export default {
   data() {
     return {
@@ -60,16 +59,15 @@ export default {
     allMoney() {
       if (this.checkData.length) {
         const sum = this.checkData.reduce((previousValue, data) => {
-          const sum = previousValue + (+data.realAmount)
-          return sum
-        }, 0)
-        return sum
+          const sum = previousValue + +data.realAmount;
+          return sum;
+        }, 0);
+        return sum.toFixed(2);
       }
-      return 0
+      return 0;
     }
   },
   methods: {
-    // 复选框
     checkboxChange({ detail }) {
       this.checked = detail.value || [];
       this.checkData = this.bcosInfo.filter(data => {
@@ -78,12 +76,12 @@ export default {
     },
     checkAll({ detail }) {
       if (!detail.value?.length) {
-        this.checked = []
-        this.checkData = []
-        return
+        this.checked = [];
+        this.checkData = [];
+        return;
       }
-      this.checkData = this.bcosInfo
-      this.checked = this.bcosInfo.map(obj => obj.id)
+      this.checkData = this.bcosInfo;
+      this.checked = this.bcosInfo.map(obj => obj.id);
     },
     // 下一步，前往下一步选择 / 开具发票
     billopen() {
@@ -92,20 +90,18 @@ export default {
         return;
       }
       uni.navigateTo({
-        url: './BillchoseB'
+        url: `./BillchoseB?id=${this.checked.join(',')}`
       });
     },
     queryList(pageNo, pageSize) {
-      findOrderByMemberId({ pageNo, pageSize, findType: 0 }).then(
-        ({ result }) => {
-          const records = result?.orderInfo?.records;
-          if (records.length > 0) {
-            this.$refs.paging.complete(records);
-          } else {
-            this.$refs.paging.complete([]);
-          }
+      findMemberOrderByInvoice({ pageNo, pageSize }).then(({ result }) => {
+        const records = result.records || [];
+        if (records.length > 0) {
+          this.$refs.paging.complete(records);
+        } else {
+          this.$refs.paging.complete([]);
         }
-      );
+      });
     }
   }
 };

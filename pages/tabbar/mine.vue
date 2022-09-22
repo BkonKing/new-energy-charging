@@ -54,9 +54,7 @@
       <view @click="renzname">
         <image src="/static/image/my_04.png" mode="widthFix"></image>
         <text>实名认证</text>
-        <text v-if="hasCertification === 1" class="ztpos">
-          已认证
-        </text>
+        <text v-if="hasCertification === 1" class="ztpos">已认证</text>
       </view>
       <view @click="renzcard">
         <image src="/static/image/my_05.png" mode="widthFix"></image>
@@ -70,9 +68,15 @@
         <image src="/static/image/my_07.png" mode="widthFix"></image>
         <text>故障报修</text>
       </view>
+    </view>
+    <view class="myliB">
       <view v-if="token" @click="changephone">
-      	<image src="/static/image/my_10.png" mode="widthFix"></image>
-      	<text>更改手机号</text>
+        <image src="/static/image/my_10.png" mode="widthFix"></image>
+        <text>更改手机号</text>
+      </view>
+      <view @click="aboutus">
+        <image src="../../static/image/my_11.png" mode="widthFix"></image>
+        <text>关于我们</text>
       </view>
       <view @click="contact">
         <image src="/static/image/my_09.png" mode="widthFix"></image>
@@ -121,8 +125,8 @@ export default {
     },
     handleLogout() {
       this.$tip.confirm('是否退出当前账号').then(() => {
-        this.logout()
-      })
+        this.logout();
+      });
     },
     logout() {
       this.$store.dispatch('logout').then(() => {
@@ -161,7 +165,7 @@ export default {
     // 前往实名认证
     renzname() {
       if (this.hasCertification) {
-        return
+        return;
       }
       uni.navigateTo({
         url: '/pages/Renz/Renzname'
@@ -209,10 +213,16 @@ export default {
         url: '/pages/Bill/Billitem'
       });
     },
-		//前往更改手机号
-		changephone() {
+    //前往更改手机号
+    changephone() {
+      uni.navigateTo({
+        url: '/pages/Mine/ChangePhone'
+      });
+    },
+		// 前往关于我们
+		aboutus() {
 			uni.navigateTo({
-				url: '/pages/Mine/ChangePhone'
+				url: '/pages/Mine/Aboutus'
 			});
 		}
   }

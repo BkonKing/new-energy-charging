@@ -3,13 +3,14 @@
     <view class="odtitle">
       <view class="disflex4">
         <text>{{ payStatusText }}</text>
-        <text v-if="orderInfo.payStatus === 2" class="weip">
+        <view v-if="orderInfo.payStatus === 2" class="weip">
           剩
           <uni-countdown
             class="weit"
             color="#333"
+            splitorColor="#333"
             :show-day="false"
-            :font-size="26"
+            :font-size="12"
             :showColon="false"
             :showDay="false"
             :hour="countDownHour"
@@ -17,7 +18,7 @@
             :second="countDownSecond"
           />
           自动结算订单
-        </text>
+        </view>
       </view>
       <view class="disflex4 order-number-box">
         <text class="order-label">
@@ -77,14 +78,14 @@
       <view class="otbig">充电信息</view>
       <view class="stbst disflex4">
         <text class="ststar">起</text>
-        <text>{{ orderInfo.startTime }}</text>
+        <text>{{ orderInfo.startTime || '--' }}</text>
       </view>
       <view class="stbst disflex4">
         <text class="stend">讫</text>
-        <text>{{ orderInfo.endTime }}</text>
+        <text>{{ orderInfo.endTime || '--' }}</text>
       </view>
       <view class="reson">
-        <text>停止原因：{{ orderInfo.stopReason || '--' }}</text>
+        <text>停止原因：{{ orderInfo.stopReason | stopReasonText }}</text>
         <text>
           SOC:{{ orderInfo.startSoc || 0 }}%-{{ orderInfo.endSoc || 0 }}%
         </text>
@@ -98,11 +99,13 @@
       </view>
       <view class="otli">
         <text>充电时长</text>
-        <view class="otmx">{{chargeTime }}</view>
+        <view class="otmx">{{ orderInfo.chargeTime | formatTime }}</view>
       </view>
       <view class="otli">
         <text>充电电量</text>
-        <view class="otmx">{{ orderInfo.totalPower || '--' }}度</view>
+        <view class="otmx">
+          {{ orderInfo.totalPower | defaultValue('度') }}
+        </view>
       </view>
       <view class="sechart" @click="orderchart">查看充电曲线</view>
     </view>
@@ -141,12 +144,38 @@
 
 <script>
 import { findChargeOrder, closeMemberOrder } from '@/api/member.js';
-import { throttle } from '@/common/util.js';
+import { throttle, secondToTime } from '@/common/util.js';
 const payStatusDict = {
   0: '已关闭',
   1: '已支付',
   2: '待支付',
   3: '执行中'
+};
+const stopReasonObj = {
+  0: '充满停止充电',
+  1: 'APP远程停止充电',
+  2: '余额不足停止充电',
+  3: '触控屏手动停止充电',
+  4: '手动刷卡停止充电',
+  5: 'APP账号停止充电',
+  6: '连接器断开停止充电',
+  7: '充电过程中拔枪停止充电',
+  8: '后台停止充电',
+
+  9: '满足设定时间停止充电',
+  10: '满足设定电量停止充电',
+  11: '满足设定金额停止充电',
+  12: '满足设定SOC停止充电',
+  13: '无有效电流停止充电',
+  14: '充电桩达到终止条件停止',
+  15: 'BMS 停止充电',
+
+  16: 'BMS异常停止充电',
+  17: '设备故障停止充电',
+  18: '电源故障停止充电',
+  19: '车辆故障停止充电',
+
+  20: '急停按钮已被按下'
 };
 export default {
   data() {
@@ -164,13 +193,11 @@ export default {
     payStatusText() {
       const key = this.orderInfo.payStatus;
       return payStatusDict[key] || '--';
-    },
-    chargeTime() {
-      const value = this.orderInfo.chargeTime
-      if (value) {
-        return this.formatTime(value)
-      }
-      return '--'
+    }
+  },
+  filters: {
+    stopReasonText(value) {
+      return stopReasonObj[value] || '--';
     }
   },
   onLoad({ orderId }) {
@@ -181,9 +208,22 @@ export default {
     findChargeOrder() {
       findChargeOrder({
         orderId: this.orderId
-      }).then(({ result }) => {
+      }).then(({ result, timestamp }) => {
         const { order, chargeInfo, electricEnergyTrend } = result;
         this.orderInfo = order || {};
+        const { payStatus, endTime } = this.orderInfo;
+        if (+payStatus !== 2) {
+          return;
+        }
+        const intervalTime = Math.floor((timestamp - new Date(endTime).getTime()) / 1000);
+        const daySecond = 24 * 60 * 60;
+        if (intervalTime < daySecond) {
+          const value = daySecond - intervalTime;
+          const { hour, minute, second } = secondToTime(value);
+          this.countDownHour = hour;
+          this.countDownMinute = minute;
+          this.countDownSecond = second;
+        }
       });
     },
     closeMemberOrder() {
@@ -206,15 +246,6 @@ export default {
           console.log('success');
         }
       });
-    },
-    formatTime(time) {
-      let h = parseInt((time / 60 / 60) % 24);
-      h = h < 10 ? '0' + h : h;
-      let m = parseInt((time / 60) % 60);
-      m = m < 10 ? '0' + m : m;
-      let s = parseInt(time % 60);
-      s = s < 10 ? '0' + s : s;
-      return `${h}时${m}分${s}秒`
     },
     // 前往充电曲线
     orderchart() {
@@ -245,6 +276,8 @@ export default {
     margin-bottom: 10rpx;
   }
   .weip {
+    display: flex;
+    align-items: center;
     font-size: 22rpx;
     color: #888;
     border: 1px solid #888;

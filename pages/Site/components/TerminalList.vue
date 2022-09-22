@@ -60,12 +60,12 @@
           </view>
           <view>
             <text>电流</text>
-            <text>最大{{ item.currentUpperLimits || '--' }}A</text>
+            <text>最大{{ item.currentUpperLimits | defaultValue('A') }}</text>
           </view>
           <view>
             <text>电压</text>
             <text>
-              {{ item.voltageLowerLimits || 0 }}V-{{ item.voltageUpperLimits || '--' }}V
+              {{ item.voltageLowerLimits | defaultValue('V') }}-{{ item.voltageUpperLimits  | defaultValue('V') }}
             </text>
           </view>
           <view>
@@ -74,7 +74,7 @@
           </view>
           <view class="ter_nr">
             <text>{{ item.equipmentType | electricityType }}</text>
-            <text>| 最大功率{{ item.powerUpperLimits || '--'  }}KW</text>
+            <text>| 最大功率{{ item.powerUpperLimits | defaultValue('KW')  }}</text>
             <text v-if="item.nationalStandard">
               | {{ item.nationalStandard }}
             </text>
@@ -190,6 +190,12 @@ export default {
     },
     connectorStatusText(key) {
       return connectorStatus[key];
+    },
+    defaultValue(value, unit) {
+      if (value || value === 0) {
+        return `${value}${unit}`
+      }
+      return '--'
     }
   },
   computed: {

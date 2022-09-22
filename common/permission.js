@@ -1,39 +1,3 @@
-import {
-  getLocationInfo
-} from './util'
-
-export class systemPermission {
-  constructor() {
-    this.x = x;
-    this.y = y;
-  }
-
-  /**
-   * 判断是否有权限
-   * @param {string} perm 权限名
-   * @return {Object} 查询权限结果
-   * {scope.address: true}
-   */
-  hasPermission(perm) {
-    return new Promise((resolve, reject) => {
-      uni.getSetting({
-        success(res) {
-          const setting = res.authSetting
-          const key = `scope.${perm}`
-          if (setting[key]) {
-            resolve(true, setting)
-            return
-          }
-          reject()
-        },
-        fail() {
-          reject()
-        }
-      })
-    })
-  }
-}
-
 /*  scope.userInfo	uni.getUserInfo	用户信息	
     scope.userLocation	uni.getLocation, uni.chooseLocation	地理位置	
     scope.userLocationBackground	wx.userLocationBackground	后台定位	微信小程序
@@ -114,7 +78,6 @@ export function hasPermission(perm) {
       success(res) {
         const setting = res.authSetting
         const key = `scope.${perm}`
-        console.log('setting', res);
         if (setting[key]) {
           resolve(true, setting)
           return

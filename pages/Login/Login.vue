@@ -26,7 +26,9 @@
         <!-- #endif -->
         <view class="wxiey">
           登录即同意
-          <text>《逸充新能源使用协议》</text>
+          <text @click.stop="agreeYs">《隐私协议》</text>
+          和
+          <text @click.stop="agreeUse">《使用协议》</text>
         </view>
       </template>
     </view>
@@ -108,23 +110,25 @@ export default {
       });
     },
     login() {
-      this.$store.dispatch('login', {
-        wxCode: this.wxCode,
-        userInfo: this.userInfo,
-        phoneInfo: this.phoneInfo,
-        // wxSession: this.wxSession
-      }).then(() => {
-        this.$tip.success('登录成功')
-        uni.navigateBack({
-          delta: 1
+      this.$store
+        .dispatch('login', {
+          wxCode: this.wxCode,
+          userInfo: this.userInfo,
+          phoneInfo: this.phoneInfo
+          // wxSession: this.wxSession
         })
-      });
+        .then(() => {
+          this.$tip.success('登录成功');
+          uni.navigateBack({
+            delta: 1
+          });
+        });
     },
     setPhoneNumber(params) {
       getPhoneNumber(params).then(({ result }) => {
         console.log('result', result);
         this.phoneInfo = result || {};
-        this.login()
+        this.login();
       });
     },
     getSession() {
@@ -161,7 +165,19 @@ export default {
     goBack() {
       uni.navigateBack({
         delta: 1
-      })
+      });
+    },
+    // 前往隐私协议
+    agreeYs() {
+      uni.navigateTo({
+        url: '/pages/Other/AgreeYs'
+      });
+    },
+    // 前往使用协议
+    agreeUse() {
+      uni.navigateTo({
+        url: '/pages/Other/AgreeUse'
+      });
     }
   }
 };

@@ -44,6 +44,18 @@
       "style": {
         "navigationBarTitleText": "登录"
       }
+    },
+    {
+      "path": "pages/Other/AgreeYs",
+      "style": {
+        "navigationBarTitleText": "隐私协议"
+      }
+    },
+    {
+      "path": "pages/Other/AgreeUse",
+      "style": {
+        "navigationBarTitleText": "使用协议"
+      }
     }
   ],
   "subPackages": [{
@@ -100,6 +112,12 @@
         "path": "Txdetail",
         "style": {
           "navigationBarTitleText": "明细"
+        }
+      },
+      {
+        "path": "Wtdetail",
+        "style": {
+          "navigationBarTitleText": "详情"
         }
       },
       {
@@ -233,10 +251,10 @@
         }
       },
       {
-      	"path": "BillchoseB",
-      	"style": {
-      		"navigationBarTitleText": "选择订单"
-      	}
+        "path": "BillchoseB",
+        "style": {
+          "navigationBarTitleText": "选择订单"
+        }
       },
       {
         "path": "Billopen",
@@ -251,10 +269,10 @@
         }
       },
       {
-      	"path": "Billinclure",
-      	"style": {
-      		"navigationBarTitleText": "所含订单"
-      	}
+        "path": "Billinclure",
+        "style": {
+          "navigationBarTitleText": "所含订单"
+        }
       },
       {
         "path": "Billdetail",
@@ -283,12 +301,18 @@
           "navigationBarTitleText": "联系客服"
         }
       },
-	  {
-	  	"path": "ChangePhone",
-	  	"style": {
-	  		"navigationBarTitleText": "更改手机号"
-	  	}
-	  }
+      {
+        "path": "ChangePhone",
+        "style": {
+          "navigationBarTitleText": "更改手机号"
+        }
+      },
+      {
+        "path": "Aboutus",
+        "style": {
+          "navigationBarTitleText": "关于我们"
+        }
+      }
     ]
   }],
   "globalStyle": {
@@ -377,6 +401,10 @@
     }, {
       "name": "发票详情",
       "path": "pages/Bill/Billdetail",
+      "query": ""
+    }, {
+      "name": "开发票",
+      "path": "pages/Bill/Billopen",
       "query": ""
     }]
   }

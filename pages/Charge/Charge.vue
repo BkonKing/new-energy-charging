@@ -14,7 +14,7 @@
     <!-- 充电汽车切换 -->
     <view class="carul disflex5">
       <text @click="$refs.pop.show()">
-        设备编码：{{ orderInfo.connectorNum || '--' }}
+        设备编码：{{ connectorNum || '--' }}
       </text>
       <image
         src="/static/image/arrow_03.png"
@@ -57,12 +57,14 @@
     <view class="Timesul">
       <div class="cTimes">
         <uni-countdown
+          v-if="remainTime"
           :show-day="false"
           :font-size="40"
           :hour="countDownHour"
           :minute="countDownMinute"
           :second="countDownSecond"
         />
+        <text v-else class="un-count-down">--:--:--</text>
       </div>
       <view class="sTimes disflex5">
         <text>正在充电中，已充电</text>
@@ -78,7 +80,7 @@
     <view class="cFeiy disflex">
       <view>
         <text>实时费用</text>
-        <text class="wonum">{{ chargeInfo.electricAmount || '--' }}</text>
+        <text class="wonum">{{ realTimeAmount }}</text>
       </view>
       <view @click="goCashin">
         <text>账户余额</text>
@@ -91,22 +93,22 @@
       <view>
         <text>电压</text>
         <text class="wonum">
-          {{ chargeInfo.outputVoltage || 0 }}
-          <text class="snum">v /--v</text>
+          {{ outputVoltage }} / --
+          <!-- <text class="snum"> /--</text> -->
         </text>
       </view>
       <view>
         <text>功率</text>
         <text class="wonum">
-          {{ chargeInfo.outputPower || 0 }}
-          <text class="snum">kW /--kW</text>
+          {{ outputPower }} / --
+          <!-- <text class="snum"> /--</text> -->
         </text>
       </view>
       <view>
         <text>电流</text>
         <text class="wonum">
-          {{ chargeInfo.outputElectricity || 0 }}
-          <text class="snum">A /--A</text>
+          {{ outputElectricity }} / --
+          <!-- <text class="snum"> /--</text> -->
         </text>
       </view>
     </view>
@@ -146,12 +148,12 @@
         <view class="uctitle">
           <view>
             <text>实际输出电压</text>
-            <text>392.90V</text>
+            <text>{{ outputVoltage }}</text>
           </view>
-          <view>
+          <!-- <view>
             <text>所需电压</text>
             <text>421V</text>
-          </view>
+          </view> -->
         </view>
         <view style="height: 250px;">
           <qiun-data-charts
@@ -167,12 +169,12 @@
         <view class="uctitle">
           <view>
             <text>实际输出功率</text>
-            <text>0kW</text>
+            <text>{{ outputPower }}</text>
           </view>
-          <view>
+          <!-- <view>
             <text>所需功率</text>
             <text>0kW</text>
-          </view>
+          </view> -->
         </view>
         <view style="height: 250px;">
           <qiun-data-charts
@@ -188,12 +190,12 @@
         <view class="uctitle">
           <view>
             <text>实际输出电流</text>
-            <text>10A</text>
+            <text>{{ outputElectricity }}</text>
           </view>
-          <view>
+          <!-- <view>
             <text>所需电流</text>
             <text>10A</text>
-          </view>
+          </view> -->
         </view>
         <view style="height: 250px;">
           <qiun-data-charts
@@ -271,6 +273,7 @@ export default {
       // 数据图标tab页面
       showType: 1,
       chartDataDY: {}, //电压
+      remainTime: 0,
       optsDY: {
         color: ['#FAC858', '#EE6666'],
         padding: [0, 10, 0, 0],
@@ -435,6 +438,7 @@ export default {
     // 传感器chart数据
     gaugeOption() {
       const soc = this.chargeInfo.soc || 0;
+      const chargePower = this.chargeInfo.chargePower || 0;
       return {
         id: 'gaugeId1',
         bgColor: 'rgba(255,255,255,1)',
@@ -447,7 +451,7 @@ export default {
         max: 100,
         value: soc,
         unit: '%',
-        name: `已充${soc}度`,
+        name: `已充${chargePower}度`,
         detail: {
           //数值单位设置
           title: {
@@ -495,6 +499,30 @@ export default {
           }
         ]
       };
+    },
+    realTimeAmount() {
+      let { electricityAmount, serviceAmount } = this.chargeInfo;
+      if (electricityAmount === undefined || electricityAmount === null) {
+        return '--';
+      }
+      electricityAmount = +this.chargeInfo.electricityAmount || 0;
+      serviceAmount = +this.chargeInfo.serviceAmount || 0;
+      const realTimeAmount = (electricityAmount + serviceAmount).toFixed(2);
+      return realTimeAmount;
+    },
+    outputVoltage() {
+      const outputVoltage = this.chargeInfo.outputVoltage;
+      return outputVoltage || outputVoltage === 0 ? `${outputVoltage}V` : '--';
+    },
+    outputPower() {
+      const outputPower = this.chargeInfo.outputPower;
+      return outputPower || outputPower === 0 ? `${outputPower}KW` : '--';
+    },
+    outputElectricity() {
+      const outputElectricity = this.chargeInfo.outputElectricity;
+      return outputElectricity || outputElectricity === 0
+        ? `${outputElectricity}A`
+        : '--';
     }
   },
   filters: {
@@ -526,9 +554,10 @@ export default {
     pollOrder(ts = 15000) {
       this.clearPoll();
       this.pollTimer = setTimeout(() => {
-        this.findChargeOrder().then(() => {
+        this.findChargeOrder().finally(() => {
           this.pollOrder(ts);
         });
+        this.findOrderByMemberId()
       }, ts);
     },
     clearPoll() {
@@ -552,7 +581,7 @@ export default {
         }
         this.orderInfo = order || {};
         this.chargeInfo = chargeInfo || {};
-        this.$refs.countup.start(chargeInfo.totalTime * 60 || 0);
+        this.$refs.countup.start(chargeInfo.totalTime || 0);
         this.setCountDown(chargeInfo.remainTime);
         if (electricEnergyTrend && electricEnergyTrend.length) {
           this.setChartsData(electricEnergyTrend);
@@ -561,9 +590,10 @@ export default {
       });
     },
     setCountDown(remainTime) {
-      this.countDownHour = Math.ceil(remainTime / 60);
-      this.countDownMinute = Math.ceil(remainTime % 60);
-      this.countDownSecond = 0;
+      this.remainTime = remainTime;
+      this.countDownHour = Math.floor(remainTime / 3600);
+      this.countDownMinute = Math.floor((remainTime / 60) % 60);
+      this.countDownSecond = Math.floor(remainTime % 60);
     },
     findOrderByMemberId() {
       findOrderByMemberId({
@@ -593,6 +623,7 @@ export default {
     },
     popchose(data) {
       this.orderId = data.id;
+      this.connectorNum = data.connectorNum;
       this.findChargeOrder();
       this.$refs.pop.close();
     },
@@ -1000,5 +1031,8 @@ export default {
     width: 100rpx;
     height: 100rpx;
   }
+}
+.un-count-down {
+  font-size: 50rpx;
 }
 </style>

@@ -5,15 +5,15 @@
         class="dep_ul"
         v-for="(item, index) in bhistory"
         :key="index"
-        @click="billdetail"
+        @click="goDetail(item)"
       >
         <view class="dep_title">
-          <text>2022-04-06 12:23:33</text>
-          <text>已开票</text>
+          <text>{{item.createTime || '--'}}</text>
+          <text>{{item.status | statusText}}</text>
         </view>
         <view class="dep_nr">
           <text>电子发票</text>
-          <text>￥300.00</text>
+          <text>￥{{item.invoiceAmount}}</text>
         </view>
       </view>
     </z-paging>
@@ -21,31 +21,40 @@
 </template>
 
 <script>
-import { findOrderByMemberId } from '@/api/member.js';
+import { findMemberHisInvoice } from '@/api/member.js';
+
+const statusObj = {
+  1: '已开票',
+  0: '开票失败',
+  2: '开票中',
+}
+
 export default {
   data() {
     return {
       bhistory: []
     };
   },
+  filters: {
+    statusText(value) {
+      return statusObj[value];
+    }
+  },
   created() {},
   methods: {
     queryList(pageNo, pageSize) {
-      findOrderByMemberId({ pageNo, pageSize, findType: 0 }).then(
-        ({ result }) => {
-          const records = result?.orderInfo?.records;
-          if (records.length > 0) {
-            this.$refs.paging.complete(records);
-          } else {
-            this.$refs.paging.complete([]);
-          }
+      findMemberHisInvoice({ pageNo, pageSize }).then(({ result }) => {
+        const records = result?.records || [];
+        if (records.length > 0) {
+          this.$refs.paging.complete(records);
+        } else {
+          this.$refs.paging.complete([]);
         }
-      );
+      });
     },
-    // 下一步，前往发票详情
-    billdetail: function() {
+    goDetail({ id }) {
       uni.navigateTo({
-        url: './Billdetail'
+        url: `./Billdetail?id=${id}`
       });
     }
   }

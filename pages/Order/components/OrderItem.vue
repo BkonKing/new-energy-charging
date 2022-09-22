@@ -29,10 +29,23 @@
       </view>
       <view class="stprice">
         <text>
-          ￥
-          <text class="stbum">{{ data.realAmount || '--' }}</text>
+          <template v-if="data.realAmount !== null && data.realAmount !== ''">
+            ￥
+            <text class="stbum">{{ data.realAmount }}</text>
+          </template>
+          <template v-else>
+            --
+          </template>
         </text>
-        <text>| {{ data.totalPower || '--' }}度</text>
+        <text>
+          |
+          <template v-if="data.totalPower !== null && data.totalPower !== ''">
+            {{ data.totalPower }}度
+          </template>
+          <template v-else>
+            --
+          </template>
+        </text>
       </view>
     </view>
   </view>
@@ -59,7 +72,7 @@ export default {
   },
   computed: {
     statusClassName() {
-      return `pay-status-${this.data.payStatus}`
+      return `pay-status-${this.data.payStatus}`;
     }
   },
   filters: {
@@ -81,7 +94,9 @@ export default {
         });
         return;
       }
-      this.goOrderDetail();
+      if (![0, 2].includes(this.data.chargeStatus)) {
+        this.goOrderDetail();
+      }
     },
     // 前往订单详情
     goOrderDetail() {
@@ -136,10 +151,11 @@ export default {
       padding-right: 25rpx;
     }
     .pay-status-0 {
-        color: #999;
+      color: #999;
     }
-    .pay-status-2, .pay-status-3 {
-        color: #dd524d;
+    .pay-status-2,
+    .pay-status-3 {
+      color: #dd524d;
     }
   }
   .stkind {

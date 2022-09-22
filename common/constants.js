@@ -9,6 +9,8 @@ export const WHITELIST = [
   '/pages/tabbar/wait',
   '/pages/tabbar/mine',
   '/pages/login/login',
+  '/pages/Other/AgreeYs',
+  '/pages/Other/AgreeUse',
 ]
 
 export const qqScaleObj = {

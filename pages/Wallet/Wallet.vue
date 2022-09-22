@@ -53,7 +53,7 @@
             :class="{ wtxbg: item.payType === 2 }"
             @click="goTxdetail(item)"
           >
-            <view class="w-70">
+            <view class="w-60">
               <view class="wbtou">
                 {{ item.payType | payTypeText }}
                 <text
@@ -168,6 +168,10 @@ export default {
       if (data.payType === '2') {
         uni.navigateTo({
           url: `/pages/Wallet/Txdetail?id=${data.id}`
+        });
+      } else {
+        uni.navigateTo({
+          url: `/pages/Wallet/Wtdetail?id=${data.id}`
         });
       }
     },

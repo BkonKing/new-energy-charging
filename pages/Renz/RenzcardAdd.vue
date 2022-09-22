@@ -28,7 +28,7 @@
 				<button class="yzmi">获取验证码</button>
 			</view> -->
     </view>
-    <view class="agrcd disflex4">
+    <!-- <view class="agrcd disflex4">
       <checkbox-group @change="changeCheck">
         <label>
           <checkbox :checked="isCheck" class="checkbox" style="transform:scale(0.7)" />
@@ -36,7 +36,7 @@
           <text>《逸充新能源支付协议》</text>
         </label>
       </checkbox-group>
-    </view>
+    </view> -->
     <button class="surerz" :disabled="disabled" :loading="disabled" @click="handleSubmit">立即绑定</button>
   </view>
 </template>
@@ -67,10 +67,10 @@ export default {
       this.isCheck = !!detail.value.length;
     },
     submit() {
-      if (!this.isCheck) {
-        this.$tip.toast('请阅读并同意支付协议');
-        return;
-      }
+      // if (!this.isCheck) {
+      //   this.$tip.toast('请阅读并同意支付协议');
+      //   return;
+      // }
       const validator = [
         // {
         //   value: this.bankName,

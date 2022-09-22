@@ -25,7 +25,7 @@
           <view class="fcmd">
             <cCircle :percent="item.soc" :animation="true">
               <span slot="content" class="cmdtx">
-                <text>{{ item.soc || '--' }}%</text>
+                <text>{{item.soc | defaultValue('%')}}</text>
               </span>
             </cCircle>
           </view>
@@ -34,16 +34,24 @@
             <view class="fcsm">
               <text>
                 实时费用：
-                <text class="fcfont">{{ item.realAmount || '--' }}元</text>
+                <text class="fcfont">
+                  {{item.realTimeAmount | defaultValue('元')}}
+                </text>
               </text>
               <text>
                 预计剩余：
-                <text class="fcfont">{{ item.remainChargeTime || '--' }}</text>
+                <text class="fcfont">
+                  {{item.remainChargeTime | formatTime}}
+                </text>
               </text>
             </view>
           </view>
         </view>
-        <view v-if="orderList && orderList.length > 1" class="expand-icon" @click="changeExpand">
+        <view
+          v-if="orderList && orderList.length > 1"
+          class="expand-icon"
+          @click="changeExpand"
+        >
           <uni-icons type="bottom" size="20"></uni-icons>
         </view>
       </view>
@@ -110,7 +118,7 @@
 import { findSiteByCoordinate, findSiteById } from '@/api/site.js';
 import { findOrderByMemberId } from '@/api/member.js';
 import CustomTabBar from '@/components/CustomTabBar/CustomTabBar.vue';
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import SiteCard from '@/modules/SiteCard.vue';
 import { qqScaleObj } from '@/common/constants.js';

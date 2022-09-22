@@ -17,14 +17,14 @@
         <view class="fcname ellipsis">{{ siteData.siteName }}</view>
         <view class="fctips fpd20">
           <!-- <text class="xying">歇业中</text> -->
-          <text>{{ siteData.businessType }}</text>
-          <text>{{ siteData.operateType }}</text>
+          <text v-if="siteData.businessType">{{ siteData.businessType }}</text>
+          <text v-if="siteData.operateType">{{ siteData.operateType }}</text>
         </view>
         <view class="fpd20">
-          <view class="fctime">营业时间：{{ businessTime }}</view>
+          <view class="fctime">营业时间：{{ businessTime || '--' }}</view>
         </view>
         <view class="fpd20">
-          <view class="fclw">最大功率{{ siteData.powerUpperLimits }}KW</view>
+          <view class="fclw">最大功率：{{ powerUpperLimits }}</view>
         </view>
         <view class="fcsta" @click="gomap">
           <view class="dadr">{{ siteData.address }}</view>
@@ -217,11 +217,18 @@ export default {
       }
       return '';
     },
+    powerUpperLimits() {
+      const {powerUpperLimits} = this.siteData
+      if (powerUpperLimits || powerUpperLimits === 0) {
+        return `${powerUpperLimits}KW`
+      }
+      return '--'
+    },
     businessTime() {
       if (this.siteData.businessTime) {
         return this.siteData.businessTime.split(',').join(' ~ ');
       }
-      return '';
+      return '--';
     },
     currentPostageIndex() {
       const { startTime, endTime } = this.siteData;

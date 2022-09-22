@@ -2,11 +2,17 @@ import Vue from 'vue'
 import App from './App'
 import {router,RouterMount} from './router/index.js'  //路径换成自己的
 import store from './store'
+import * as filters from './filters' // 全局filter
 import tip from './common/tip.js'
 
 Vue.config.productionTip = false
 Vue.prototype.$tip = tip;
 App.mpType = 'app'
+
+// 注册全局实用过滤器
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
 
 Vue.use(router)
 

@@ -2,64 +2,74 @@
   <view class="container">
     <view class="botitle">
       <text>电子发票</text>
-      <text class="bstatus">已开票</text>
+      <text class="bstatus">{{invoiceInfo.status | statusText}}</text>
     </view>
     <view class="pd24">
       <view class="boitem">
         <text>发票抬头</text>
-        <text>附件逸充物联网科技有限公司</text>
+        <text>{{ invoiceInfo.invoiceTitle }}</text>
       </view>
       <view class="boitem">
         <text>纳税号码</text>
-        <text>454654354545</text>
+        <text>{{ invoiceInfo.invoiceTaxNo }}</text>
       </view>
       <view class="boitem">
         <text>发票金额</text>
-        <text>300.00元</text>
+        <text>{{ invoiceInfo.invoiceAmount || 0 }}元</text>
       </view>
       <view class="boitem">
-        <text>申请事件</text>
-        <text>2022-04-06 12:23:33</text>
+        <text>申请时间</text>
+        <text>{{ invoiceInfo.createTime }}</text>
       </view>
-      <view class="boitem">
+      <view v-if="invoiceInfo.vatTelphone" class="boitem">
         <text>电话号码</text>
-        <text>13800000000</text>
+        <text>{{ invoiceInfo.vatTelphone }}</text>
       </view>
-      <view class="boitem">
+      <view v-if="invoiceInfo.vatCompanyAddress" class="boitem">
         <text>单位地址</text>
-        <text>福建声卡街坊邻居</text>
+        <text>{{ invoiceInfo.vatCompanyAddress }}</text>
       </view>
-      <view class="boitem">
+      <view v-if="invoiceInfo.vatBankAccount" class="boitem">
         <text>银行账号</text>
-        <text>6222000012340236123</text>
+        <text>{{ invoiceInfo.vatBankAccount }}</text>
       </view>
-      <view class="boitem">
+      <view v-if="invoiceInfo.vatBankName" class="boitem">
         <text>开户银行</text>
-        <text>中国工商银行五一支行</text>
+        <text>{{ invoiceInfo.vatBankName }}</text>
+      </view>
+      <view v-if="invoiceInfo.invoiceRemark" class="boitem">
+        <text>备注</text>
+        <text>{{ invoiceInfo.invoiceRemark }}</text>
       </view>
     </view>
     <view class="botitle">接收信息</view>
     <view class="pd24">
       <view class="boitem">
         <text>电子邮件</text>
-        <text>123@123.com</text>
+        <text>{{ invoiceInfo.email }}</text>
       </view>
     </view>
     <view class="pd24 bord" @click="billinclure">
-      <view>1张发票，含4个订单</view>
+      <view>1张发票，含{{ invoiceInfo.relOrderNum || 0 }}个订单</view>
     </view>
     <view class="clearw"></view>
-    <view class="wfoot">
+    <view v-if="invoiceInfo.status !== 2" class="wfoot">
       <button class="combutton" @click="repeatSent()">重发发票</button>
     </view>
     <!-- 提现弹框 -->
-    <view class="maskbg" v-if="mshow">
+    <view v-if="mshow" class="maskbg">
       <view class="swarp">
         <view class="stitle">重发发票</view>
-        <input placeholder="请输入电子邮件" />
+        <input v-model="email" placeholder="请输入电子邮件" />
         <view class="sbtv">
           <button class="cancel" @click="Sentcancel()">取消</button>
-          <button>提交</button>
+          <button
+            :disabled="disabled"
+            :loading="disabled"
+            @click="handleSubmit"
+          >
+            提交
+          </button>
         </view>
       </view>
     </view>
@@ -67,30 +77,69 @@
 </template>
 
 <script>
+import { findMemberInvoiceDetail } from '@/api/member.js';
+import { throttle } from '@/common/util.js';
+
+const statusObj = {
+  1: '已开票',
+  0: '开票失败',
+  2: '开票中',
+}
+
 export default {
   components: {},
   data() {
     return {
-      mshow: false
+      mshow: false,
+      invoiceInfo: {},
+      email: '',
+      disabled: false,
+      handleSubmit: throttle(this.submit)
     };
   },
-  onLoad() {},
+  filters: {
+    statusText(value) {
+      return statusObj[value];
+    }
+  },
+  onLoad({ id }) {
+    this.id = id;
+    this.findMemberInvoiceDetail();
+  },
   methods: {
+    findMemberInvoiceDetail() {
+      findMemberInvoiceDetail({
+        id: this.id
+      }).then(({ result }) => {
+        this.invoiceInfo = result || {};
+      });
+    },
     // 弹框
     watchOpen() {},
     watchClose() {},
     // 点击重新发票
     repeatSent() {
+      this.email = '';
       this.mshow = true;
     },
     // 点击弹框取消按钮
     Sentcancel() {
       this.mshow = false;
     },
+    submit() {
+      if (!this.email) {
+        this.$tip.toast('请输入电子邮件')
+        return
+      }
+      this.disabled = true;
+      Promise.finally(() => {
+        this.disabled = false;
+      });
+    },
     //前往所含订单
     billinclure() {
       uni.navigateTo({
-        url: './Billinclure'
+        url: `./Billinclure?id=${this.invoiceInfo.id}`
       });
     }
   }

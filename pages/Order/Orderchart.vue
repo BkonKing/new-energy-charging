@@ -75,8 +75,6 @@ export default {
           gridColor: '#eee',
           dashLength: 2,
           splitNumber: 6,
-          min: -5,
-          max: 40,
           format: val => {
             return val.toFixed(0) + 'KW';
           }
@@ -126,8 +124,6 @@ export default {
           gridColor: '#eee',
           dashLength: 2,
           splitNumber: 6,
-          min: 0,
-          max: 500,
           format: val => {
             return val.toFixed(0) + 'KW';
           }
@@ -177,8 +173,6 @@ export default {
           gridColor: '#eee',
           dashLength: 2,
           splitNumber: 6,
-          min: 0,
-          max: 100,
           format: val => {
             return val.toFixed(0) + 'KW';
           }

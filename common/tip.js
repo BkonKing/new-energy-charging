@@ -30,7 +30,7 @@ export default class Tips {
   /**
    * 弹出确认窗口
    */
-  static confirm(text,showCancel, payload = {}, title = "提示") {
+  static confirm(text, showCancel, payload = {}, title = "提示") {
     return new Promise((resolve, reject) => {
       uni.showModal({
         title: title,
@@ -56,7 +56,7 @@ export default class Tips {
         title: title,
         icon: icon,
         mask: true,
-        duration:1000
+        duration: 2000
       });
     }, 300);
 

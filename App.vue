@@ -67,4 +67,8 @@ uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked:before,
 .carstyle .uni-indexed-list {
 	top: 120rpx !important;
 }
+button[disabled] ,
+uni-button[disabled]  {
+  opacity: 0.6;
+}
 </style>

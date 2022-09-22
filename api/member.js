@@ -123,3 +123,53 @@ export function closeMemberOrder(params) {
 export function submitMemberRepair(params) {
   return http.post('/member/submitMemberRepair', params)
 }
+
+// 修改手机号短信发送（会员）
+export function sendSms(params) {
+  return http.post('/member/sms/code/send', params)
+}
+
+// 修改手机号（会员）
+export function updatePhone(params) {
+  return http.post('/member/updatePhone', params)
+}
+
+// 可开发票订单列表（会员）
+export function findMemberOrderByInvoice(params) {
+  return http.get('/member/findMemberOrderByInvoice', {
+    params
+  })
+}
+
+// 可开发票订单列表（会员）
+export function findMemberOrderByNextInvoice(params) {
+  return http.get('/member/findMemberOrderByNextInvoice', {
+    params
+  })
+}
+
+// 已开票查询列表（会员）
+export function findMemberHisInvoice(params) {
+  return http.get('/member/findMemberHisInvoice', {
+    params
+  })
+}
+
+// 发票详情（会员）
+export function findMemberInvoiceDetail(params) {
+  return http.get('/member/findMemberInvoiceDetail', {
+    params
+  })
+}
+
+// 发票关联订单列表（会员）
+export function findMemberInvoiceForOrdersRel(params) {
+  return http.get('/member/findMemberInvoiceForOrdersRel', {
+    params
+  })
+}
+
+// 发票保存（会员）
+export function saveMemberInvoice(params) {
+  return http.post('/member/saveMemberInvoice', params)
+}
