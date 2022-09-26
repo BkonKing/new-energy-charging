@@ -9,7 +9,7 @@
         <text>发票抬头</text>
         <text>{{ invoiceInfo.invoiceTitle }}</text>
       </view>
-      <view class="boitem">
+      <view v-if="invoiceInfo.invoiceTaxNo" class="boitem">
         <text>纳税号码</text>
         <text>{{ invoiceInfo.invoiceTaxNo }}</text>
       </view>
@@ -21,21 +21,21 @@
         <text>申请时间</text>
         <text>{{ invoiceInfo.createTime }}</text>
       </view>
-      <view v-if="invoiceInfo.vatTelphone" class="boitem">
+      <view v-if="invoiceInfo.invoiceTelphone" class="boitem">
         <text>电话号码</text>
-        <text>{{ invoiceInfo.vatTelphone }}</text>
+        <text>{{ invoiceInfo.invoiceTelphone }}</text>
       </view>
-      <view v-if="invoiceInfo.vatCompanyAddress" class="boitem">
+      <view v-if="invoiceInfo.invoiceAddress" class="boitem">
         <text>单位地址</text>
-        <text>{{ invoiceInfo.vatCompanyAddress }}</text>
+        <text>{{ invoiceInfo.invoiceAddress }}</text>
       </view>
-      <view v-if="invoiceInfo.vatBankAccount" class="boitem">
+      <view v-if="invoiceInfo.invoiceBankAccount" class="boitem">
         <text>银行账号</text>
-        <text>{{ invoiceInfo.vatBankAccount }}</text>
+        <text>{{ invoiceInfo.invoiceBankAccount }}</text>
       </view>
-      <view v-if="invoiceInfo.vatBankName" class="boitem">
+      <view v-if="invoiceInfo.invoiceBankName" class="boitem">
         <text>开户银行</text>
-        <text>{{ invoiceInfo.vatBankName }}</text>
+        <text>{{ invoiceInfo.invoiceBankName }}</text>
       </view>
       <view v-if="invoiceInfo.invoiceRemark" class="boitem">
         <text>备注</text>
@@ -53,9 +53,9 @@
       <view>1张发票，含{{ invoiceInfo.relOrderNum || 0 }}个订单</view>
     </view>
     <view class="clearw"></view>
-    <view v-if="invoiceInfo.status !== 2" class="wfoot">
+    <!-- <view v-if="invoiceInfo.status === 1" class="wfoot">
       <button class="combutton" @click="repeatSent()">重发发票</button>
-    </view>
+    </view> -->
     <!-- 提现弹框 -->
     <view v-if="mshow" class="maskbg">
       <view class="swarp">

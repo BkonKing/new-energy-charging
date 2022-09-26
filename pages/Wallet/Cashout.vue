@@ -5,28 +5,54 @@
         <view>提现金额</view>
         <view class="outip disflex4">
           <text>￥</text>
-          <input v-model="amount" placeholder="0.00" type="digit" @blur="handleBlur" />
+          <input
+            v-model="amount"
+            placeholder="0.00"
+            type="digit"
+            @blur="handleBlur"
+          />
         </view>
       </view>
       <view class="cotip">
         <text>可提现金额：￥{{ balances }}</text>
         <text class="alltx" @click="cashOutAll">全部提现</text>
       </view>
-      <button class="suretx" :disabled="disabled" :loading="disabled" @click="handleSubmit">2小时内到账，确定提现</button>
+      <button
+        class="suretx"
+        :disabled="disabled"
+        :loading="disabled"
+        @click="handleSubmit"
+      >
+        2小时内到账，确定提现
+      </button>
     </view>
     <view class="cotts">
       <view>温馨提示</view>
       <view>1、存在未结束订单时无法进行提现操作。</view>
       <view>2、充值金额涉及充值优惠，退款时扣除相应的优惠金额。</view>
       <view>3、6个月订单原路退回。</view>
+      <view>4、提现到银行卡限制一天只能提现一次。</view>
+      <view>5、付款至银行卡到账时间 为1-3日内，具体以银行到账时间为准。</view>
     </view>
     <!-- 弹框 -->
-    <pop ref="popA" direction="below" :is_close="true" :is_mask="true" :width="100" height="fit-content" :maskFun="true" @watchOpen="watchOpen" @watchClose="watchClose">
+    <pop
+      ref="popA"
+      direction="below"
+      :is_close="true"
+      :is_mask="true"
+      :width="100"
+      height="fit-content"
+      :maskFun="true"
+      @watchOpen="watchOpen"
+      @watchClose="watchClose"
+    >
       <view class="tcwarp">
         <view class="taxtA">
           <view>余额提现</view>
           <view class="taxnum">{{ amount }}</view>
-          <view v-if="noAmount" class="alert-text">{{ `${canAmount}元按原路退还，${noAmount}元提现到银行卡` }}</view>
+          <view v-if="noAmount" class="alert-text">
+            {{ `${canAmount}元按原路退还，${noAmount}元提现到银行卡` }}
+          </view>
         </view>
         <scroll-view scroll-y="true" class="Dview">
           <!-- 原路返回 -->
@@ -43,17 +69,41 @@
           <view class="taxfor" @click="$refs.popB.show()" v-else>
             <text>提现至</text>
             <view class="txfid">
-              <image v-if="activeBank.logo" :src="activeBank.logo" mode="widthFix"></image>
-              <text>{{ activeBank.bankName || '请选择银行卡' }}{{ activeBank.cardNo | cardNoSubstr }}</text>
+              <image
+                v-if="activeBank.logo"
+                :src="activeBank.logo"
+                mode="widthFix"
+              ></image>
+              <text>
+                {{ activeBank.bankName || '请选择银行卡'
+                }}{{ activeBank.cardNo | cardNoSubstr }}
+              </text>
             </view>
           </view>
         </scroll-view>
-        <button class="sureco" :disabled="disabled" :loading="disabled" @click="handleWithdraw">确认提现</button>
+        <button
+          class="sureco"
+          :disabled="disabled"
+          :loading="disabled"
+          @click="handleWithdraw"
+        >
+          确认提现
+        </button>
       </view>
     </pop>
 
     <!-- 弹框 提现至-->
-    <pop ref="popB" direction="below" :is_close="true" :is_mask="true" :width="100" height="fit-content" :maskFun="true" @watchOpen="watchOpen" @watchClose="watchClose">
+    <pop
+      ref="popB"
+      direction="below"
+      :is_close="true"
+      :is_mask="true"
+      :width="100"
+      height="fit-content"
+      :maskFun="true"
+      @watchOpen="watchOpen"
+      @watchClose="watchClose"
+    >
       <view class="tcwarp">
         <view class="tctitle">请选择</view>
         <scroll-view scroll-y="true" class="radiowp">
@@ -63,7 +113,11 @@
                 <image :src="item.logo" mode="widthFix"></image>
                 <text>{{ item.bankName }}{{ item.cardNo | cardNoSubstr }}</text>
               </view>
-              <radio :value="item.id" :checked="bankId === item.id" color="#33b048" />
+              <radio
+                :value="item.id"
+                :checked="bankId === item.id"
+                color="#33b048"
+              />
             </label>
           </radio-group>
         </scroll-view>
@@ -76,7 +130,11 @@
 
 <script>
 import { throttle } from '@/common/util.js';
-import { findMemberBanks, withdrawalMember, findMemberByWallet } from '@/api/member.js';
+import {
+  findMemberBanks,
+  withdrawalMember,
+  findMemberByWallet
+} from '@/api/member.js';
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 
 export default {
@@ -229,7 +287,7 @@ export default {
             }, 1000);
             return;
           }
-          this.$tip.toast(message)
+          this.$tip.toast(message);
         })
         .finally(() => {
           this.disabled = false;

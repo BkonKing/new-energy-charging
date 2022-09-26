@@ -3,7 +3,7 @@
     <view class="txdA">
       <view>提现</view>
       <view class="wanum">
-        -{{ dataInfo.realAmount }}
+        -{{ dataInfo.amount || 0 }}
         <text>元</text>
       </view>
     </view>
@@ -13,18 +13,29 @@
         <text>提现</text>
       </view>
       <view class="txditem">
-        <text>时间</text>
-        <text>{{ dataInfo.payTime }}</text>
+        <text>申请时间</text>
+        <text>{{ dataInfo.createTime }}</text>
       </view>
       <view class="txditem">
-        <text>余额</text>
-        <text>￥{{ dataInfo.afterAmount }}</text>
+        <text>钱包余额</text>
+        <text>￥{{ dataInfo.afterAmount || 0 }}</text>
       </view>
       <view class="txditem">
-        <text>状态</text>
-        <text>{{ payStatusText }}</text>
+        <text>提现状态</text>
+        <text>{{ dataInfo.refundStatus | refundStatusText }}</text>
       </view>
-      <view class="txdms">
+      <view class="txditem">
+        <text>提现渠道</text>
+        <text>{{ withdrawChannelText }}</text>
+      </view>
+      <view
+        v-if="
+          dataInfo.withdrawChannel === 4 &&
+            dataInfo.records &&
+            dataInfo.records.length
+        "
+        class="txdms"
+      >
         <view class="w-20">明细</view>
         <view class="w-80">
           <view
@@ -33,65 +44,93 @@
             class="txmin disflex"
           >
             <view>
-              <view>{{item.payChannel | payChannelText}}</view>
-              <view class="gray">{{item.payTime}}</view>
+              <view>{{ item.payChannel | payChannelText }}</view>
+              <view class="gray">{{ item.createTime }}</view>
             </view>
-            <view>￥{{item.realAmount}}</view>
+            <view>
+              <view class="text-right">￥{{ item.realAmount }}</view>
+              <view class="gray">{{ item.refundStatus | refundStatusText }}</view>
+            </view>
           </view>
         </view>
+      </view>
+      <template v-if="dataInfo.withdrawChannel === 1">
+        <view class="txditem">
+          <text>账户名称</text>
+          <text>{{ dataInfo.accountName }}</text>
+        </view>
+        <view class="txditem">
+          <text>账户号码</text>
+          <text>{{ dataInfo.accountNumber }}</text>
+        </view>
+      </template>
+      <view v-if="dataInfo.payTime" class="txditem">
+        <text>到账时间</text>
+        <text>{{ dataInfo.payTime }}</text>
       </view>
     </view>
   </view>
 </template>
 
 <script>
-import { findMemberExtractCash } from '@/api/member.js'
+import { findMemberExtractCash } from '@/api/member.js';
 
-const payStatusText = {
-  0: '提现中',
+const refundStatusDect = {
+  0: '提现失败',
   1: '提现成功',
   2: '提现中',
-  3: '已取消',
-}
+  3: '到账中',
+  4: '部分成功'
+};
 
 const payChannelText = {
   1: '钱包',
   2: '微信',
   3: '支付宝',
-  5: '云闪付',
-}
+  5: '云闪付'
+};
+
+const withdrawChannelDect = {
+  1: '银行卡',
+  2: '微信钱包',
+  3: '支付宝',
+  4: '原路返回'
+};
 
 export default {
-	data() {
-		return {
+  data() {
+    return {
       id: '',
       dataInfo: {
         records: []
       }
     };
-	},
-  components: {
-    payStatusText() {
-      const status = this.dataInfo.payStatus
-      return payStatusText[status] || '';
+  },
+  computed: {
+    withdrawChannelText() {
+      const status = this.dataInfo.withdrawChannel;
+      return withdrawChannelDect[status] || '';
     }
   },
   filters: {
+    refundStatusText(value) {
+      return refundStatusDect[value] || '';
+    },
     payChannelText(value) {
       return payChannelText[value];
     }
   },
-	onLoad({id}) {
-    this.id = id
-    this.findMemberExtractCash()
+  onLoad({ id }) {
+    this.id = id;
+    this.findMemberExtractCash();
   },
-	methods: {
+  methods: {
     findMemberExtractCash() {
       findMemberExtractCash({
-        id: this.id
-      }).then(({result}) => {
-        this.dataInfo = result || {}
-      })
+        extractId: this.id
+      }).then(({ result }) => {
+        this.dataInfo = result || {};
+      });
     }
   }
 };
@@ -144,7 +183,8 @@ export default {
     justify-content: flex-start;
     margin-bottom: 40rpx;
     text:nth-child(1) {
-      width: 20%;
+      width: 120rpx;
+      margin-right: 32rpx;
     }
     text:nth-child(2) {
       color: #888;

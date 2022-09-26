@@ -21,7 +21,7 @@
           </view>
           <view class="bcrpice">
             ￥
-            <text>{{ item.real_amount }}</text>
+            <text>{{ item.totalAmount }}</text>
           </view>
         </view>
       </label>

@@ -2,10 +2,10 @@
   <view class="container">
     <view class="txdA">
       <!-- 类型为：充值、退款、提现退回 -->
-      <block v-if="kindshow">
-        <view>充值</view>
+      <block v-if="isAdd">
+        <view>{{ payTypeText }}</view>
         <view class="wanum colorb">
-          +10.70
+          +{{ dataInfo.amount || 0 }}
           <text>元</text>
         </view>
       </block>
@@ -13,76 +13,157 @@
       <block v-else>
         <view>消费</view>
         <view class="wanum">
-          -10.70
+          -{{ dataInfo.amount || 0 }}
           <text>元</text>
         </view>
       </block>
     </view>
     <view class="txdB">
       <view class="txditem">
-        <text>订单号</text>
-        <text>CZ123456789101112</text>
+        <text class="order-label">订单号</text>
+        <view class="d-flex flex-fill" @click="setClipboardData">
+          <view class="text-truncate flex-fill width-0">{{ dataInfo.platformOrderNo || '' }}</view>
+          <view class="clipboard-text">复制</view>
+        </view>
       </view>
       <view class="txditem">
         <text>交易金额</text>
-        <text>￥10.7</text>
+        <text>￥{{ dataInfo.amount || 0 }}</text>
       </view>
-      <view class="txditem">
+      <!-- <view v-if="dataInfo.discountAmount" class="txditem">
         <text>优惠金额</text>
-        <text class="colora">-￥1.0</text>
-      </view>
-      <view class="txditem">
+        <text class="colora">-￥{{dataInfo.discountAmount}}</text>
+      </view> -->
+      <!-- <view class="txditem">
         <text>实际交易金额</text>
-        <text>￥9.7</text>
-      </view>
+        <text>￥{{dataInfo.realAmount || 0}}</text>
+      </view> -->
       <view class="txditem">
         <text>交易后余额</text>
-        <text class="colorb">￥51.7</text>
+        <text class="colorb">￥{{ dataInfo.afterAmount || 0 }}</text>
       </view>
       <view class="txditem">
         <text>支付通道</text>
-        <text>微信</text>
+        <text>{{ payChannelText }}</text>
       </view>
       <view class="txditem">
         <text>支付状态</text>
-        <text>已支付</text>
+        <text>{{ payStatusText }}</text>
       </view>
       <view class="txditem">
         <text>支付时间</text>
-        <text>2022.06.16 14:40</text>
+        <text>{{ dataInfo.payTime || '--' }}</text>
       </view>
     </view>
     <!-- 状态为待支付时显示 -->
-    <view class="paywarp"><button class="surepay" :disabled="disabled" :loading="disabled" @click="handleClose">去支付</button></view>
+    <view v-if="dataInfo.payType == 1 && dataInfo.payStatus == 2" class="paywarp">
+      <button
+        class="surepay"
+        :disabled="disabled"
+        :loading="disabled"
+        @click="handleClose"
+      >
+        去支付
+      </button>
+    </view>
     <view class="clearha"></view>
   </view>
 </template>
 
 <script>
-import { closeMemberOrder } from '@/api/member.js';
+import { findMemberExtractCash, afreshRechargeMember } from '@/api/member.js';
 import { throttle } from '@/common/util.js';
+
+const payChannelText = {
+  1: '钱包',
+  2: '微信',
+  3: '支付宝',
+  5: '云闪付'
+};
+
+const payStatusDect = {
+  0: '已取消',
+  1: '已支付',
+  2: '待支付',
+  3: '执行中'
+};
+
+const payTypeDect = {
+  1: '充值',
+  2: '提现',
+  3: '消费',
+  4: '退款',
+  5: '提现退回'
+};
+
 export default {
   data() {
     return {
-      //种类
-      kindshow: true,
-      handleClose: throttle(this.closeMemberOrder)
+      id: '',
+      dataInfo: {},
+      handleClose: throttle(this.handlePay)
     };
   },
-  onLoad() {},
+  computed: {
+    payChannelText() {
+      const status = this.dataInfo.payChannel;
+      return payChannelText[status];
+    },
+    payStatusText() {
+      const status = this.dataInfo.payStatus;
+      return payStatusDect[status];
+    },
+    payTypeText() {
+      const status = this.dataInfo.payType;
+      return payTypeDect[status];
+    },
+    isAdd() {
+      return [1, 4, 5].includes(this.dataInfo.payType);
+    }
+  },
+  onLoad({ id }) {
+    this.id = id;
+    this.findMemberExtractCash();
+  },
   methods: {
-    closeMemberOrder() {
+    findMemberExtractCash() {
+      findMemberExtractCash({
+        extractId: this.id
+      }).then(({ result }) => {
+        this.dataInfo = result || {};
+      });
+    },
+    setClipboardData() {
+      uni.setClipboardData({
+        data: this.dataInfo.platformOrderNo
+      });
+    },
+    handlePay() {
       this.disabled = true;
-      closeMemberOrder({
-        orderId: this.orderId
+      afreshRechargeMember({
+        platformOrderNo: this.dataInfo.platformOrderNo
       })
         .then(({ result }) => {
-          this.$tip.success('支付成功');
-          this.findChargeOrder();
+          this.requestPayment(result);
         })
         .finally(() => {
           this.disabled = false;
         });
+    },
+    requestPayment(params) {
+      let provider = 'wxpay';
+      // #ifdef MP-ALIPAY
+      provider = 'alipay';
+      // #endif
+      uni.requestPayment({
+        provider,
+        ...params,
+        success: res => {
+          this.$tip.success('支付成功');
+          this.findMemberExtractCash();
+        },
+        fail(e) {}
+      });
     }
   }
 };
@@ -167,5 +248,18 @@ export default {
     border-radius: 100rpx;
     margin: 0rpx auto;
   }
+}
+.order-label {
+  width: 170rpx;
+  flex-shrink: 0;
+}
+.clipboard-text {
+  margin-left: 20rpx;
+  width: 60rpx;
+  font-size: 28rpx;
+  color: #33b048;
+}
+.width-0 {
+  width: 0;
 }
 </style>

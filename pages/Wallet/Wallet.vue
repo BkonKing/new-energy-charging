@@ -45,29 +45,25 @@
           <text style="color: #33b048;">{{ chooseDate }} ▼</text>
         </view>
       </view>
-      <!-- 明细 -->
+      <!-- 明细 列表 -->
       <view class="wallB">
         <view v-for="item in billList" :key="item.id">
-          <view
-            class="wblist"
-            :class="{ wtxbg: item.payType === 2 }"
-            @click="goTxdetail(item)"
-          >
+          <view class="wblist wtxbg" @click="goTxdetail(item)">
             <view class="w-60">
               <view class="wbtou">
                 {{ item.payType | payTypeText }}
-                <text
-                  v-if="item.payType === 2 && item.payStatus === 1"
-                  class="wbtxzt"
-                >
-                  提现成功
+                <text v-if="item.payType === 1" class="wbtxzt">
+                  {{ item.payStatus | payStatusText }}
+                </text>
+                <text v-if="item.payType === 2" class="wbtxzt">
+                  {{ item.refundStatus | refundStatusText }}
                 </text>
               </view>
-              <view>{{ item.payTime || '--' }}</view>
+              <view>{{ item.createTime || '--' }}</view>
             </view>
             <view>
               <view class="wbmon">
-                <text>{{ [1, 4].includes(item.payType) ? '+' : '-' }}</text>
+                <text>{{ [1, 4, 5].includes(item.payType) ? '+' : '-' }}</text>
                 <text>{{ item.amount || 0 }}</text>
                 <text class="wbtsm">元</text>
               </view>
@@ -107,7 +103,23 @@ const payTypeText = {
   1: '充值',
   2: '提现',
   3: '消费',
-  4: '退款'
+  4: '退款',
+  5: '提现退回'
+};
+
+const payStatusDect = {
+  0: '已取消',
+  1: '已支付',
+  2: '待支付',
+  3: '执行中'
+};
+
+const refundStatusDect = {
+  0: '提现失败',
+  1: '提现成功',
+  2: '提现中',
+  3: '到账中',
+  4: '部分成功'
 };
 
 export default {
@@ -134,7 +146,13 @@ export default {
   },
   filters: {
     payTypeText(value) {
-      return payTypeText[value];
+      return payTypeText[value] || '';
+    },
+    refundStatusText(value) {
+      return refundStatusDect[value] || '';
+    },
+    payStatusText(value) {
+      return payStatusDect[value] || '';
     }
   },
   onShow() {
@@ -165,7 +183,7 @@ export default {
     },
     //提现明细
     goTxdetail(data) {
-      if (data.payType === '2') {
+      if (data.payType === 2) {
         uni.navigateTo({
           url: `/pages/Wallet/Txdetail?id=${data.id}`
         });

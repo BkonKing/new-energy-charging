@@ -146,7 +146,7 @@
 import { findChargeOrder, closeMemberOrder } from '@/api/member.js';
 import { throttle, secondToTime } from '@/common/util.js';
 const payStatusDict = {
-  0: '已关闭',
+  0: '已取消',
   1: '已支付',
   2: '待支付',
   3: '执行中'

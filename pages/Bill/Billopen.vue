@@ -64,7 +64,7 @@
             <text v-if="isSpecialInvoice" class="required-text">*</text>
           </text>
           <input
-            v-model="vatTelphone"
+            v-model="invoiceTelphone"
             type="number"
             placeholder="输入电话号码"
           />
@@ -74,14 +74,14 @@
             单位地址
             <text v-if="isSpecialInvoice" class="required-text">*</text>
           </text>
-          <input v-model="vatCompanyAddress" placeholder="输入单位地址" />
+          <input v-model="invoiceAddress" placeholder="输入单位地址" />
         </view>
         <view class="boitem">
           <text>
             开户银行
             <text v-if="isSpecialInvoice" class="required-text">*</text>
           </text>
-          <input v-model="vatBankName" placeholder="输入开户银行" />
+          <input v-model="invoiceBankName" placeholder="输入开户银行" />
         </view>
         <view class="boitem">
           <text>
@@ -89,7 +89,7 @@
             <text v-if="isSpecialInvoice" class="required-text">*</text>
           </text>
           <input
-            v-model="vatBankAccount"
+            v-model="invoiceBankAccount"
             type="number"
             placeholder="输入银行账号"
           />
@@ -104,7 +104,10 @@
       <view class="botitle">接收方式</view>
       <view class="pd24">
         <view class="boitem">
-          <text>电子邮件</text>
+          <text>
+            电子邮件
+            <text v-if="invoiceCategory === 2" class="required-text">*</text>
+          </text>
           <input v-model="email" placeholder="输入电子邮件" />
         </view>
       </view>
@@ -151,10 +154,10 @@ export default {
       invoiceType: '0',
       invoiceTitle: '',
       invoiceTaxNo: '',
-      vatTelphone: '',
-      vatCompanyAddress: '',
-      vatBankName: '',
-      vatBankAccount: '',
+      invoiceTelphone: '',
+      invoiceAddress: '',
+      invoiceBankName: '',
+      invoiceBankAccount: '',
       invoiceRemark: '',
       email: '',
       disabled: false,
@@ -201,19 +204,24 @@ export default {
         });
       }
       if (this.isSpecialInvoice) {
-        validates.push({
-          value: this.vatTelphone,
-          message: '请输入电话号码'
-        },{
-          value: this.vatCompanyAddress,
-          message: '请输入单位地址'
-        },{
-          value: this.vatBankName,
-          message: '请输入开户银行'
-        },{
-          value: this.vatBankAccount,
-          message: '请输入银行账号'
-        });
+        validates.push(
+          {
+            value: this.invoiceTelphone,
+            message: '请输入电话号码'
+          },
+          {
+            value: this.invoiceAddress,
+            message: '请输入单位地址'
+          },
+          {
+            value: this.invoiceBankName,
+            message: '请输入开户银行'
+          },
+          {
+            value: this.invoiceBankAccount,
+            message: '请输入银行账号'
+          }
+        );
       } else {
         validates.push({
           value: this.email,
@@ -238,10 +246,10 @@ export default {
       if (this.isEnterpriseType) {
         Object.assign(params, {
           invoiceTaxNo: this.invoiceTaxNo,
-          vatTelphone: this.vatTelphone,
-          vatCompanyAddress: this.vatCompanyAddress,
-          vatBankName: this.vatBankName,
-          vatBankAccount: this.vatBankAccount,
+          invoiceTelphone: this.invoiceTelphone,
+          invoiceAddress: this.invoiceAddress,
+          invoiceBankName: this.invoiceBankName,
+          invoiceBankAccount: this.invoiceBankAccount,
           invoiceRemark: this.invoiceRemark
         });
       }

@@ -177,3 +177,8 @@ export function findMemberInvoiceForOrdersRel(params) {
 export function saveMemberInvoice(params) {
   return http.post('/member/saveMemberInvoice', params)
 }
+
+// 订单详情 - 重新支付
+export function afreshRechargeMember(params) {
+  return http.post('/member/wechat/afreshRechargeMember', params)
+}
