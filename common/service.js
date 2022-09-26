@@ -84,7 +84,7 @@ http.interceptors.response.use((response) => {
     store.commit('SET_TOKEN', '')
     store.commit('SET_USERINFO', '')
     uni.navigateTo({
-      url: '/pages/login/login'
+      url: '/pages/Login/Login'
     })
     return Promise.reject(response)
   }
@@ -122,12 +122,12 @@ http.interceptors.response.use((response) => {
             //     }
             //   });
             //   uni.redirectTo({
-            //     url: '/pages/login/login'
+            //     url: '/pages/Login/Login'
             //   });
             // })
             // store.dispatch('Logout').then(() => {
             // 	uni.redirectTo({
-            // 	    url: '/pages/login/login'
+            // 	    url: '/pages/Login/Login'
             // 	});
             // }) 
           }, 1000)

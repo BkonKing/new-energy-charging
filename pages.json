@@ -40,7 +40,7 @@
       }
     },
     {
-      "path": "pages/login/login",
+      "path": "pages/Login/Login",
       "style": {
         "navigationBarTitleText": "登录"
       }
@@ -372,7 +372,7 @@
       "query": ""
     }, {
       "name": "登录",
-      "path": "pages/login/login",
+      "path": "pages/Login/Login",
       "query": ""
     }, {
       "name": "故障维修",

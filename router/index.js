@@ -24,7 +24,7 @@ router.beforeEach((to, from, next) => {
         title: '请前往登录'
       })
       next({
-        path: '/pages/login/login'
+        path: '/pages/Login/Login'
       })
     }
   }

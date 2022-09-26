@@ -120,7 +120,7 @@ export default {
     // 前往登录
     login() {
       uni.navigateTo({
-        url: '/pages/login/login'
+        url: '/pages/Login/Login'
       });
     },
     handleLogout() {

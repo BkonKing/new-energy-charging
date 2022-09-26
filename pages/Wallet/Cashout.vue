@@ -30,7 +30,7 @@
       <view>温馨提示</view>
       <view>1、存在未结束订单时无法进行提现操作。</view>
       <view>2、充值金额涉及充值优惠，退款时扣除相应的优惠金额。</view>
-      <view>3、6个月订单原路退回。</view>
+      <view>3、6个月订单原路退回，超过6个月的订单则提现到银行卡。</view>
       <view>4、提现到银行卡限制一天只能提现一次。</view>
       <view>5、付款至银行卡到账时间 为1-3日内，具体以银行到账时间为准。</view>
     </view>
@@ -43,7 +43,6 @@
       :width="100"
       height="fit-content"
       :maskFun="true"
-      @watchOpen="watchOpen"
       @watchClose="watchClose"
     >
       <view class="tcwarp">
@@ -101,8 +100,6 @@
       :width="100"
       height="fit-content"
       :maskFun="true"
-      @watchOpen="watchOpen"
-      @watchClose="watchClose"
     >
       <view class="tcwarp">
         <view class="tctitle">请选择</view>
@@ -495,7 +492,7 @@ export default {
   }
   .radiowp {
     width: 92%;
-    // min-height: 320rpx;
+    min-height: 350rpx;
     max-height: 50vh;
     // overflow-y: scroll;
     margin: 0 auto;

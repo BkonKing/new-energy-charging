@@ -8,7 +8,7 @@ export const WHITELIST = [
   '/pages/tabbar/sitelist',
   '/pages/tabbar/wait',
   '/pages/tabbar/mine',
-  '/pages/login/login',
+  '/pages/Login/Login',
   '/pages/Other/AgreeYs',
   '/pages/Other/AgreeUse',
 ]
@@ -138,4 +138,3 @@ export const payTypeDict = {
 }
 
 
-// import { InvoiceTypeDict } from '@/common/constants.js'

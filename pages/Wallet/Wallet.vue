@@ -52,10 +52,17 @@
             <view class="w-60">
               <view class="wbtou">
                 {{ item.payType | payTypeText }}
-                <text v-if="item.payType === 1" class="wbtxzt">
+                <!-- 状态样式：success、fail、process -->
+                <text
+                  v-if="item.payType === 1"
+                  :class="payStatusClassName[item.payStatus]"
+                >
                   {{ item.payStatus | payStatusText }}
                 </text>
-                <text v-if="item.payType === 2" class="wbtxzt">
+                <text
+                  v-if="item.payType === 2"
+                  :class="refundStatusClassName[item.refundStatus]"
+                >
                   {{ item.refundStatus | refundStatusText }}
                 </text>
               </view>
@@ -82,7 +89,7 @@
       </template>
     </z-paging>
     <rangeDatePick
-      start="2021-01-01"
+      start="2022-01-01"
       end="2200-12-01"
       themeColor="#33b048"
       fields="day"
@@ -123,7 +130,20 @@ export default {
         startDate: '',
         endDate: ''
       },
-      billList: []
+      billList: [],
+      payStatusClassName: {
+        0: 'fail',
+        1: 'success',
+        2: 'process',
+        3: 'process'
+      },
+      refundStatusClassName: {
+        0: 'fail',
+        1: 'success',
+        2: 'process',
+        3: 'process',
+        4: 'success'
+      }
     };
   },
   filters: {
@@ -340,7 +360,25 @@ export default {
       font-weight: 550;
       color: #555;
       margin-bottom: 10rpx;
-      .wbtxzt {
+      .success {
+        margin-left: 16rpx;
+        font-weight: normal;
+        background: #e5f9e8;
+        color: #68ba3f;
+        font-size: 22rpx;
+        padding: 8rpx 10rpx;
+        border-radius: 10rpx;
+      }
+      .fail {
+        margin-left: 16rpx;
+        font-weight: normal;
+        background: #ededed;
+        color: #999;
+        font-size: 22rpx;
+        padding: 8rpx 10rpx;
+        border-radius: 10rpx;
+      }
+      .process {
         margin-left: 16rpx;
         font-weight: normal;
         background: #ffe8e8;
