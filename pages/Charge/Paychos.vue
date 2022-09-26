@@ -180,13 +180,7 @@
 import { findConnectorByNum } from '@/api/site.js';
 import { findMemberByWallet, startCharge } from '@/api/member.js';
 import { throttle } from '@/common/util.js';
-
-const operateTypeDict = {
-  1: '直营',
-  2: '联营',
-  3: '互联互通',
-  4: '他营'
-};
+import { operateTypeDict } from '@/common/constants.js'
 
 export default {
   data() {

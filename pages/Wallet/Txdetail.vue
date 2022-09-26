@@ -49,7 +49,9 @@
             </view>
             <view>
               <view class="text-right">￥{{ item.realAmount }}</view>
-              <view class="gray">{{ item.refundStatus | refundStatusText }}</view>
+              <view class="gray">
+                {{ item.refundStatus | refundStatusText }}
+              </view>
             </view>
           </view>
         </view>
@@ -74,28 +76,11 @@
 
 <script>
 import { findMemberExtractCash } from '@/api/member.js';
-
-const refundStatusDect = {
-  0: '提现失败',
-  1: '提现成功',
-  2: '提现中',
-  3: '到账中',
-  4: '部分成功'
-};
-
-const payChannelText = {
-  1: '钱包',
-  2: '微信',
-  3: '支付宝',
-  5: '云闪付'
-};
-
-const withdrawChannelDect = {
-  1: '银行卡',
-  2: '微信钱包',
-  3: '支付宝',
-  4: '原路返回'
-};
+import {
+  refundStatusDict,
+  payChannelDict,
+  withdrawChannelDict
+} from '@/common/constants.js';
 
 export default {
   data() {
@@ -109,15 +94,15 @@ export default {
   computed: {
     withdrawChannelText() {
       const status = this.dataInfo.withdrawChannel;
-      return withdrawChannelDect[status] || '';
+      return withdrawChannelDict[status] || '';
     }
   },
   filters: {
     refundStatusText(value) {
-      return refundStatusDect[value] || '';
+      return refundStatusDict[value] || '';
     },
     payChannelText(value) {
-      return payChannelText[value];
+      return payChannelDict[value];
     }
   },
   onLoad({ id }) {

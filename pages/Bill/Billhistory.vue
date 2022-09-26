@@ -22,12 +22,7 @@
 
 <script>
 import { findMemberHisInvoice } from '@/api/member.js';
-
-const statusObj = {
-  1: '已开票',
-  0: '开票失败',
-  2: '开票中',
-}
+import { InvoiceStatusDict } from '@/common/constants.js'
 
 export default {
   data() {
@@ -37,7 +32,7 @@ export default {
   },
   filters: {
     statusText(value) {
-      return statusObj[value];
+      return InvoiceStatusDict[value];
     }
   },
   created() {},

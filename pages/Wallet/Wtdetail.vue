@@ -22,7 +22,9 @@
       <view class="txditem">
         <text class="order-label">订单号</text>
         <view class="d-flex flex-fill" @click="setClipboardData">
-          <view class="text-truncate flex-fill width-0">{{ dataInfo.platformOrderNo || '' }}</view>
+          <view class="text-truncate flex-fill width-0">
+            {{ dataInfo.platformOrderNo || '' }}
+          </view>
           <view class="clipboard-text">复制</view>
         </view>
       </view>
@@ -56,7 +58,10 @@
       </view>
     </view>
     <!-- 状态为待支付时显示 -->
-    <view v-if="dataInfo.payType == 1 && dataInfo.payStatus == 2" class="paywarp">
+    <view
+      v-if="dataInfo.payType == 1 && dataInfo.payStatus == 2"
+      class="paywarp"
+    >
       <button
         class="surepay"
         :disabled="disabled"
@@ -73,28 +78,11 @@
 <script>
 import { findMemberExtractCash, afreshRechargeMember } from '@/api/member.js';
 import { throttle } from '@/common/util.js';
-
-const payChannelText = {
-  1: '钱包',
-  2: '微信',
-  3: '支付宝',
-  5: '云闪付'
-};
-
-const payStatusDect = {
-  0: '已取消',
-  1: '已支付',
-  2: '待支付',
-  3: '执行中'
-};
-
-const payTypeDect = {
-  1: '充值',
-  2: '提现',
-  3: '消费',
-  4: '退款',
-  5: '提现退回'
-};
+import {
+  payChannelDict,
+  payStatusDict,
+  payTypeDict
+} from '@/common/constants.js';
 
 export default {
   data() {
@@ -107,15 +95,15 @@ export default {
   computed: {
     payChannelText() {
       const status = this.dataInfo.payChannel;
-      return payChannelText[status];
+      return payChannelDict[status];
     },
     payStatusText() {
       const status = this.dataInfo.payStatus;
-      return payStatusDect[status];
+      return payStatusDict[status];
     },
     payTypeText() {
       const status = this.dataInfo.payType;
-      return payTypeDect[status];
+      return payTypeDict[status];
     },
     isAdd() {
       return [1, 4, 5].includes(this.dataInfo.payType);

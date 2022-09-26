@@ -52,12 +52,8 @@
 </template>
 
 <script>
-const payStatusDict = {
-  0: '已取消',
-  1: '已支付',
-  2: '待支付',
-  3: '执行中'
-};
+import { payStatusDict } from '@/common/constants.js'
+
 export default {
   name: 'OrderItem',
   props: {

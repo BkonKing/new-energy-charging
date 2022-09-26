@@ -97,6 +97,7 @@
 
 <script>
 import { findConnectorBySiteId } from '@/api/site.js';
+import { equipmentTypeDict, connectorStatusDict } from '@/common/constants.js'
 import cCircle from '@/components/cCircle/cCircle.vue'; //进度环
 import zModal from '@/components/z-modal/z-modal.vue'; //modal弹框
 
@@ -120,17 +121,8 @@ const equipmentAction = {
   fast: 1,
   slow: 2
 };
-const equipmentType = {
-  1: '直流快充',
-  2: '交流慢充'
-};
-const connectorStatus = {
-  0: '空闲',
-  1: '已插枪',
-  2: '充电中',
-  3: '充电结束',
-  4: '故障'
-};
+
+
 export default {
   components: {
     cCircle,
@@ -186,10 +178,10 @@ export default {
   },
   filters: {
     electricityType(key) {
-      return equipmentType[key];
+      return equipmentTypeDict[key];
     },
     connectorStatusText(key) {
-      return connectorStatus[key];
+      return connectorStatusDict[key];
     },
     defaultValue(value, unit) {
       if (value || value === 0) {

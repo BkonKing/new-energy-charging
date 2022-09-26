@@ -36,13 +36,7 @@
 
 <script>
 import { findMemberOrderByNextInvoice } from '@/api/member.js';
-
-const InvoiceTypes = {
-  0: '增值税普通发票',
-  1: '增值税专用发票',
-  2: '增值税电子普通发票',
-  3: '所有'
-};
+import { InvoiceTypeDict } from '@/common/constants.js';
 
 export default {
   data() {
@@ -56,7 +50,7 @@ export default {
   components: {},
   filters: {
     invoiceType(value) {
-      return InvoiceTypes[value] || '--';
+      return InvoiceTypeDict[value] || '--';
     }
   },
   onLoad({ id }) {
@@ -84,7 +78,7 @@ export default {
         return;
       }
       const {
-        real_amount: amount,
+        totalAmount: amount,
         orderIds: id,
         hasInvoiceCategory
       } = this.checkData;

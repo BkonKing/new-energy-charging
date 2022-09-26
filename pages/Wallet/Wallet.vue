@@ -97,30 +97,12 @@
 
 <script>
 import { findMemberByWallet, findMemberBalance } from '@/api/member.js';
+import {
+  payTypeDict,
+  payStatusDict,
+  refundStatusDict
+} from '@/common/constants.js';
 import rangeDatePick from '@/components/pyh-rdtpicker/pyh-rdtpicker.vue'; //日期选择
-
-const payTypeText = {
-  1: '充值',
-  2: '提现',
-  3: '消费',
-  4: '退款',
-  5: '提现退回'
-};
-
-const payStatusDect = {
-  0: '已取消',
-  1: '已支付',
-  2: '待支付',
-  3: '执行中'
-};
-
-const refundStatusDect = {
-  0: '提现失败',
-  1: '提现成功',
-  2: '提现中',
-  3: '到账中',
-  4: '部分成功'
-};
 
 export default {
   components: {
@@ -146,13 +128,13 @@ export default {
   },
   filters: {
     payTypeText(value) {
-      return payTypeText[value] || '';
+      return payTypeDict[value] || '';
     },
     refundStatusText(value) {
-      return refundStatusDect[value] || '';
+      return refundStatusDict[value] || '';
     },
     payStatusText(value) {
-      return payStatusDect[value] || '';
+      return payStatusDict[value] || '';
     }
   },
   onShow() {

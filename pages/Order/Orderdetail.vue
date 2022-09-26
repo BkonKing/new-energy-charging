@@ -145,38 +145,8 @@
 <script>
 import { findChargeOrder, closeMemberOrder } from '@/api/member.js';
 import { throttle, secondToTime } from '@/common/util.js';
-const payStatusDict = {
-  0: '已取消',
-  1: '已支付',
-  2: '待支付',
-  3: '执行中'
-};
-const stopReasonObj = {
-  0: '充满停止充电',
-  1: 'APP远程停止充电',
-  2: '余额不足停止充电',
-  3: '触控屏手动停止充电',
-  4: '手动刷卡停止充电',
-  5: 'APP账号停止充电',
-  6: '连接器断开停止充电',
-  7: '充电过程中拔枪停止充电',
-  8: '后台停止充电',
+import { payStatusDict, stopReasonDict } from '@/common/constants.js'
 
-  9: '满足设定时间停止充电',
-  10: '满足设定电量停止充电',
-  11: '满足设定金额停止充电',
-  12: '满足设定SOC停止充电',
-  13: '无有效电流停止充电',
-  14: '充电桩达到终止条件停止',
-  15: 'BMS 停止充电',
-
-  16: 'BMS异常停止充电',
-  17: '设备故障停止充电',
-  18: '电源故障停止充电',
-  19: '车辆故障停止充电',
-
-  20: '急停按钮已被按下'
-};
 export default {
   data() {
     return {
@@ -197,7 +167,7 @@ export default {
   },
   filters: {
     stopReasonText(value) {
-      return stopReasonObj[value] || '--';
+      return stopReasonDict[value] || '--';
     }
   },
   onLoad({ orderId }) {

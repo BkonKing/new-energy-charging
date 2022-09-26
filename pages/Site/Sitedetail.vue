@@ -218,11 +218,11 @@ export default {
       return '';
     },
     powerUpperLimits() {
-      const {powerUpperLimits} = this.siteData
+      const { powerUpperLimits } = this.siteData;
       if (powerUpperLimits || powerUpperLimits === 0) {
-        return `${powerUpperLimits}KW`
+        return `${powerUpperLimits}KW`;
       }
-      return '--'
+      return '--';
     },
     businessTime() {
       if (this.siteData.businessTime) {
@@ -233,7 +233,7 @@ export default {
     currentPostageIndex() {
       const { startTime, endTime } = this.siteData;
       return this.postageList.findIndex(obj => {
-        return startTime === obj.startTime && endTime === obj.endTime
+        return startTime === obj.startTime && endTime === obj.endTime;
       });
     },
     // 这样计算会有问题，中间如果缺了一个时间段(找不到当前时间段)，则下一个时间段永远是第一个，实际应该要重新遍历

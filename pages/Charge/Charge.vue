@@ -239,15 +239,9 @@ import {
   findOrderByMemberId
 } from '@/api/member.js';
 import { throttle } from '@/common/util.js';
+import { chargeStatusDict } from '@/common/constants.js'
 import pop from '@/components/ming-pop/ming-pop.vue'; //弹框
 import bestGauge from '@/components/best-gauge/best-gauge.vue'; //环形传感器
-
-const chargeStatusDict = {
-  '-1': '充电失败',
-  0: '充电中',
-  1: '充电结束',
-  2: '等待充电'
-};
 
 export default {
   components: { pop, bestGauge },

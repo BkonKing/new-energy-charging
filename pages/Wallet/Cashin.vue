@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <view class="cinA">
-      <view class="danyu">当前余额：￥{{balances}} 元</view>
+      <view class="danyu">当前余额：￥{{ balances }} 元</view>
       <view class="cinitem">
         <view>
           充值金额
@@ -50,14 +50,21 @@
     </view>
     <!-- #endif -->
     <view class="paywarp">
-      <button class="surepay" :disabled="disabled" :loading="disabled" @click="handleSubmit">充值</button>
+      <button
+        class="surepay"
+        :disabled="disabled"
+        :loading="disabled"
+        @click="handleSubmit"
+      >
+        充值
+      </button>
     </view>
   </view>
 </template>
 
 <script>
 import { findMemberByWallet, rechargeMember } from '@/api/member.js';
-import { throttle } from '@/common/util.js'
+import { throttle } from '@/common/util.js';
 
 export default {
   data() {
@@ -81,13 +88,13 @@ export default {
     };
   },
   onShow() {
-    this.findMemberByWallet()
+    this.findMemberByWallet();
   },
   methods: {
     findMemberByWallet() {
-      findMemberByWallet().then(({result}) => {
-        this.balances = result.balances || 0
-      })
+      findMemberByWallet().then(({ result }) => {
+        this.balances = result.balances || 0;
+      });
     },
     // 选中充值金额
     cincheck(data, index) {
@@ -118,12 +125,14 @@ export default {
       });
     },
     rechargeMember(params) {
-      this.disabled = true
-      rechargeMember(params).then(({ result }) => {
-        this.requestPayment(result);
-      }).finally(() => {
-        this.disabled = false
-      });
+      this.disabled = true;
+      rechargeMember(params)
+        .then(({ result }) => {
+          this.requestPayment(result);
+        })
+        .finally(() => {
+          this.disabled = false;
+        });
     },
     requestPayment(params) {
       let provider = 'wxpay';
