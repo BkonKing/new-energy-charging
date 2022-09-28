@@ -1,28 +1,18 @@
 <template>
   <view class="container">
     <!-- 加载动画 -->
-    <view
-      class="loaditem"
-      @touchmove.stop.prevent="moveHandle"
-      v-show="loadshwo"
-    >
-      <view>请稍等，正在通知设备给电……</view>
-    </view>
+    <view class="loaditem" @touchmove.stop.prevent="moveHandle" v-show="loadshwo"><view>请稍等，正在通知设备给电……</view></view>
     <view class="PcoA">
       <view class="zduan">
         <view class="zdshop ellipsis" @click="goSitedetail">
-          <text class="zdkind">{{ operateTypeText }}</text>
+          <text v-if="operateTypeText" class="zdkind">{{ operateTypeText }}</text>
           <text>{{ terminalData.siteName }}</text>
         </view>
         <view class="zdcode">
-          <text>终端编号：{{ terminalData.connectorNum }}</text>
+          <text>终端编号：{{ terminalData.connectorNum || '' }}</text>
           <text class="zdcope" @click="setClipboardData">复制</text>
         </view>
-        <view class="zdtime">
-          当前时段：{{ terminalData.startTime || '00:00' }}-{{
-            terminalData.endTime || '00:00'
-          }}
-        </view>
+        <view class="zdtime">当前时段：{{ terminalData.startTime || '00:00' }}-{{ terminalData.endTime || '00:00' }}</view>
         <view class="zdprice">
           <text>{{ terminalData.fee || 0 }}</text>
           元/度
@@ -38,14 +28,7 @@
     <view class="odtitem">
       <view class="otbig">支付方式</view>
       <view class="otkind">
-        <text
-          v-for="(item, index) in paykind"
-          :key="index"
-          :class="payChannel == item.value ? 'otkindck' : ''"
-          @click="paykindcheck(item)"
-        >
-          {{ item.label }}
-        </text>
+        <text v-for="(item, index) in paykind" :key="index" :class="payChannel == item.value ? 'otkindck' : ''" @click="paykindcheck(item)">{{ item.label }}</text>
       </view>
       <!-- <view class="otli">
         <text>电站优惠</text>
@@ -80,12 +63,7 @@
               <view class="Xy_sm">微信支付分550分及以上，先充电后付款</view>
             </view>
             <view class="Xyopen" v-if="xyshow">去开通</view>
-            <image
-              class="xyget"
-              src="/static/image/ico_13.png"
-              mode="widthFix"
-              v-else
-            ></image>
+            <image class="xyget" src="/static/image/ico_13.png" mode="widthFix" v-else></image>
           </view>
         </view>
         <!-- #endif -->
@@ -98,12 +76,7 @@
               <view class="Xy_sm">芝麻信用650分及以上，先充电后付款</view>
             </view>
             <view class="Xyopen" v-if="!xyshow">去开通</view>
-            <image
-              class="xyget"
-              src="../../static/image/ico_13.png"
-              mode="widthFix"
-              v-else
-            ></image>
+            <image class="xyget" src="../../static/image/ico_13.png" mode="widthFix" v-else></image>
           </view>
         </view>
         <!-- #endif -->
@@ -127,12 +100,7 @@
       <view class="otli">
         <view>充电策略</view>
         <view class="otcl">
-          <text
-            v-for="(item, index) in chargeStrategyOptions"
-            :key="index"
-            :class="chargeStrategyValue == item.value ? 'otcl_a' : ''"
-            @click="planCdcheck(item)"
-          >
+          <text v-for="(item, index) in chargeStrategyOptions" :key="index" :class="chargeStrategyValue == item.value ? 'otcl_a' : ''" @click="planCdcheck(item)">
             {{ item.label }}
           </text>
         </view>
@@ -140,15 +108,9 @@
       <view class="otli" v-if="chargeStrategyValue == 1">
         <view>
           <view>限定金额</view>
-          <view class="ot_sm">可用余额：{{ walletData.balances }}元</view>
+          <view class="ot_sm">可用余额：{{ walletData.balances || 0 }}元</view>
         </view>
-        <view class="otxip">
-          <input
-            v-model="amount"
-            placeholder="请输入充电金额(￥)"
-            type="digit"
-          />
-        </view>
+        <view class="otxip"><input v-model="amount" placeholder="请输入充电金额(￥)" type="digit" /></view>
       </view>
     </view>
     <!-- 结算策略 -->
@@ -163,16 +125,7 @@
 			<view class="zsnote" v-if="planAscurrent == 1">充电结束24H内可自行进行支付，超过24H则会使用系统计算出最终价格进行结算</view>
 		</view> -->
     <view class="clearw"></view>
-    <view class="wfoot">
-      <button
-        class="combutton"
-        :disabled="disabled"
-        :loading="disabled"
-        @click="handleSubmit"
-      >
-        启动充电
-      </button>
-    </view>
+    <view class="wfoot"><button class="combutton" :disabled="disabled" :loading="disabled" @click="handleSubmit">启动充电</button></view>
   </view>
 </template>
 
@@ -222,14 +175,44 @@ export default {
       return operateTypeDict[this.terminalData.operateType] || '';
     }
   },
-  onLoad({ connectorNum }) {
+  onLoad({ connectorNum, q }) {
     this.connectorNum = connectorNum;
+    if (q) {
+      const params = this.getQueryParams(q)
+      params.gun && (this.connectorNum = params.gun)
+    }
   },
   onShow() {
     this.findConnectorByNum();
     this.findMemberByWallet();
   },
   methods: {
+    getQueryParams(queryString) {
+      // 微信扫码得到的内容进行了一次编码，所以官方要求需要进行decodeURIComponent一次
+      queryString = decodeURIComponent(queryString)
+      let params = {}
+      if (queryString) {
+        let queryArray = queryString.split('?')
+        if (queryArray.length > 1) {
+          //验证是否是有效二维码
+          // if (queryArray[1] !== this.$config.apiUrl) {
+          // 	return this.$tip.alert("二维码无效")
+          // }
+          let query = queryArray[1]
+          let array = query.split('&')
+          array.map((value) => {
+            let valueArray = value.split('=')
+            if (valueArray.length > 1) {
+              // 还需要对value进行解码（可能涉及到在value为中文字符，在赋值到二维码前进行encodeURI编码）
+              Object.assign(params, {
+                [valueArray[0]]: decodeURI(valueArray[1])
+              })
+            }
+          })
+        }
+      }
+      return params
+    },
     findConnectorByNum() {
       findConnectorByNum({
         connectorNum: this.connectorNum
@@ -621,8 +604,7 @@ export default {
   view {
     width: 70%;
     border-radius: 20rpx;
-    background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center
-      50rpx no-repeat;
+    background: rgba(0, 0, 0, 0.7) url('@/static/image/loading_1.gif') center 50rpx no-repeat;
     background-size: 100rpx 100rpx;
     color: #fff;
     font-size: 28rpx;
